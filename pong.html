@@ -1,0 +1,133 @@
+<html>
+<head>
+    <title>Pong (html5-games)</title>
+</head>
+
+<body>
+<canvas id="canvas" width="800" height="600"></canvas>
+<script>
+function Paddle(x, y, height = 100, width = 10, score = 0) {
+    this.x          = x;
+    this.y          = y;
+    this.height     = height;
+    this.width      = width;
+    this.score      = score
+}
+
+function Ball(x, y, diameter = 6, xSpeed = 3, ySpeed = 3) {
+    this.x          = x;
+    this.y          = y;
+    this.diameter   = diameter;
+    this.xSpeed     = xSpeed;
+    this.ySpeed     = ySpeed;
+    
+    this.move       = function(p1, p2) {
+        // Move one step
+        this.x += this.xSpeed;
+        this.y += this.ySpeed;
+
+        // Bounce from ceiling
+        if (
+            ball.y < 0 && ball.ySpeed < 0
+        ) {
+            this.ySpeed = -this.ySpeed;
+        }
+
+        // Bounce from floor
+        if (
+            ball.y > canvas.height && ball.ySpeed > 0
+        ) {
+            this.ySpeed = -this.ySpeed;
+        }
+
+        // Bounce from player 1
+        if (
+            ball.x < 0 + p1.width                   // The ball is at paddle 1's right edge
+            && ball.y > p1.y                        // The ball is below paddle 1's upper edge
+            && ball.y < p1.y + p1.height            // The ball is above paddle 1's lower edge
+        ) {
+            this.xSpeed = -this.xSpeed;
+            ball.ySpeed = (ball.y - (p1.y + p1.height / 2)) * 0.3;
+        }
+
+        // Bounce from player 2
+        if (
+            ball.x > canvas.width - p2.width        // The ball is at paddle 2's left edge
+            && ball.y > p2.y                        // The ball is below paddle 2's upper edge
+            && ball.y < p2.y + p2.height            // The ball is above paddle 2's lower edge
+        ) {
+            this.xSpeed = -this.xSpeed;
+            ball.ySpeed = (ball.y - (p2.y + p2.height / 2)) * 0.3;
+        }
+    }
+}
+
+player1 = new Paddle(0, 10);
+player2 = new Paddle(canvas.width - 10, 10);
+ball    = new Ball(50, 50);
+aiStep = 3;
+
+window.onload = function() {
+    canvas  = document.getElementById('canvas');
+    context = canvas.getContext('2d');
+    setInterval(update, 1000/60);
+    canvas.addEventListener('mousemove', function(e) {
+        player1.y = e.clientY - player1.height/2;
+    })
+}
+
+function reset() {
+    ball.x  = canvas.width/2;
+    ball.y  = canvas.height/2;
+    ball.xSpeed = -ball.xSpeed;
+    ball.ySpeed = 3;
+}
+
+function update() {
+    move();
+
+    // Player 1 missed the ball
+    if (ball.x < 0) {
+        player2.score++;
+        reset();
+    }
+
+    // Player 2 missed the ball
+    if (ball.x > canvas.width) {
+        player1.score++;
+        reset();
+    }
+
+    draw();
+}
+
+function move() {
+    ball.move(player1, player2);
+
+    // Move player 2 if the ball is outside the paddle's surface area
+    if (!(ball.y > player2.y + aiStep && ball.y < player2.y + player2.height - aiStep)) {
+        if (player2.y + player2.height/2 < ball.y) {
+            player2.y += aiStep;
+        }
+        else {
+            player2.y -= aiStep;
+        }
+    }
+}
+
+function draw() {
+    context.fillStyle = 'black';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.fillStyle = 'white';
+    context.fillRect(player1.x, player1.y, player1.width, player1.height);
+    context.fillRect(player2.x, player2.y, player2.width, player2.height);
+    context.fillRect((ball.x - ball.diameter/2), (ball.y - ball.diameter/2), ball.diameter, ball.diameter);
+    context.font="20px monospace";
+    context.fillText(player1.score, 100, 100);
+    context.fillText(player2.score, (canvas.width - 100), 100);
+}
+
+</script>
+</body>
+</html>
