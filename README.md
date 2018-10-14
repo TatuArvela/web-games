@@ -6,6 +6,6 @@ I must give credit to [this video by Gamkedo](https://www.youtube.com/watch?v=Ko
 [Click to play](https://tatuarvela.github.io/js-games/pong.html)
 
 ## Snake
-This one was also based on a [video by Gamkedo](https://www.youtube.com/watch?v=xGmXxplj6vs). Here I made a lot of changes to the scalability, appearance and structure of the game.
+This one was also based on a [video by Gamkedo](https://www.youtube.com/watch?v=xGmXxpIj6vs). Here I made a lot of changes to the scalability, appearance and structure of the game.
 
 [Click to play](https://tatuarvela.github.io/js-games/snake.html)
