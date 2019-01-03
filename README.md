@@ -1,7 +1,7 @@
 # js-games
 
 ## Pong
-I must give credit to [this video by Gamkedo](https://www.youtube.com/watch?v=KoWqdEACyLI) for the base of this little game. I did make a bunch of adjustments however, especially to speeds, paddles and the AI.
+I must give credit to [this video by Gamkedo](https://www.youtube.com/watch?v=KoWqdEACyLI) for the base of this little game. I rewrote most of the code, which also made the gameplay very boring by accident. I might fix this (again) some day.
 
 [Click to play](https://tatuarvela.github.io/js-games/pong.html)
 
