@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tic-Tac-Toe</title>
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+  <style>
+    body {
+      background-color: #a5a5ff;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      margin: auto;
+      background-color: #4242e7;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas" width="640" height="480"></canvas>
+  <script>
+    /* Graphics */
+
+    const c = document.getElementById('canvas');
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+
+    const rects = [
+      [60, 74],
+      [180, 74],
+      [300, 74],
+      [60, 194],
+      [180, 194],
+      [300, 194],
+      [60, 314],
+      [180, 314],
+      [300, 314]
+    ];
+
+    function Draw() {
+      ctx.fillStyle = "#4242e7";
+      ctx.fillRect(0, 0, c.width, c.height);
+
+      ctx.fillStyle = "#ffffff"
+      ctx.strokeStyle = "#ffffff"
+      ctx.lineWidth = 4;
+      ctx.font = "24px 'Press Start 2P'";
+
+      ctx.textAlign = "center";
+      ctx.fillText("Tic-Tac-Toe", c.width / 2, 50);
+      ctx.fillText(actionText, c.width / 2, 464);
+
+      ctx.textAlign = "left";
+      if (currentCharacter == "X")
+        ctx.fillText("P.X<", 450, 104);
+      else
+        ctx.fillText("P.X", 450, 104);
+      ctx.fillText(scoreX, 450, 144);
+
+      if (currentCharacter == "O")
+        ctx.fillText("P.O<", 450, 224);
+      else
+        ctx.fillText("P.O", 450, 224);
+      ctx.fillText(scoreO, 450, 264);
+
+      ctx.strokeRect(rects[0][0], rects[0][1], 100, 100);
+      ctx.strokeRect(rects[1][0], rects[1][1], 100, 100);
+      ctx.strokeRect(rects[2][0], rects[2][1], 100, 100);
+      ctx.strokeRect(rects[3][0], rects[3][1], 100, 100);
+      ctx.strokeRect(rects[4][0], rects[4][1], 100, 100);
+      ctx.strokeRect(rects[5][0], rects[5][1], 100, 100);
+      ctx.strokeRect(rects[6][0], rects[6][1], 100, 100);
+      ctx.strokeRect(rects[7][0], rects[7][1], 100, 100);
+      ctx.strokeRect(rects[8][0], rects[8][1], 100, 100);
+
+      ctx.textAlign = "center";
+      ctx.font = "90px 'Press Start 2P'";
+      ctx.fillText(grid[0], 116, 174);
+      ctx.fillText(grid[1], 236, 174);
+      ctx.fillText(grid[2], 356, 174);
+      ctx.fillText(grid[3], 116, 294);
+      ctx.fillText(grid[4], 236, 294);
+      ctx.fillText(grid[5], 356, 294);
+      ctx.fillText(grid[6], 116, 414);
+      ctx.fillText(grid[7], 236, 414);
+      ctx.fillText(grid[8], 356, 414);
+    }
+
+
+    /* Game mechanics */
+
+    let grid = ["", "", "", "", "", "", "", "", ""];
+    let actionText = "Click to start...";
+
+    let initialized = false;
+    let willRestart = false;
+    let currentCharacter;
+    let scoreX = 0;
+    let scoreO = 0;
+    let step = 0;
+
+    function Initialize() {
+      actionText = "";
+      initialized = true;
+      currentCharacter = "X";
+    }
+
+    function ClickOnBox(i) {
+      let text = grid[i];
+      if (text == "") {
+        grid[i] = currentCharacter;
+        GameStep();
+      }
+    }
+
+    function GameStep() {
+      step++;
+      CheckVictoryCondition();
+      NextPlayer();
+      console.debug(step + " " + willRestart);
+    }
+
+    function NextPlayer() {
+      if (currentCharacter == "O") {
+        currentCharacter = "X";
+      } else {
+        currentCharacter = "O";
+      }
+    }
+
+    function CheckVictoryCondition() {
+      if (grid[0] == currentCharacter && grid[1] == currentCharacter && grid[2] == currentCharacter) {
+        FinishedGame();
+      }
+
+      if (grid[3] == currentCharacter && grid[4] == currentCharacter && grid[5] == currentCharacter) {
+        FinishedGame();
+      }
+
+      if (grid[6] == currentCharacter && grid[7] == currentCharacter && grid[8] == currentCharacter) {
+        FinishedGame();
+      }
+
+      if (grid[0] == currentCharacter && grid[3] == currentCharacter && grid[6] == currentCharacter) {
+        FinishedGame();
+      }
+
+      if (grid[1] == currentCharacter && grid[4] == currentCharacter && grid[7] == currentCharacter) {
+        FinishedGame();
+      }
+
+      if (grid[2] == currentCharacter && grid[5] == currentCharacter && grid[8] == currentCharacter) {
+        FinishedGame();
+      }
+
+      if (grid[0] == currentCharacter && grid[4] == currentCharacter && grid[8] == currentCharacter) {
+        FinishedGame();
+      }
+
+      if (grid[2] == currentCharacter && grid[4] == currentCharacter && grid[6] == currentCharacter) {
+        FinishedGame();
+      }
+
+      if (step == 9 && !willRestart) {
+        FinishedGame(true);
+      }
+    }
+
+    function FinishedGame(tie = false) {
+      actionText = "Click to restart..."
+      willRestart = true;
+
+      if (currentCharacter == "X" && !tie) {
+        scoreX++;
+      } else if (!tie) {
+        scoreO++;
+      }
+    }
+
+    function RestartGame() {
+      actionText = "";
+      grid = ["", "", "", "", "", "", "", "", ""];
+      willRestart = false;
+      step = 0;
+    }
+
+    function HandleCanvasClickAreas(e) {
+      const rect = c.getBoundingClientRect();
+      const pos = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+      for (const i in rects) {
+        if (
+          pos.x >= rects[i][0] &&
+          pos.x <= rects[i][0] + 100 &&
+          pos.y >= rects[i][1] &&
+          pos.y <= rects[i][1] + 100
+        ) {
+          ClickOnBox(i);
+        }
+      }
+    }
+
+    Draw();
+    window.addEventListener("click", function (e) {
+      if (willRestart)
+        RestartGame();
+      if (initialized)
+        HandleCanvasClickAreas(e);
+      else
+        Initialize();
+      Draw();
+    });
+  </script>
+</body>
+
+</html>

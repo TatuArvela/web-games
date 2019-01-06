@@ -1,226 +1,243 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <title>Snake (html5-games)</title>
-    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Snake</title>
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+  <style>
+    body {
+      background: #479b47
+    }
+
+    canvas {
+      margin: 20px auto;
+      display: block
+    }
+  </style>
 </head>
 
-<body style="background: #479b47">
-<canvas id="canvas" style="margin: 20px auto; display: block"></canvas>
-<script>
-game                        = new Object();
-    game.width              = 600;
-    game.height             = 450;
-    game.scale              = 30;
-    game.speed              = 10;
-    
-    game.columns            = game.width / game.scale;
-    game.rows               = game.height / game.scale;
-    game.score              = 0;
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    game = new Object();
+    game.width = 600;
+    game.height = 450;
+    game.scale = 30;
+    game.speed = 10;
 
-snake                       = new Object();
-    snake.y                 = 10;
-    snake.x                 = 10;
-    snake.vector            = new Object();
-        snake.vector.x      = 0;
-        snake.vector.y      = 0;
-    snake.trail             = [];
-    snake.tail              = 5;
+    game.columns = game.width / game.scale;
+    game.rows = game.height / game.scale;
+    game.score = 0;
 
-bug                         = new Object();
+    snake = new Object();
+    snake.y = 10;
+    snake.x = 10;
+    snake.vector = new Object();
+    snake.vector.x = 0;
+    snake.vector.y = 0;
+    snake.trail = [];
+    snake.tail = 5;
 
-edges                       = new Object();
-    edges.left              = 1;
-    edges.right             = (game.columns - 1) - 1;
-    edges.top               = 3;
-    edges.bottom            = (game.rows - 1) - 1;
+    bug = new Object();
 
-window.onload = function() {
-    if ((game.width % game.scale) != 0 || (game.height % game.scale) != 0) {
+    edges = new Object();
+    edges.left = 1;
+    edges.right = (game.columns - 1) - 1;
+    edges.top = 3;
+    edges.bottom = (game.rows - 1) - 1;
+
+    window.onload = function () {
+      if ((game.width % game.scale) != 0 || (game.height % game.scale) != 0) {
         game.width -= (game.width % game.scale);
-    }
+      }
 
-    if ((game.height % game.scale) != 0 || (game.height % game.scale) != 0) {
+      if ((game.height % game.scale) != 0 || (game.height % game.scale) != 0) {
         game.height -= (game.height % game.scale);
+      }
+
+      newBugPosition();
+
+      canvas = document.getElementById("canvas");
+      canvas.width = game.width;
+      canvas.height = game.height;
+
+      context = canvas.getContext("2d");
+
+      document.addEventListener("keydown", input);
+      setInterval(update, 1000 / game.speed);
     }
 
-    newBugPosition();
+    function update() {
+      snake.x += snake.vector.x;
+      snake.y += snake.vector.y;
 
-    canvas                  = document.getElementById("canvas");
-        canvas.width        = game.width;
-        canvas.height       = game.height;
-
-    context                 = canvas.getContext("2d");
-
-    document.addEventListener("keydown", input);
-    setInterval(update, 1000/game.speed);
-}
-
-function update() {
-    snake.x += snake.vector.x;
-    snake.y += snake.vector.y;
-
-    // Left edge
-    if (snake.x < edges.left) {
+      // Left edge
+      if (snake.x < edges.left) {
         snake.x = edges.right;
-    }
+      }
 
-    // Right edge
-    if (snake.x > edges.right) {
+      // Right edge
+      if (snake.x > edges.right) {
         snake.x = edges.left;
-    }
+      }
 
-    // Top edge
-    if (snake.y < edges.top) {
+      // Top edge
+      if (snake.y < edges.top) {
         snake.y = edges.bottom;
-    }
+      }
 
-    // Bottom edge
-    if (snake.y > edges.bottom) {
+      // Bottom edge
+      if (snake.y > edges.bottom) {
         snake.y = edges.top;
-    }
+      }
 
-    // If the snake bites their snake.tail, reset the snake.tail
-    for (var i = 0; i < snake.trail.length; i++) {
+      // If the snake bites their snake.tail, reset the snake.tail
+      for (var i = 0; i < snake.trail.length; i++) {
         if (snake.trail[i].x == snake.x && snake.trail[i].y == snake.y) {
-            snake.trail = [];
-            snake.x = 10;
-            snake.y = 10;
-            game.score = 0;
-            snake.tail = 5;
+          snake.trail = [];
+          snake.x = 10;
+          snake.y = 10;
+          game.score = 0;
+          snake.tail = 5;
         }
-    }
+      }
 
-    // Grow the tail
-    snake.trail.push({x:snake.x, y:snake.y})
-    while (snake.trail.length > snake.tail) {
+      // Grow the tail
+      snake.trail.push({
+        x: snake.x,
+        y: snake.y
+      })
+      while (snake.trail.length > snake.tail) {
         snake.trail.shift();
-    }
+      }
 
-    // If the snake eats the bug, generate a new bug
-    if (bug.x == snake.x && bug.y == snake.y) {
+      // If the snake eats the bug, generate a new bug
+      if (bug.x == snake.x && bug.y == snake.y) {
         snake.tail++;
         game.score++;
         newBugPosition();
+      }
+
+      draw();
     }
 
-    draw();
-}
-
-function newBugPosition() {
-    bug.x = Math.floor(Math.random() * (edges.right - edges.left - 1) + edges.left);
-    bug.y = Math.floor(Math.random() * (edges.bottom - edges.top - 1) + edges.top);
-    // Making sure the bug doesn't spawn inside the snake
-    for (var i = 0; i < snake.trail.length; i++) {
+    function newBugPosition() {
+      bug.x = Math.floor(Math.random() * (edges.right - edges.left - 1) + edges.left);
+      bug.y = Math.floor(Math.random() * (edges.bottom - edges.top - 1) + edges.top);
+      // Making sure the bug doesn't spawn inside the snake
+      for (var i = 0; i < snake.trail.length; i++) {
         if ((snake.trail[i].x == bug.x) && (snake.trail[i].y == bug.y)) {
-            newBugPosition();
+          newBugPosition();
         }
+      }
     }
-}
 
-function draw() {
-    context.filter = "blur(1px)";
+    function draw() {
+      context.filter = "blur(1px)";
 
-    // Draw the background
-    context.fillStyle = "#479b47";
-    context.fillRect(
+      // Draw the background
+      context.fillStyle = "#479b47";
+      context.fillRect(
         0,
         0,
         canvas.width,
         canvas.height
-    );
+      );
 
-    // Draw the border
-    context.fillStyle = "#1f3f1f";
-    context.fillRect(
+      // Draw the border
+      context.fillStyle = "#1f3f1f";
+      context.fillRect(
         game.scale / 3 * 1,
         game.scale / 3 * 7,
         canvas.width - (game.scale / 3 * 2),
         canvas.height - (game.scale / 3 * 8)
-    );
+      );
 
-    // Draw inner background
-    context.fillStyle = "#479b47";
-    context.fillRect(
+      // Draw inner background
+      context.fillStyle = "#479b47";
+      context.fillRect(
         game.scale / 3 * 2,
         game.scale / 3 * 8,
         canvas.width - game.scale / 3 * 4,
-        canvas.height  - (game.scale / 3 * 10)
-    );
+        canvas.height - (game.scale / 3 * 10)
+      );
 
-    // Draw the snake
-    context.fillStyle = "#1f3f1f";
-    for (var i = 0; i < snake.trail.length; i++) {
+      // Draw the snake
+      context.fillStyle = "#1f3f1f";
+      for (var i = 0; i < snake.trail.length; i++) {
         context.fillRect(
-            snake.trail[i].x * game.scale,
-            snake.trail[i].y * game.scale,
-            game.scale * 0.9,
-            game.scale * 0.9
+          snake.trail[i].x * game.scale,
+          snake.trail[i].y * game.scale,
+          game.scale * 0.9,
+          game.scale * 0.9
         );
-    }
+      }
 
-    // Draw the bug
-    context.fillStyle = "#1f3f1f";
-    context.fillRect(
+      // Draw the bug
+      context.fillStyle = "#1f3f1f";
+      context.fillRect(
         bug.x * game.scale + (game.scale / 3),
         bug.y * game.scale,
         game.scale / 3,
         game.scale / 3
-    );
-    context.fillRect(
+      );
+      context.fillRect(
         bug.x * game.scale,
         bug.y * game.scale + (game.scale / 3),
         game.scale / 3,
         game.scale / 3
-    );
-    context.fillRect(
+      );
+      context.fillRect(
         bug.x * game.scale + (game.scale / 3 * 2),
         bug.y * game.scale + (game.scale / 3),
         game.scale / 3,
         game.scale / 3
-    );
-    context.fillRect(
+      );
+      context.fillRect(
         bug.x * game.scale + (game.scale / 3),
         bug.y * game.scale + (game.scale / 3 * 2),
         game.scale / 3,
         game.scale / 3
-    );
+      );
 
-    context.font = 1.5 * game.scale + "px 'Press Start 2P'";
-    context.fillText(
+      context.font = 1.5 * game.scale + "px 'Press Start 2P'";
+      context.fillText(
         ("0000" + game.score).slice(-3),
         game.scale / 2,
         game.scale * 2
-    );
-}
-
-function input(e) {
-    switch(e.keyCode) {
-        case 37:        // Left
-            if (snake.vector.x != 1) {
-                snake.vector.x = -1;
-                snake.vector.y = 0;
-            }
-            break;
-        case 38:        // Up
-            if (snake.vector.y != 1) {
-                snake.vector.x = 0;
-                snake.vector.y = -1;
-            }
-            break;
-        case 39:        // Right
-            if (snake.vector.x != -1) {
-                snake.vector.x = 1;
-                snake.vector.y = 0;
-            }
-            break;
-        case 40:        // Down
-            if (snake.vector.y != -1) {
-                snake.vector.x = 0;
-                snake.vector.y = 1;
-            }
-            break;
+      );
     }
-}
 
-</script>
+    function input(e) {
+      switch (e.keyCode) {
+        case 37: // Left
+          if (snake.vector.x != 1) {
+            snake.vector.x = -1;
+            snake.vector.y = 0;
+          }
+          break;
+        case 38: // Up
+          if (snake.vector.y != 1) {
+            snake.vector.x = 0;
+            snake.vector.y = -1;
+          }
+          break;
+        case 39: // Right
+          if (snake.vector.x != -1) {
+            snake.vector.x = 1;
+            snake.vector.y = 0;
+          }
+          break;
+        case 40: // Down
+          if (snake.vector.y != -1) {
+            snake.vector.x = 0;
+            snake.vector.y = 1;
+          }
+          break;
+      }
+    }
+  </script>
 </body>

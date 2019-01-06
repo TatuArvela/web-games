@@ -1,14 +1,18 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <title>Pong (html5-games)</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Pong</title>
   <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
   <style>
     body {
       background: gray;
     }
 
-    #canvas {
+    canvas {
       margin: auto;
       left: 0;
       right: 0;
@@ -22,7 +26,6 @@
 <body>
   <canvas id="canvas" width="800" height="600"></canvas>
   <script>
-
     function Paddle(x, y, height = 80, width = 10, score = 0) {
       this.x = x;
       this.y = y;
@@ -39,7 +42,7 @@
       this.diameter = diameter;
       this.angle = 0;
 
-      this.move = function() {
+      this.move = function () {
         this.x += this.speedX / framerate;
         this.y += this.speedY / framerate;
       }
@@ -54,10 +57,10 @@
 
     function detectCollision(b, p) {
       return (
-        (b.x + b.diameter / 2) > p.x &&           // Right side
+        (b.x + b.diameter / 2) > p.x && // Right side
         (b.x - b.diameter / 2) < p.x + p.width && // Left side
-        (b.y + b.diameter / 2) > p.y &&           // Top side
-        (b.y - b.diameter / 2) < p.y + p.height   // Bottom side
+        (b.y + b.diameter / 2) > p.y && // Top side
+        (b.y - b.diameter / 2) < p.y + p.height // Bottom side
       )
     }
 
@@ -96,21 +99,20 @@
 
       // Move AI
       if (!(
-        ball.y > player2.y + aiStep &&
-        ball.y < player2.y + player2.height - aiStep
-      )) {
+          ball.y > player2.y + aiStep &&
+          ball.y < player2.y + player2.height - aiStep
+        )) {
         if (player2.y + player2.height / 2 < ball.y) {
           player2.y += aiStep;
-        }
-        else {
+        } else {
           player2.y -= aiStep;
-          if (player2.y > canvas.height- player2.height)
+          if (player2.y > canvas.height - player2.height)
             player2.y = canvas.height - player2.height;
         }
-        
+
         if (player2.y < 0)
           player2.y = 0;
-        if (player2.y > canvas.height- player2.height)
+        if (player2.y > canvas.height - player2.height)
           player2.y = canvas.height - player2.height;
 
       }
