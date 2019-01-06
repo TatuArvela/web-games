@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <meta http-equiv='X-UA-Compatible' content='ie=edge'>
   <title>Tic-Tac-Toe</title>
-  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet" id="font">
   <style>
     body {
       background-color: #a5a5ff;
@@ -25,12 +25,14 @@
 </head>
 
 <body>
-  <canvas id="canvas" width="640" height="480"></canvas>
+  <canvas id='canvas' width='640' height='480'></canvas>
   <script>
-    /* Graphics */
+    /*
+      Graphics
+    */
 
     const c = document.getElementById('canvas');
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
     const rects = [
@@ -46,29 +48,29 @@
     ];
 
     function Draw() {
-      ctx.fillStyle = "#4242e7";
+      ctx.fillStyle = '#4242e7';
       ctx.fillRect(0, 0, c.width, c.height);
 
-      ctx.fillStyle = "#ffffff"
-      ctx.strokeStyle = "#ffffff"
+      ctx.fillStyle = '#ffffff'
+      ctx.strokeStyle = '#ffffff'
       ctx.lineWidth = 4;
-      ctx.font = "24px 'Press Start 2P'";
+      ctx.font = '24px "Press Start 2P"';
 
-      ctx.textAlign = "center";
-      ctx.fillText("Tic-Tac-Toe", c.width / 2, 50);
+      ctx.textAlign = 'center';
+      ctx.fillText('Tic-Tac-Toe', c.width / 2, 50);
       ctx.fillText(actionText, c.width / 2, 464);
 
-      ctx.textAlign = "left";
-      if (currentCharacter == "X")
-        ctx.fillText("P.X<", 450, 104);
+      ctx.textAlign = 'left';
+      if (currentCharacter == 'X')
+        ctx.fillText('P.X<', 450, 104);
       else
-        ctx.fillText("P.X", 450, 104);
+        ctx.fillText('P.X', 450, 104);
       ctx.fillText(scoreX, 450, 144);
 
-      if (currentCharacter == "O")
-        ctx.fillText("P.O<", 450, 224);
+      if (currentCharacter == 'O')
+        ctx.fillText('P.O<', 450, 224);
       else
-        ctx.fillText("P.O", 450, 224);
+        ctx.fillText('P.O', 450, 224);
       ctx.fillText(scoreO, 450, 264);
 
       ctx.strokeRect(rects[0][0], rects[0][1], 100, 100);
@@ -81,8 +83,8 @@
       ctx.strokeRect(rects[7][0], rects[7][1], 100, 100);
       ctx.strokeRect(rects[8][0], rects[8][1], 100, 100);
 
-      ctx.textAlign = "center";
-      ctx.font = "90px 'Press Start 2P'";
+      ctx.textAlign = 'center';
+      ctx.font = '90px "Press Start 2P"';
       ctx.fillText(grid[0], 116, 174);
       ctx.fillText(grid[1], 236, 174);
       ctx.fillText(grid[2], 356, 174);
@@ -95,10 +97,12 @@
     }
 
 
-    /* Game mechanics */
+    /* 
+      Game mechanics
+    */
 
-    let grid = ["", "", "", "", "", "", "", "", ""];
-    let actionText = "Click to start...";
+    let grid = ['', '', '', '', '', '', '', '', ''];
+    let actionText = 'Click to start...';
 
     let initialized = false;
     let willRestart = false;
@@ -108,14 +112,14 @@
     let step = 0;
 
     function Initialize() {
-      actionText = "";
+      actionText = '';
       initialized = true;
-      currentCharacter = "X";
+      currentCharacter = 'X';
     }
 
     function ClickOnBox(i) {
       let text = grid[i];
-      if (text == "") {
+      if (text == '') {
         grid[i] = currentCharacter;
         GameStep();
       }
@@ -125,14 +129,13 @@
       step++;
       CheckVictoryCondition();
       NextPlayer();
-      console.debug(step + " " + willRestart);
     }
 
     function NextPlayer() {
-      if (currentCharacter == "O") {
-        currentCharacter = "X";
+      if (currentCharacter == 'O') {
+        currentCharacter = 'X';
       } else {
-        currentCharacter = "O";
+        currentCharacter = 'O';
       }
     }
 
@@ -175,10 +178,10 @@
     }
 
     function FinishedGame(tie = false) {
-      actionText = "Click to restart..."
+      actionText = 'Click to restart...'
       willRestart = true;
 
-      if (currentCharacter == "X" && !tie) {
+      if (currentCharacter == 'X' && !tie) {
         scoreX++;
       } else if (!tie) {
         scoreO++;
@@ -186,8 +189,8 @@
     }
 
     function RestartGame() {
-      actionText = "";
-      grid = ["", "", "", "", "", "", "", "", ""];
+      actionText = '';
+      grid = ['', '', '', '', '', '', '', '', ''];
       willRestart = false;
       step = 0;
     }
@@ -210,16 +213,20 @@
       }
     }
 
-    Draw();
-    window.addEventListener("click", function (e) {
+    window.addEventListener('click', function(e) {
       if (willRestart)
         RestartGame();
-      if (initialized)
+      else if (initialized)
         HandleCanvasClickAreas(e);
       else
         Initialize();
-      Draw();
     });
+
+    document.getElementById("font").addEventListener('load', function(e) {
+      console.log("test");
+    });
+
+    setInterval(Draw, 1000/10);
   </script>
 </body>
 
