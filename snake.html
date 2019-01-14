@@ -9,12 +9,16 @@
   <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
   <style>
     body {
-      background: #479b47
+      background: #263d00;
     }
 
     canvas {
-      margin: 20px auto;
-      display: block
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      margin: auto;
     }
   </style>
 </head>
@@ -23,9 +27,9 @@
   <canvas id="canvas"></canvas>
   <script>
     game = new Object();
-    game.width = 600;
-    game.height = 450;
-    game.scale = 30;
+    game.width = 576;
+    game.height = 384;
+    game.scale = 24;
     game.speed = 10;
 
     game.columns = game.width / game.scale;
@@ -46,7 +50,7 @@
     edges = new Object();
     edges.left = 1;
     edges.right = (game.columns - 1) - 1;
-    edges.top = 3;
+    edges.top = 1;
     edges.bottom = (game.rows - 1) - 1;
 
     window.onload = function () {
@@ -65,9 +69,21 @@
       canvas.height = game.height;
 
       context = canvas.getContext("2d");
+      context.imageSmoothingEnabled = false;
+      context.filter = "blur(1px)";
 
       document.addEventListener("keydown", input);
       setInterval(update, 1000 / game.speed);
+    }
+
+    function reset() {
+      snake.trail = [];
+      snake.vector.x = 0;
+      snake.vector.y = 0;
+      snake.x = 10;
+      snake.y = 10;
+      game.score = 0;
+      snake.tail = 5;
     }
 
     function update() {
@@ -76,32 +92,32 @@
 
       // Left edge
       if (snake.x < edges.left) {
-        snake.x = edges.right;
+        //snake.x = edges.right;
+        reset();
       }
 
       // Right edge
       if (snake.x > edges.right) {
-        snake.x = edges.left;
+        //snake.x = edges.left;
+        reset();
       }
 
       // Top edge
       if (snake.y < edges.top) {
-        snake.y = edges.bottom;
+        //snake.y = edges.bottom;
+        reset();
       }
 
       // Bottom edge
       if (snake.y > edges.bottom) {
-        snake.y = edges.top;
+        //snake.y = edges.top;
+        reset();
       }
 
       // If the snake bites their snake.tail, reset the snake.tail
       for (var i = 0; i < snake.trail.length; i++) {
         if (snake.trail[i].x == snake.x && snake.trail[i].y == snake.y) {
-          snake.trail = [];
-          snake.x = 10;
-          snake.y = 10;
-          game.score = 0;
-          snake.tail = 5;
+          reset();
         }
       }
 
@@ -136,10 +152,15 @@
     }
 
     function draw() {
-      context.filter = "blur(1px)";
+      var grd = context.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grd.addColorStop(0, "#88b330");
+      grd.addColorStop(0.2, "#84b005");
+      grd.addColorStop(0.5, "#a1ce02");
+      grd.addColorStop(0.9, "#90bc03");
+      grd.addColorStop(1, "#add209");
 
       // Draw the background
-      context.fillStyle = "#479b47";
+      context.fillStyle = grd;
       context.fillRect(
         0,
         0,
@@ -148,36 +169,36 @@
       );
 
       // Draw the border
-      context.fillStyle = "#1f3f1f";
+      context.fillStyle = "#263d00";
       context.fillRect(
         game.scale / 3 * 1,
-        game.scale / 3 * 7,
+        game.scale / 3 * 1,
         canvas.width - (game.scale / 3 * 2),
-        canvas.height - (game.scale / 3 * 8)
+        canvas.height - (game.scale / 3 * 2)
       );
 
       // Draw inner background
-      context.fillStyle = "#479b47";
+      context.fillStyle = grd;
       context.fillRect(
         game.scale / 3 * 2,
-        game.scale / 3 * 8,
+        game.scale / 3 * 2,
         canvas.width - game.scale / 3 * 4,
-        canvas.height - (game.scale / 3 * 10)
+        canvas.height - (game.scale / 3 * 4)
       );
 
       // Draw the snake
-      context.fillStyle = "#1f3f1f";
+      context.fillStyle = "#263d00";
       for (var i = 0; i < snake.trail.length; i++) {
         context.fillRect(
           snake.trail[i].x * game.scale,
           snake.trail[i].y * game.scale,
-          game.scale * 0.9,
-          game.scale * 0.9
+          game.scale,
+          game.scale
         );
       }
 
       // Draw the bug
-      context.fillStyle = "#1f3f1f";
+      context.fillStyle = "#263d00";
       context.fillRect(
         bug.x * game.scale + (game.scale / 3),
         bug.y * game.scale,
@@ -203,12 +224,25 @@
         game.scale / 3
       );
 
-      context.font = 1.5 * game.scale + "px 'Press Start 2P'";
-      context.fillText(
-        ("0000" + game.score).slice(-3),
-        game.scale / 2,
-        game.scale * 2
-      );
+      context.fillStyle = grd;
+      let w = canvas.width / (game.scale / 3);
+      for (let i = 0; i < w; i++) {
+        context.fillRect(
+          game.scale / 3 * i,
+          0,
+          game.scale / 3 / 12,
+          canvas.height
+        );
+      }
+      let h = canvas.width / (game.scale / 3);
+      for (let i = 0; i < w; i++) {
+        context.fillRect(
+          0,
+          game.scale / 3 * i,
+          canvas.width,
+          game.scale / 3 / 12
+        );
+      }
     }
 
     function input(e) {
