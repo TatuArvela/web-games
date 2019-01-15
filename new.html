@@ -161,8 +161,9 @@ C:\\>dir/w\n\
       ctx.fillStyle = "#101010";
       ctx.fillRect(0, 0, c.width, c.height);
 
-      ctx.fillStyle = ctx.shadowColor = '#bd8c21';
-      ctx.shadowBlur = 1;
+      ctx.fillStyle = '#ffae00';
+      ctx.shadowColor = '#bd8c21';
+      ctx.shadowBlur = 2;
       ctx.font = '16px "PC"';
 
       var lineheight = 16;
@@ -195,12 +196,12 @@ C:\\>dir/w\n\
       ctx.fillRect(0, 0, c.width, c.height);
 
       let grd2 = ctx.createLinearGradient(0, 0, c.width, 0);
-      grd2.addColorStop(0, "rgba(16, 16, 16, 0.3)");
-      grd2.addColorStop(0.01, "rgba(16, 16, 16, 0.3)");
+      grd2.addColorStop(0, "rgba(16, 16, 16, 0.9)");
+      grd2.addColorStop(0.03, "rgba(16, 16, 16, 0.3)");
       grd2.addColorStop(0.05, "rgba(0, 0, 0, 0)");
       grd2.addColorStop(0.95, "rgba(0, 0, 0, 0)");
-      grd2.addColorStop(0.98, "rgba(16, 16, 16, 0.3)");
-      grd2.addColorStop(1, "rgba(16, 16, 16, 0.3)");
+      grd2.addColorStop(0.97, "rgba(16, 16, 16, 0.3)");
+      grd2.addColorStop(1, "rgba(16, 16, 16, 0.9)");
 
       ctx.fillStyle = grd2;
       ctx.fillRect(0, 0, c.width, c.height);
