@@ -10,106 +10,259 @@
 <body>
 <canvas id='🎦'/>
 <script>
-/* ---------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
-              document.title = 'MYSTIFY.SCR'
 
-                 const scale =  2
-               const canvas  =  document.getElementById('🎦')
-                    const c  =  canvas.getContext('2d')
-               canvas.width  =  1024*scale
-              canvas.height  =  768*scale
+         document.title = 'MYSTIFY.SCR'
 
-        document.body.style  = 'background: black'
-               canvas.style  = 'margin: auto;\
-                                left: 0;\
-                                right: 0;\
-                                position: absolute;\
-                                top: 0;\
-                                bottom: 0;\
-                                border: 2px solid white;\
-                                transform: scale(0.5);\
-                                image-rendering: pixelated;\
-                                image-rendering: crisp-edges'
+            const width = 1280
+           const height = 1024
+            const scale = 1
+            const speed = 24
 
-/* ---------------------------------------------------------------- */
+ const shapeGroupsCount = 2
+      const shapesCount = 5
+      const pointsCount = 4
+
+           const canvas = document.getElementById('🎦')
+                const c = canvas.getContext('2d')
+
+           canvas.width = width * scale
+          canvas.height = height * scale
+
+    document.body.style = `background: gray;
+                           margin: 0;
+                           display: block;
+                           position: absolute;
+                           height: 100%;
+                           width: 100%;
+                           top: 0;
+                           bottom: 0;
+                           left: 0;
+                           right: 0;
+                           min-width: ${width}px;
+                           min-height: ${height}px;
+                           overflow: hidden`
+           canvas.style = `position: absolute;
+                           top: 50%;
+                           left: 50%;
+                           margin-right: -50%;
+                           transform: translate(-50%, -50%) scale(${1 / scale});
+                           image-rendering: pixelated;
+                           image-rendering: crisp-edges`
+
+
+/* -------------------------------------------------------------------------- */
+
+
+  function randomSpeed() {
+    return {
+      x: (Math.floor(Math.random() * (speed / 3)) + 1),
+      y: (Math.floor(Math.random() * (speed / 3)) + 1)
+    }
+  }
+
+  function randomPoint() {
+    return new Point(
+      (Math.floor(Math.random() * (width - 100)) + 50),
+      (Math.floor(Math.random() * (height - 100)) + 50),
+      randomSpeed()
+    )
+  }
+
+  function randomSpread() {
+    return {
+      x: (Math.floor(Math.random() * 7)),
+      y: (Math.floor(Math.random() * 7))
+    }
+  }
+
+  function Color() {
+    this.r = Math.floor(Math.random()*235) + 20
+    this.g = Math.floor(Math.random()*235) + 20
+    this.b = Math.floor(Math.random()*235) + 20
+    this.toString = function() {
+      return '#' + 
+        this.r.toString(16) + 
+        this.g.toString(16) + 
+        this.b.toString(16)
+    }
+  }
+
+  function Point(x, y, speed) {
+    this.x = x
+    this.y = y
+    this.speed = speed
+  }
+
+  function Shape(points, spreads, multiplier) {
+    this.points = JSON.parse(JSON.stringify(points))
+    for (let i = 0; i < pointsCount; i ++) {
+      this.points[i].x = points[i].x + spreads[i].x * multiplier,
+      this.points[i].y = points[i].y + spreads[i].y * multiplier
+    }
+  }
+
+  function ShapeGroup(color) {
+    this.color = new Color()
+    this.nextColor = new Color()
+
+    points = []
+    spreads = []
+    this.nextSpeeds = []
+    for (let i = 0; i < pointsCount; i ++) {
+      points.push(randomPoint())
+      spreads.push(randomSpread())
+      this.nextSpeeds.push(randomSpeed())
+    }
+
+    this.shapes = []
+    for (let i = 0; i < shapesCount; i++)
+      this.shapes.push(new Shape(points, spreads, i))
+  }
+
+
+/* -------------------------------------------------------------------------- */
+
 
   function clear() {
     c.fillStyle = 'black'
     c.fillRect(0, 0, canvas.width, canvas.height)
   }
 
-  function drawLineSet(startCoords, endCoords, startSpacing, endSpacing) {
-    for (let i = 0; i < 5; i++) {
-      c.beginPath()
-      c.moveTo(
-        (startCoords[0]) * scale,
-        (startCoords[1] + startSpacing * i) * scale
-      )
-      c.lineTo(
-        (endCoords[0]) * scale,
-        (endCoords[1] + endSpacing * i) * scale
-      )
-      c.closePath();
-      c.stroke();
+  function drawLine(startPoint, endPoint) {
+    c.beginPath()
+    c.moveTo(
+      startPoint.x * scale,
+      startPoint.y * scale,
+    )
+    c.lineTo(
+      endPoint.x * scale,
+      endPoint.y * scale,
+    )
+    c.closePath();
+    c.stroke();
+  }
+
+  function drawShape(shape) {
+    for (let i = 0; i < pointsCount; i++) {
+      if (i === pointsCount - 1)
+        drawLine(shape.points[i], shape.points[0])
+      else
+        drawLine(shape.points[i], shape.points[i+1])
     }
   }
 
-  function drawShape(color, coords, spacings) {
-    c.strokeStyle = color
-    drawLineSet(coords[0], coords[1], spacings[0], spacings[1])
-    drawLineSet(coords[1], coords[2], spacings[1], spacings[2])
-    drawLineSet(coords[2], coords[3], spacings[2], spacings[3])
-    drawLineSet(coords[3], coords[0], spacings[3], spacings[0])
+  function stepColorComponent(current, next) {
+    if (current > next) {
+      return current - 1
+    }
+    else if (current < next) {
+      return current + 1
+    }
+    else {
+      return current
+    }
   }
 
-  function pixelate() {
-    let imageData = c.getImageData(0, 0, canvas.width, canvas.height);    
-    for (i = 0; i != imageData.data.length; i ++) {
-      imageData.data[i] = (imageData.data[i] >> 1) * 0xFF
+  function stepColor(shapeGroup) {
+    shapeGroup.color.r = stepColorComponent(
+      shapeGroup.color.r, 
+      shapeGroup.nextColor.r
+    )
+    shapeGroup.color.g = stepColorComponent(
+      shapeGroup.color.g, 
+      shapeGroup.nextColor.g
+    )
+    shapeGroup.color.b = stepColorComponent(
+      shapeGroup.color.b, 
+      shapeGroup.nextColor.b
+    )
+
+    if (shapeGroup.color.r === shapeGroup.nextColor.r
+        && shapeGroup.color.g === shapeGroup.nextColor.g
+        && shapeGroup.color.b === shapeGroup.nextColor.b) {
+      shapeGroup.nextColor = new Color()
     }
-    c.putImageData (imageData, 0, 0);
+  }
+
+  function drawShapeGroup(shapeGroup) {
+    c.strokeStyle = shapeGroup.color.toString()
+    c.lineWidth = 1
+    shapeGroup.shapes.forEach(shape => drawShape(shape))
+    stepColor(shapeGroup)
   }
 
   function draw() {
     clear()
-    drawShape(color1, coords1, spacings1)
-    drawShape(color2, coords2, spacings2)
-    pixelate()
+    for (let i = 0; i < shapeGroupsCount; i++)
+      drawShapeGroup(shapeGroups[i])
+  }
+
+  function movePoint(point, nextSpeed, bounced) {
+    point.x = point.x + point.speed.x
+    point.y = point.y + point.speed.y
+
+    if (point.x < 0) {
+      point.x = 0
+      point.speed.x = Math.abs(nextSpeed.x)
+      bounced = true
+    }
+    else if (point.x > width) {
+      point.x = width
+      point.speed.x = -Math.abs(nextSpeed.x)
+      bounced = true
+    }
+
+    if (point.y < 0) {
+      point.y = 0
+      point.speed.y = Math.abs(nextSpeed.y)
+      bounced = true
+    }
+    else if (point.y > height) {
+      point.y = height
+      point.speed.y = -Math.abs(nextSpeed.y)
+      bounced = true
+    }
+  }
+
+  function animateShape(shape, nextSpeed) {
+    bounced = false
+
+    for (let i = 0; i < pointsCount; i++)
+      movePoint(shape.points[i], nextSpeed[i], bounced)
+
+    if (bounced)
+      nextSpeed = randomSpeed()
+  }
+
+  function animateShapeGroup(shapeGroup) {
+    for (let i = 0; i < shapesCount; i++)
+      animateShape(shapeGroup.shapes[i], shapeGroup.nextSpeeds)
+  }
+
+  function animate() {
+    for (let i = 0; i < shapeGroupsCount; i++)
+      animateShapeGroup(shapeGroups[i])
   }
 
   function update() {
+    animate()
     draw()
   }
 
-  let color1 = 'magenta'
 
-  let coords1 = [
-    [30, 30],
-    [150, 30],
-    [400, 300],
-    [80, 240]
-  ]
+/* -------------------------------------------------------------------------- */
 
-  let spacings1 = [8, 10, 2, 4]
 
-  let color2 = 'cyan'
+  let shapeGroups = []
+  for (let i = 0; i < shapeGroupsCount; i++)
+    shapeGroups.push(new ShapeGroup())
 
-  let coords2 = [
-    [60, 70],
-    [500, 230],
-    [600, 90],
-    [400, 40]
-  ]
+  setInterval(update, 1000 / speed);
 
-  let spacings2 = [16, 6, 7, 11]
 
-  setInterval(update, 1000 / 10);
-
-// TODO: Shape corners have motion vectors (speedX, speedY)
-// TODO: Shape corners bounce on canvas edges
-// TODO: Shapes cycle web-safe colors
-
+/* -------------------------------------------------------------------------- */
 </script>
 </body>
 

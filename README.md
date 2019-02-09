@@ -2,6 +2,14 @@
 
 This repository contains a bunch of small HTML5 game projects.
 
+## Mystify
+
+![Mystify icon](./mystify-icon.png?raw=true "Mystify")
+
+Recreation of the classic Windows screensaver Mystify. This one is not a game, but fits here nonetheless.
+
+[Click to view](https://tatuarvela.github.io/js-games/mystify.html)
+
 ## Tic-Tac-Toe
 
 This one is based on [my earlier Unity version of Tic-Tac-Toe](https://github.com/TatuArvela/Unity-Tic-Tac-Toe), and has a Commodore-inspired, brutalist look.
