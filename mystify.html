@@ -199,6 +199,7 @@
       drawShapeGroup(shapeGroups[i])
   }
 
+  // FIXME: Points should gather on edges, and bounce back with a new spread
   function movePoint(point, nextSpeed, bounced) {
     point.x = point.x + point.speed.x
     point.y = point.y + point.speed.y
@@ -263,6 +264,7 @@
 
 
 /* -------------------------------------------------------------------------- */
+
 </script>
 </body>
 
