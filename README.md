@@ -1,15 +1,6 @@
 # js-games
 
-This repository contains a bunch of small HTML5 game projects.
-
-## Mystify
-
-![Mystify icon](./mystify32.png?raw=true "Mystify")
-
-Recreation of the classic Windows screensaver Mystify. This one is not a game, but fits here nonetheless.  
-Original Copyright (C) Microsoft Corp. 1991 - 1998
-
-[Click to view](https://tatuarvela.github.io/js-games/mystify.html)
+Several small JavaScript / HTML5 game projects
 
 ## Tic-Tac-Toe
 
