@@ -2,7 +2,7 @@
 
 A collection of little browser games, presented in a CRT monitor simulation.
 
-[**Click to play!**](https://tatuarvela.github.io/Web-Games)
+[**Click to play!**](https://tatuarvela.github.io/web-games)
 
 ## Credits
 
