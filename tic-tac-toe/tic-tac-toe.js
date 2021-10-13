@@ -79,14 +79,14 @@ function checkVictoryCondition() {
   const {grid, curr} = state;
 
   const victoryPatterns = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 9],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
+    [0, 1, 2], // first row
+    [3, 4, 5], // second row
+    [6, 7, 8], // third row
+    [0, 3, 6], // first column
+    [1, 4, 7], // second column
+    [2, 5, 8], // third column
+    [0, 4, 8], // top left to bottom right
+    [2, 4, 6] // bottom left to top right
   ];
 
   for (let i = 0; i < victoryPatterns.length; i++) {
