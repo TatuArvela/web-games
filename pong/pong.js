@@ -7,8 +7,11 @@ canvas.width = 800;
 canvas.height = 600;
 const context = canvas.getContext('2d');
 
-const fps = 100;
-const gameSpeed = 3;
+const updateRate = 100;
+const frameRate = 60;
+const aiRate = 5;
+
+const paddleWidth = 10;
 const ballSpeedIncrease = 1.1;
 
 
@@ -16,45 +19,60 @@ const ballSpeedIncrease = 1.1;
 * Objects
 * */
 
-function PlayerPaddle(x, y, height = 80, width = 10, score = 0) {
-  this.x = x;
-  this.y = y;
-  this.height = height;
-  this.width = width;
-  this.score = score
+function Ball() {
+  this.x = canvas.width / 2;
+  this.y = canvas.height / 2;
+  this.size = 10;
+  this.speedX = 0;
+  this.speedY = 0;
 }
 
-function Ball(x, y, size) {
+function PlayerPaddle(x, y) {
   this.x = x;
   this.y = y;
-  this.size = size;
-  // speedX;
-  // speedY;
+  this.height = 80;
+  this.width = paddleWidth;
+  this.score = 0;
 }
 
 
 /*
-* Functions
+* Physics
 * */
 
-function getStartingSpeed() {
-  const speeds = [
-    [1, 1],
-    [1, -1],
-    [-1, 1],
-    [-1, -1]
-  ];
-  const random = Math.floor(Math.random() * 4);
-  return speeds[random];
-}
+function reflectBall(ball, paddle) {
+  function getSign(number) {
+    return number > 0 ? 1 : -1;
+  }
 
-function resetBall(ball) {
-  const [speedX, speedY] = getStartingSpeed();
+  function getAbsSpeedY(ballMidPoint, paddleMidPoint) {
+    const distance = Math.floor(Math.abs(paddleMidPoint - ballMidPoint));
 
-  ball.x = canvas.width / 2;
-  ball.y = canvas.height / 2;
-  ball.speedX = speedX * gameSpeed;
-  ball.speedY = speedY * gameSpeed;
+    if (distance >= 0 && distance <= 10) {
+      return 1;
+    }
+    if (distance > 10 && distance <= 20) {
+      return 2;
+    }
+    if (distance > 20 && distance <= 30) {
+      return 3;
+    }
+    return 4;
+  }
+
+  const signX = -1 * getSign(ball.speedX);
+  const absSpeedX = Math.min(Math.abs(ball.speedX * ballSpeedIncrease), paddleWidth);
+  const speedX = signX * absSpeedX;
+
+  const ballMidPoint = (ball.y + ball.size / 2);
+  const paddleMidPoint = (paddle.y + paddle.height / 2);
+
+  const signY = ballMidPoint < paddleMidPoint ? -1 : 1;
+  const absSpeedY = getAbsSpeedY(ballMidPoint, paddleMidPoint);
+  const speedY = signY * absSpeedY;
+
+  ball.speedX = speedX;
+  ball.speedY = speedY;
 }
 
 function detectCollision(rect1, rect2) {
@@ -65,7 +83,6 @@ function detectCollision(rect1, rect2) {
 }
 
 function detectPaddleCollision(ball, paddle) {
-  const grace = ball.size;
   return detectCollision({
     x: ball.x,
     y: ball.y,
@@ -73,9 +90,9 @@ function detectPaddleCollision(ball, paddle) {
     h: ball.size
   }, {
     x: paddle.x,
-    y: paddle.y - grace,
+    y: paddle.y,
     w: paddle.width,
-    h: paddle.height + grace
+    h: paddle.height
   });
 }
 
@@ -83,21 +100,57 @@ function calculateBounce(surface, collider) {
   return (surface - collider) * 2;
 }
 
-function controlGame(ball, player1, player2) {
+function moveBall(ball, player1, player2) {
+  ball.x += ball.speedX;
+  ball.y += ball.speedY;
+
   // Ball hits player 1
   if (detectPaddleCollision(ball, player1)) {
     ball.x += calculateBounce(player1.x + player1.width, ball.x);
-    ball.speedX = Math.abs(ball.speedX * ballSpeedIncrease);
+    reflectBall(ball, player1);
   }
 
   // Ball hits player 2
   if (detectPaddleCollision(ball, player2)) {
     ball.x += calculateBounce(player2.x, ball.x + ball.size);
-    ball.speedX = -Math.abs(ball.speedX * ballSpeedIncrease);
+    reflectBall(ball, player2);
   }
 
-  ball.x += ball.speedX;
-  ball.y += ball.speedY;
+  // Ball hits the ceiling
+  if (ball.y < 0) {
+    ball.y += calculateBounce(0, ball.y);
+    ball.speedY = ball.speedY * -1;
+  }
+
+  // Ball hits the floor
+  if (ball.y + ball.size > canvas.height) {
+    ball.y += calculateBounce(canvas.height, ball.y + ball.size);
+    ball.speedY = ball.speedY * -1;
+  }
+}
+
+
+/*
+* Game logic
+* */
+
+function resetBall(ball) {
+  function randomMinusOrPlus() {
+    return Math.random() < 0.5 ? -1 : 1;
+  }
+
+  function randomSpeedY() {
+    return Math.floor(Math.random() * 6) / 2;
+  }
+
+  ball.x = canvas.width / 2;
+  ball.y = canvas.height / 2;
+  ball.speedX = randomMinusOrPlus() * 3;
+  ball.speedY = randomMinusOrPlus() * randomSpeedY();
+}
+
+function update(ball, player1, player2) {
+  moveBall(ball, player1, player2);
 
   // Ball hits the left edge
   if (ball.x < 0) {
@@ -109,18 +162,6 @@ function controlGame(ball, player1, player2) {
   if (ball.x + ball.size > canvas.width) {
     player1.score++;
     resetBall(ball);
-  }
-
-  // Ball hits the ceiling
-  if (ball.y < 0) {
-    ball.y += calculateBounce(0, ball.y);
-    ball.speedY = Math.abs(ball.speedY * ballSpeedIncrease);
-  }
-
-  // Ball hits the floor
-  if (ball.y + ball.size > canvas.height) {
-    ball.y += calculateBounce(canvas.height, ball.y + ball.size);
-    ball.speedY = -Math.abs(ball.speedY * ballSpeedIncrease);
   }
 }
 
@@ -135,33 +176,29 @@ function movePlayer(paddle, event) {
   }
 }
 
-function moveAI(ball, paddle, maxSpeed) {
-  const maxY = canvas.height - paddle.height;
-
-  const paddleTop = paddle.y;
-  const paddleBottom = paddle.y + paddle.height;
-
-  const shouldMove = ball.x > canvas.width * (2 / 5);
-  const willHitBall = (ball.y + ball.size * 2 > paddleTop) && (ball.y - ball.size < paddleBottom);
-
-  if (!shouldMove || willHitBall) {
+function moveAi(ball, paddle) {
+  const shouldMove = ball.x > (canvas.width / 2);
+  if (!shouldMove) {
     return;
   }
 
-  if (ball.y < paddleTop) {
-    const requiredMove = paddleTop - ball.y;
-    paddle.y -= Math.min(Math.abs(requiredMove), maxSpeed);
+  const paddleCenter = paddle.y + paddle.height / 2;
+
+  if (ball.y < paddleCenter) {
+    const requiredMove = paddleCenter - ball.y;
+    paddle.y -= Math.abs(requiredMove);
   }
 
-  if (ball.y > paddleBottom) {
-    const requiredMove = ball.y - paddleBottom;
-    paddle.y += Math.min(requiredMove, maxSpeed);
+  if (ball.y > paddleCenter) {
+    const requiredMove = ball.y - paddleCenter;
+    paddle.y += requiredMove;
   }
 
   if (paddle.y < 0) {
     paddle.y = 0;
   }
 
+  const maxY = canvas.height - paddle.height;
   if (paddle.y > maxY) {
     paddle.y = maxY;
   }
@@ -188,19 +225,15 @@ function draw(ball, player1, player2) {
 * */
 
 function pong() {
+  const ball = new Ball();
+  resetBall(ball);
+
   const player1 = new PlayerPaddle(20, 10);
   const player2 = new PlayerPaddle(canvas.width - 10 - 20, 10);
-  const ball = new Ball(canvas.width / 2, canvas.height / 2, 10);
-  const aiMaxSpeed = gameSpeed * 4;
 
-  function update() {
-    controlGame(ball, player1, player2);
-    moveAI(ball, player2, aiMaxSpeed);
-    draw(ball, player1, player2);
-  }
-
-  resetBall(ball);
-  setInterval(update, 1000 / fps);
+  setInterval(() => update(ball, player1, player2), 1000 / updateRate);
+  setInterval(() => draw(ball, player1, player2), 1000 / frameRate)
+  setInterval(() => moveAi(ball, player2), 1000 / aiRate)
 
   canvas.addEventListener('mousemove', function (event) {
     movePlayer(player1, event);
