@@ -8,21 +8,8 @@ canvas.height = 480;
 const context = canvas.getContext('2d');
 context.imageSmoothingEnabled = false;
 
-const fps = 10;
+const frameRate = 10;
 
-
-/*
-* Structure
-* */
-
-let state = {
-  actionText: "Click to start",
-  grid: ['', '', '', '', '', '', '', '', ''],
-  scoreO: 0,
-  scoreX: 0,
-  turn: 0,
-  willRestart: true,
-};
 const boxes = [
   [60, 74],
   [180, 74],
@@ -34,6 +21,20 @@ const boxes = [
   [180, 314],
   [300, 314]
 ];
+
+
+/*
+* State
+* */
+
+let state = {
+  actionText: "Click to start",
+  grid: ['', '', '', '', '', '', '', '', ''],
+  scoreO: 0,
+  scoreX: 0,
+  turn: 0,
+  willRestart: true,
+};
 
 
 /*
@@ -53,8 +54,8 @@ function resetGame() {
   }
 }
 
-function clickOnBox(i) {
-  let text = state.grid[i];
+function clickBox(i) {
+  const text = state.grid[i];
   if (text === '') {
     state.grid[i] = state.curr;
     endTurn();
@@ -132,10 +133,15 @@ function getBoxForEvent(event) {
   return getBox(x, y);
 }
 
-function handleCanvasClickAreas(event) {
+function handleClick(event) {
   const box = getBoxForEvent(event);
-  box && clickOnBox(box);
+  box && clickBox(box);
 }
+
+
+/*
+* Main
+* */
 
 function draw() {
   const {actionText, curr, scoreX, scoreO, grid} = state;
@@ -170,28 +176,20 @@ function draw() {
   }
 }
 
-/*
-* Main
-* */
+setInterval(draw, 1000 / frameRate);
 
-function ticTacToe() {
-  canvas.addEventListener('mousemove', function (event) {
-    if (getBoxForEvent(event)) {
-      canvas.style.cursor = "crosshair";
-    } else {
-      canvas.style.cursor = "default";
-    }
-  });
+canvas.addEventListener('mousemove', function (event) {
+  if (getBoxForEvent(event)) {
+    canvas.style.cursor = "crosshair";
+  } else {
+    canvas.style.cursor = "default";
+  }
+});
 
-  canvas.addEventListener('click', function (event) {
-    if (state.willRestart) {
-      resetGame();
-    } else {
-      handleCanvasClickAreas(event);
-    }
-  });
-
-  setInterval(draw, 1000 / fps);
-}
-
-ticTacToe();
+canvas.addEventListener('click', function (event) {
+  if (state.willRestart) {
+    resetGame();
+  } else {
+    handleClick(event);
+  }
+});
