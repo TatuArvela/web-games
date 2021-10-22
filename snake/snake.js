@@ -2,239 +2,201 @@
 * Globals
 * */
 
+const screenWidth = 84;
+const screenHeight = 48;
+const black = '#322917';
+
+const scale = 10;
+const canvasPadding = 20;
+
 const canvas = document.getElementById('canvas');
-canvas.width = 504;
-canvas.height = 288;
+canvas.width = screenWidth * scale + canvasPadding * 2;
+canvas.height = screenHeight * scale + canvasPadding * 2;
 const context = canvas.getContext('2d');
+context.imageSmoothingEnabled = false;
+const scoreDisplay = document.getElementById('score');
+
+const tickRate = 8;
+const hardBorders = false;
+
+const borders = {
+  top: 2,
+  left: 2,
+  right: screenWidth - 1,
+  bottom: screenHeight - 1,
+}
+const playArea = {
+  top: 4,
+  right: screenWidth - 3,
+  bottom: screenHeight - 3,
+  left: 4,
+};
+const width = (playArea.right - playArea.left + 1) / 3;
+const height = (playArea.bottom - playArea.top + 1) / 3;
+
+
+/*
+* Objects
+* */
+
+function Snake() {
+  this.y = 10;
+  this.x = 10;
+  this.vector = {
+    x: 0,
+    y: 0,
+  };
+  this.tailLength = 1;
+  this.tail = [{
+    x: this.x,
+    y: this.y
+  }];
+}
+
+function Treat() {
+  function randomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min - 1) + min)
+  }
+
+  this.x = randomNumber(1, width);
+  this.y = randomNumber(1, height);
+}
 
 
 /*
 * State
-*  */
+* */
 
-const game = {
-  width: 504,
-  height: 288,
-  scale: 24,
-  speed: 10
-};
-game.columns = game.width / game.scale;
-game.rows = game.height / game.scale;
-game.score = 0;
-
-const snake = {
-  y: 10,
-  x: 10,
-  vector: {
-    x: 0,
-    y: 0,
-  },
-  trail: [],
-  tail: 5
-};
-
-const bug = {};
-
-const edges = {
-  left: 1,
-  right: (game.columns - 1) - 1,
-  top: 1,
-  bottom: (game.rows - 1) - 1
-};
+let snake = new Snake();
+let treat = new Treat();
 
 
 /*
 * Functions
 *  */
 
-window.onload = function () {
-  if ((game.width % game.scale) !== 0 || (game.height % game.scale) !== 0) {
-    game.width -= (game.width % game.scale);
-  }
-
-  if ((game.height % game.scale) !== 0 || (game.height % game.scale) !== 0) {
-    game.height -= (game.height % game.scale);
-  }
-
-  newBugPosition();
-
-  context.imageSmoothingEnabled = false;
-  context.filter = "blur(1px)";
-
-  document.addEventListener("keydown", input);
-  setInterval(update, 1000 / game.speed);
+function resetSnake() {
+  snake = new Snake();
 }
 
-function reset() {
-  snake.trail = [];
-  snake.vector.x = 0;
-  snake.vector.y = 0;
-  snake.x = 10;
-  snake.y = 10;
-  game.score = 0;
-  snake.tail = 5;
+function resetTreat() {
+  treat = new Treat();
+  if (overlapsWithSnakeTail(treat)) {
+    treat = new Treat();
+  }
 }
+
+function overlapsWithSnakeTail(item) {
+  for (let i = 0; i < snake.tail.length; i++) {
+    if ((snake.tail[i].x === item.x) && (snake.tail[i].y === item.y)) {
+      return true;
+    }
+  }
+}
+
+
+/*
+* Graphics utilities
+* */
+
+const scaled = (value) => value * scale;
+
+function drawDot(x, y) {
+  context.fillStyle = black;
+  context.fillRect(scaled(x) + 0.5, scaled(y) + 0.5, scaled(1) - 1, scaled(1) - 1);
+}
+
+function drawHorizontalLine(from, to, height) {
+  for (let i = from; i <= to; i++) {
+    drawDot(i, height);
+  }
+}
+
+function drawVerticalLine(from, to, width) {
+  for (let i = from; i <= to; i++) {
+    drawDot(width, i);
+  }
+}
+
+function drawBorders() {
+  drawHorizontalLine(borders.left, borders.right, borders.top);
+  drawHorizontalLine(borders.left, borders.right, borders.bottom);
+  drawVerticalLine(borders.top + 1, borders.bottom - 1, borders.left);
+  drawVerticalLine(borders.top + 1, borders.bottom - 1, borders.right);
+}
+
+function drawSnakeSection(x, y) {
+  for (let xOffset = 0; xOffset <= 2; xOffset++) {
+    for (let yOffset = 0; yOffset <= 2; yOffset++) {
+      drawDot(x + xOffset, y + yOffset);
+    }
+  }
+}
+
+function drawTreat() {
+  const x = treat.x * 3;
+  const y = treat.y * 3;
+  drawDot(x + 1, y);
+  drawDot(x, y + 1);
+  drawDot(x + 2, y + 1);
+  drawDot(x + 1, y + 2);
+}
+
+
+/*
+* Main
+* */
 
 function update() {
   snake.x += snake.vector.x;
   snake.y += snake.vector.y;
 
-  // Left edge
-  if (snake.x < edges.left) {
-    //snake.x = edges.right;
-    reset();
+  // Snake hits left edge
+  if (snake.x < 1) {
+    if (hardBorders) return resetSnake();
+    snake.x = width;
   }
 
-  // Right edge
-  if (snake.x > edges.right) {
-    //snake.x = edges.left;
-    reset();
+  // Snake hits right edge
+  if (snake.x > width) {
+    if (hardBorders) return resetSnake();
+    snake.x = 1;
   }
 
-  // Top edge
-  if (snake.y < edges.top) {
-    //snake.y = edges.bottom;
-    reset();
+  // Snake hits top edge
+  if (snake.y < 1) {
+    if (hardBorders) return resetSnake();
+    snake.y = height;
   }
 
-  // Bottom edge
-  if (snake.y > edges.bottom) {
-    //snake.y = edges.top;
-    reset();
+  // Snake hits bottom edge
+  if (snake.y > height) {
+    if (hardBorders) return resetSnake();
+    snake.y = 1;
   }
 
-  // If the snake bites their snake.tail, reset the snake.tail
-  for (let i = 0; i < snake.trail.length; i++) {
-    if (snake.trail[i].x === snake.x && snake.trail[i].y === snake.y) {
-      reset();
-    }
+  // Snake bites their tail
+  if (snake.tail.length > 0 && overlapsWithSnakeTail(snake)) {
+    return resetSnake();
   }
 
   // Grow the tail
-  snake.trail.push({
+  snake.tail.push({
     x: snake.x,
     y: snake.y
   })
-  while (snake.trail.length > snake.tail) {
-    snake.trail.shift();
+  while (snake.tail.length > snake.tailLength) {
+    snake.tail.shift();
   }
 
-  // If the snake eats the bug, generate a new bug
-  if (bug.x === snake.x && bug.y === snake.y) {
-    snake.tail++;
-    game.score++;
-    newBugPosition();
-  }
-
-  draw();
-}
-
-function newBugPosition() {
-  bug.x = Math.floor(Math.random() * (edges.right - edges.left - 1) + edges.left);
-  bug.y = Math.floor(Math.random() * (edges.bottom - edges.top - 1) + edges.top);
-  // Making sure the bug doesn't spawn inside the snake
-  for (let i = 0; i < snake.trail.length; i++) {
-    if ((snake.trail[i].x === bug.x) && (snake.trail[i].y === bug.y)) {
-      newBugPosition();
-    }
+  // If the snake eats the treat, generate a new treat
+  if (treat.x === snake.x && treat.y === snake.y) {
+    snake.tailLength++;
+    resetTreat();
   }
 }
 
-function draw() {
-  const grd = context.createLinearGradient(0, 0, canvas.width, canvas.height);
-  grd.addColorStop(0, "#88b330");
-  grd.addColorStop(0.2, "#84b005");
-  grd.addColorStop(0.5, "#a1ce02");
-  grd.addColorStop(0.9, "#90bc03");
-  grd.addColorStop(1, "#add209");
-
-  // Draw the background
-  context.fillStyle = grd;
-  context.fillRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  // Draw the border
-  context.fillStyle = "#263d00";
-  context.fillRect(
-    game.scale / 3,
-    game.scale / 3,
-    canvas.width - (game.scale / 3 * 2),
-    canvas.height - (game.scale / 3 * 2)
-  );
-
-  // Draw inner background
-  context.fillStyle = grd;
-  context.fillRect(
-    game.scale / 3 * 2,
-    game.scale / 3 * 2,
-    canvas.width - game.scale / 3 * 4,
-    canvas.height - (game.scale / 3 * 4)
-  );
-
-  // Draw the snake
-  context.fillStyle = "#263d00";
-  for (let i = 0; i < snake.trail.length; i++) {
-    context.fillRect(
-      snake.trail[i].x * game.scale,
-      snake.trail[i].y * game.scale,
-      game.scale,
-      game.scale
-    );
-  }
-
-  // Draw the bug
-  context.fillStyle = "#263d00";
-  context.fillRect(
-    bug.x * game.scale + (game.scale / 3),
-    bug.y * game.scale,
-    game.scale / 3,
-    game.scale / 3
-  );
-  context.fillRect(
-    bug.x * game.scale,
-    bug.y * game.scale + (game.scale / 3),
-    game.scale / 3,
-    game.scale / 3
-  );
-  context.fillRect(
-    bug.x * game.scale + (game.scale / 3 * 2),
-    bug.y * game.scale + (game.scale / 3),
-    game.scale / 3,
-    game.scale / 3
-  );
-  context.fillRect(
-    bug.x * game.scale + (game.scale / 3),
-    bug.y * game.scale + (game.scale / 3 * 2),
-    game.scale / 3,
-    game.scale / 3
-  );
-
-  context.fillStyle = grd;
-  let w = canvas.width / (game.scale / 3);
-  for (let i = 0; i < w; i++) {
-    context.fillRect(
-      game.scale / 3 * i,
-      0,
-      game.scale / 3 / 12,
-      canvas.height
-    );
-  }
-  let h = canvas.width / (game.scale / 3);
-  for (let i = 0; i < h; i++) {
-    context.fillRect(
-      0,
-      game.scale / 3 * i,
-      canvas.width,
-      game.scale / 3 / 12
-    );
-  }
-}
-
-function input(e) {
+function handleInput(e) {
   switch (e.keyCode) {
     case 37: // Left
       if (snake.vector.x !== 1) {
@@ -262,3 +224,35 @@ function input(e) {
       break;
   }
 }
+
+function draw() {
+  context.save();
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Top left pixel is 1,1
+  context.translate(canvasPadding - scale, canvasPadding - scale);
+  drawBorders();
+  context.translate(scale, scale);
+
+  drawTreat();
+
+  // Draw the snake
+  context.fillStyle = "#263d00";
+  for (let i = 0; i < snake.tail.length; i++) {
+    const section = snake.tail[i];
+    drawSnakeSection(section.x * 3, section.y * 3);
+  }
+  context.restore();
+}
+
+function displayScore() {
+  scoreDisplay.innerText = snake.tailLength;
+}
+
+setInterval(() => {
+  update();
+  draw();
+  displayScore();
+}, 1000 / tickRate);
+
+document.addEventListener("keydown", handleInput);
