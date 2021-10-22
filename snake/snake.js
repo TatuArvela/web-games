@@ -197,6 +197,7 @@ function update() {
 }
 
 function handleInput(e) {
+  e.preventDefault();
   switch (e.keyCode) {
     case 37: // Left
       if (snake.vector.x !== 1) {
