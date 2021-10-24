@@ -1,0 +1,234 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --moveDuration: 300ms;
+}
+
+body {
+  align-items: center;
+  background: transparent;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  margin: 0;
+  width: 100vw;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  user-select: none;
+}
+
+img {
+  image-rendering: pixelated;
+}
+
+.launcher {
+  font-family: "Press Start 2P", monospace;
+  background: linear-gradient(180deg, rgb(32, 2, 86) 0%, rgb(61, 18, 99) 20%, rgb(106, 55, 107) 40%, rgb(61, 18, 99) 70%, rgb(37, 3, 82) 100%);
+  height: 540px;
+  width: 960px;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.games {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: space-evenly;
+  align-items: center;
+  position: relative;
+  overflow: visible;
+}
+
+.game {
+  border-radius: 16px;
+  border: 2px solid #4d4d4d;
+  box-shadow: 0 0 0 2px #000, inset 0 0 0 2px #fff, inset 0 0 0 4px #000, 0 12px 20px rgba(0, 0, 0, 0.5);
+  height: 160px;
+  opacity: 0.6;
+  text-decoration: none;
+  width: 160px;
+  margin: 10px;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+a.game {
+  opacity: 1;
+}
+
+.game img {
+  width: 100%;
+  height: 100%;
+}
+
+.game-details {
+  background: black;
+  height: 40px;
+  border-top: 2px solid #727272;
+  width: 100%;
+  position: relative;
+}
+
+.game-players {
+  color: white;
+  background: #727272;
+  border-radius: 6px;
+  font-size: 14px;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 4px 6px 2px 6px;
+}
+
+.movePrevious {
+  animation-name: movePrevious;
+  animation-duration: var(--moveDuration);
+}
+
+@keyframes movePrevious {
+  from {
+    transform: translateX(-180px)
+  }
+  to {
+    transform: translateX(0)
+  }
+}
+
+.moveNext {
+  animation-name: moveNext;
+  animation-duration: var(--moveDuration);
+}
+
+@keyframes moveNext {
+  from {
+    transform: translateX(180px)
+  }
+  to {
+    transform: translateX(0)
+  }
+}
+
+header {
+  background: #b8b8b8;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  border-bottom: 2px solid black;
+}
+
+.instructions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+footer {
+  background: #b8b8b8;
+  border-top: 2px solid black;
+  bottom: 0;
+  height: 72px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  width: 100%;
+}
+
+.f0 {
+  background-color: #4d4d4d;
+  border-radius: 0 0 8px 8px;
+  height: calc(100% - 8px);
+  width: 100%;
+  overflow: hidden;
+  padding-bottom: 2px;
+  position: relative;
+  box-shadow: 0 2px 0 0 #a2a2a2;
+}
+
+.f1 {
+  background-color: #6e6e6e;
+  border-radius: 0 0 8px 8px;
+  padding-bottom: 2px;
+  height: 100%;
+}
+
+.f2 {
+  background-color: #868686;
+  border-radius: 4px 4px 8px 8px;
+  height: 100%;
+  padding-bottom: 4px;
+}
+
+.f3 {
+  background-color: #b8b8b8;
+  border-radius: 4px 4px 8px 8px;
+  height: 100%;
+  padding-bottom: 4px;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.f4 {
+  background-color: #d0d0d0;
+  border-radius: 4px 4px 8px 8px;
+  height: 100%;
+  padding-bottom: 4px;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.f5 {
+  background-color: #b8b8b8;
+  border-radius: 0 0 8px 8px;
+  height: 100%;
+  padding-bottom: 4px;
+  padding-left: 2px;
+  padding-right: 2px;
+  border-top: 2px solid #f5f5f5;
+}
+
+.f-lines {
+  position: absolute;
+  top: -2px;
+  left: 58px;
+  right: 58px;
+  border-left: 2px solid #4d4d4d;
+  border-right: 2px solid #4d4d4d;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2), inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+  height: calc(100% + 4px);
+}
+
+.logo {
+  position: absolute;
+  top: 2px;
+  left: 64px;
+  pointer-events: none;
+}
+
+.game-title {
+  border-radius: 12px;
+  color: #727272;
+  font-size: 18px;
+  left: 72px;
+  margin: auto;
+  padding: 6px 12px;
+  position: absolute;
+  right: 72px;
+  top: 10px;
+  width: 500px;
+}

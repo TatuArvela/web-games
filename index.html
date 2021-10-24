@@ -180,7 +180,7 @@
       <div class="screen-reflection"></div>
       <div class="screen-filter"></div>
       <div class="screen-content">
-        <iframe src="./selector.html" id="iframe" onload="this.contentWindow.focus()"></iframe>
+        <iframe src="./launcher" id="iframe" onload="this.contentWindow.focus()"></iframe>
         <div class="reset-button" onclick="reset()">
           <div class="reset-icon"></div>
         </div>
@@ -192,7 +192,7 @@
   const iframe = document.getElementById("iframe");
 
   function reset() {
-    iframe.src = "./selector.html";
+    iframe.src = "./launcher";
   }
 </script>
 </body>
