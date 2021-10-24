@@ -170,12 +170,6 @@
       transform: rotate(60deg);
     }
   </style>
-  <script>
-    function reset() {
-      const iframe = document.getElementById("iframe");
-      iframe.src = "./selector.html";
-    }
-  </script>
 </head>
 <body>
 <div class="monitor">
@@ -186,13 +180,20 @@
       <div class="screen-reflection"></div>
       <div class="screen-filter"></div>
       <div class="screen-content">
-        <iframe src="./selector.html" id="iframe"></iframe>
-        <div class="reset-button" onClick="reset()">
+        <iframe src="./selector.html" id="iframe" onload="this.contentWindow.focus()"></iframe>
+        <div class="reset-button" onclick="reset()">
           <div class="reset-icon"></div>
         </div>
       </div>
     </div>
   </div>
 </div>
+<script>
+  const iframe = document.getElementById("iframe");
+
+  function reset() {
+    iframe.src = "./selector.html";
+  }
+</script>
 </body>
 </html>
