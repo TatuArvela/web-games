@@ -238,7 +238,6 @@ function draw() {
   drawTreat();
 
   // Draw the snake
-  context.fillStyle = "#263d00";
   for (let i = 0; i < snake.tail.length; i++) {
     const section = snake.tail[i];
     drawSnakeSection(section.x * 3, section.y * 3);
