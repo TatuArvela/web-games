@@ -2,27 +2,32 @@ const games = [
   {
     title: "Pong",
     href: "./pong",
-    players: 1
+    players: 1,
+    controls: ['mouse']
   },
   {
     title: "Snake",
     href: "./snake",
-    players: 1
+    players: 1,
+    controls: ['keyboard']
   },
   {
     title: "Tic-Tac-Toe",
     href: "./tic-tac-toe",
-    players: 2
+    players: 2,
+    controls: ['mouse']
   },
   {
     title: "Super Mathgame",
     href: "https://tatuarvela.github.io/Super-Mathgame",
-    players: 1
+    players: 1,
+    controls: ['mouse']
   },
   {
     title: "Sudoku",
     href: "https://tatuarvela.github.io/Sudoku",
-    players: 1
+    players: 1,
+    controls: ['mouse', 'keyboard']
   },
 ];
 
@@ -79,18 +84,30 @@ function renderGames() {
       gameElement.href = game.href;
     }
 
-    const image = document.createElement("img");
+    const imageContainer = document.createElement("div");
+    imageContainer.className = "game-image";
+    const image = document.createElement("image");
     image.src = "test";
+    imageContainer.appendChild(image);
 
     const details = document.createElement("div");
     details.className = "game-details";
+
+    const controls = document.createElement("div");
+    controls.className = "game-controls";
+    game.controls.forEach((control) => {
+      const controlIcon = document.createElement('img');
+      controlIcon.src = `./${control}.png`;
+      controls.appendChild(controlIcon);
+    });
+    details.appendChild(controls);
 
     const players = document.createElement("div");
     players.className = "game-players";
     players.innerText = `${game.players}P`;
     details.appendChild(players);
 
-    gameElement.appendChild(image);
+    gameElement.appendChild(imageContainer);
     gameElement.appendChild(details);
     gamesElement.appendChild(gameElement);
   });
