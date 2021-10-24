@@ -56,11 +56,11 @@ img {
   inset 2px 2px 0 2px #747474, inset 0 2px 0 2px #747474, inset 2px 0 0 2px #747474,
   inset 0 0 0 6px black;
   padding: 6px;
-  height: 204px; /* 208 - 2 * 2 */
+  height: 208px;
   opacity: 0.25;
   text-decoration: none;
-  width: 188px; /* 192 - 2 * 2 */
-  margin: 14px; /* 10 + 2 * 2 */
+  width: 192px;
+  margin: 10px;
   flex-shrink: 0;
   overflow: hidden;
   position: relative;
@@ -79,7 +79,10 @@ a.game {
   height: 100%;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
-  background: red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .game-details {
@@ -87,7 +90,7 @@ a.game {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   border-top: 2px solid #727272;
-  height: 34px;
+  height: 32px;
   width: 100%;
   position: relative;
   flex-shrink: 0;
@@ -102,6 +105,7 @@ a.game {
 
 .game-controls img {
   margin-right: 2px;
+  object-fit: cover;
 }
 
 .game-players {
@@ -119,6 +123,7 @@ a.game {
 .movePrevious {
   animation-name: movePrevious;
   animation-duration: var(--moveDuration);
+  animation-timing-function: ease-in;
 }
 
 @keyframes movePrevious {
@@ -133,6 +138,7 @@ a.game {
 .moveNext {
   animation-name: moveNext;
   animation-duration: var(--moveDuration);
+  animation-timing-function: ease-in;
 }
 
 @keyframes moveNext {
@@ -185,7 +191,7 @@ footer {
 .f0 {
   background-color: #4d4d4d;
   border-radius: 0 0 8px 8px;
-  height: calc(100% - 8px);
+  height: calc(100% - 6px);
   width: 100%;
   overflow: hidden;
   padding-bottom: 2px;
@@ -196,18 +202,25 @@ footer {
 .f1 {
   background-color: #6e6e6e;
   border-radius: 0 0 8px 8px;
-  padding-bottom: 2px;
   height: 100%;
+  padding-bottom: 2px;
 }
 
 .f2 {
   background-color: #868686;
   border-radius: 4px 4px 8px 8px;
   height: 100%;
-  padding-bottom: 4px;
+  padding-bottom: 2px;
 }
 
 .f3 {
+  background-color: #9d9d9d;
+  border-radius: 4px 4px 8px 8px;
+  height: 100%;
+  padding-bottom: 4px;
+}
+
+.f4 {
   background-color: #b8b8b8;
   border-radius: 4px 4px 8px 8px;
   height: 100%;
@@ -216,7 +229,7 @@ footer {
   padding-right: 2px;
 }
 
-.f4 {
+.f5 {
   background-color: #d0d0d0;
   border-radius: 4px 4px 8px 8px;
   height: 100%;
@@ -225,7 +238,7 @@ footer {
   padding-right: 2px;
 }
 
-.f5 {
+.f6 {
   background-color: #b8b8b8;
   border-radius: 0 0 8px 8px;
   height: 100%;
@@ -238,8 +251,8 @@ footer {
 .f-lines {
   position: absolute;
   top: -2px;
-  left: 58px;
-  right: 58px;
+  left: 56px;
+  right: 56px;
   border-left: 2px solid #4d4d4d;
   border-right: 2px solid #4d4d4d;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2), inset 0 0 0 2px rgba(255, 255, 255, 0.2);

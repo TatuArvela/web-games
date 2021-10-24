@@ -3,31 +3,36 @@ const games = [
     title: "Pong",
     href: "./pong",
     players: 1,
-    controls: ['mouse']
+    controls: ['mouse'],
+    image: ['./_img/pong.png']
   },
   {
     title: "Snake",
     href: "./snake",
     players: 1,
-    controls: ['keyboard']
+    controls: ['keyboard'],
+    image: ['./_img/snake.png'],
   },
   {
     title: "Tic-Tac-Toe",
     href: "./tic-tac-toe",
     players: 2,
-    controls: ['mouse']
+    controls: ['mouse'],
+    image: ['./_img/tic-tac-toe.png']
   },
   {
     title: "Super Mathgame",
     href: "https://tatuarvela.github.io/Super-Mathgame",
     players: 1,
-    controls: ['mouse']
+    controls: ['mouse'],
+    image: ['./_img/super-mathgame.png']
   },
   {
     title: "Sudoku",
     href: "https://tatuarvela.github.io/Sudoku",
     players: 1,
-    controls: ['mouse', 'keyboard']
+    controls: ['mouse', 'keyboard'],
+    image: ['./_img/sudoku.png']
   },
 ];
 
@@ -44,6 +49,11 @@ const moveDuration = parseInt(
 let moveTimeout = null;
 
 function getGamesToRender() {
+  let minus3 = selectedIndex - 3;
+  if (minus3 < 0) {
+    minus3 = games.length + minus3;
+  }
+
   let minus2 = selectedIndex - 2;
   if (minus2 < 0) {
     minus2 = games.length + minus2;
@@ -64,12 +74,19 @@ function getGamesToRender() {
     plus2 = plus2 - games.length;
   }
 
+  let plus3 = selectedIndex + 3;
+  if (plus3 > games.length - 1) {
+    plus3 = plus3 - games.length;
+  }
+
   return [
+    games[minus3],
     games[minus2],
     games[minus1],
     games[selectedIndex],
     games[plus1],
     games[plus2],
+    games[plus3],
   ]
 }
 
@@ -86,8 +103,8 @@ function renderGames() {
 
     const imageContainer = document.createElement("div");
     imageContainer.className = "game-image";
-    const image = document.createElement("image");
-    image.src = "test";
+    const image = document.createElement("img");
+    image.src = game.image ?? '';
     imageContainer.appendChild(image);
 
     const details = document.createElement("div");
@@ -97,7 +114,7 @@ function renderGames() {
     controls.className = "game-controls";
     game.controls.forEach((control) => {
       const controlIcon = document.createElement('img');
-      controlIcon.src = `./${control}.png`;
+      controlIcon.src = `./_img/${control}.png`;
       controls.appendChild(controlIcon);
     });
     details.appendChild(controls);
