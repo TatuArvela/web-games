@@ -66,7 +66,6 @@
       border-radius: 16px;
       border: 2px solid #4d4d4d;
       box-shadow: 0 0 0 2px #000, inset 0 0 0 2px #fff, inset 0 0 0 4px #000, 0 12px 20px rgba(0, 0, 0, 0.5);
-      cursor: pointer;
       display: flex;
       flex-direction: column;
       height: 160px;
@@ -77,7 +76,7 @@
       width: 160px;
     }
 
-    #selected {
+    a.game {
       opacity: 1;
     }
 
@@ -268,11 +267,16 @@
   function renderGames() {
     gamesElement.innerHTML = '';
     getGamesToRender().forEach((game) => {
-      const link = document.createElement("a");
-      link.href = game.href;
-      link.className = "game";
-      if (games[selectedIndex].title === game.title) {
-        link.id = 'selected';
+      const isSelected = games[selectedIndex].title === game.title;
+      let gameElement;
+
+      if (isSelected) {
+        gameElement = document.createElement("a");
+        gameElement.className = "game";
+        gameElement.href = game.href;
+      } else {
+        gameElement = document.createElement("div");
+        gameElement.className = "game";
       }
 
       const image = document.createElement("div");
@@ -282,9 +286,9 @@
       title.className = "game-title";
       title.innerText = game.title;
 
-      link.appendChild(image);
-      link.appendChild(title);
-      gamesElement.appendChild(link);
+      gameElement.appendChild(image);
+      gameElement.appendChild(title);
+      gamesElement.appendChild(gameElement);
     });
   }
 
