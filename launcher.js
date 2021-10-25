@@ -94,11 +94,15 @@ function renderGames() {
   gamesElement.innerHTML = '';
   getGamesToRender().forEach((game) => {
     const isSelected = games[selectedIndex].title === game.title;
-    const gameElement = document.createElement(isSelected ? "a" : "div");
-    gameElement.className = ["game", animation].filter(Boolean).join(" ");
+    const gameElement = document.createElement("div");
+    gameElement.className = [
+      "game",
+      animation
+    ].filter(Boolean).join(" ");
 
     if (isSelected) {
-      gameElement.href = game.href;
+      gameElement.id = "selected";
+      gameElement.onclick = () => play(game.href);
     }
 
     const imageContainer = document.createElement("div");
@@ -175,7 +179,7 @@ function handleInput(e) {
       break;
     case 32:
     case 13:
-      window.location.assign(games[selectedIndex].href);
+      play(games[selectedIndex].href);
   }
 }
 

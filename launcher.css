@@ -6,7 +6,7 @@
 
 body {
   align-items: center;
-  background: transparent;
+  background: black;
   display: flex;
   height: 100vh;
   justify-content: center;
@@ -36,6 +36,38 @@ img {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.buttonPrevious {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 365px;
+  cursor: pointer;
+  opacity: 0;
+  background: linear-gradient(90deg, #ffffff22, transparent);
+  transition: opacity 0.5s;
+}
+
+.buttonPrevious:hover {
+  opacity: 1;
+}
+
+.buttonNext {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 365px;
+  cursor: pointer;
+  opacity: 0;
+  background: linear-gradient(-90deg, #ffffff22, transparent);
+  transition: opacity 0.5s;
+}
+
+.buttonNext:hover {
+  opacity: 1;
 }
 
 .games {
@@ -71,7 +103,8 @@ img {
   flex-direction: column;
 }
 
-a.game {
+.game#selected {
+  cursor: pointer;
   opacity: 1;
 }
 
