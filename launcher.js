@@ -1,38 +1,38 @@
 const games = [
   {
     title: "Pong",
-    href: "./pong",
+    href: "games/pong",
     players: 1,
     controls: ['mouse'],
-    image: ['./_img/pong.png']
+    image: ['img/pong.png']
   },
   {
     title: "Snake",
-    href: "./snake",
+    href: "games/snake",
     players: 1,
     controls: ['keyboard'],
-    image: ['./_img/snake.png'],
+    image: ['img/snake.png'],
   },
   {
     title: "Tic-Tac-Toe",
-    href: "./tic-tac-toe",
+    href: "games/tic-tac-toe",
     players: 2,
     controls: ['mouse'],
-    image: ['./_img/tic-tac-toe.png']
+    image: ['img/tic-tac-toe.png']
   },
   {
     title: "Super Mathgame",
     href: "https://tatuarvela.github.io/Super-Mathgame",
     players: 1,
     controls: ['mouse'],
-    image: ['./_img/super-mathgame.png']
+    image: ['img/super-mathgame.png']
   },
   {
     title: "Sudoku",
     href: "https://tatuarvela.github.io/Sudoku",
     players: 1,
     controls: ['mouse', 'keyboard'],
-    image: ['./_img/sudoku.png']
+    image: ['img/sudoku.png']
   },
 ];
 
@@ -118,7 +118,7 @@ function renderGames() {
     controls.className = "game-controls";
     game.controls.forEach((control) => {
       const controlIcon = document.createElement('img');
-      controlIcon.src = `./_img/${control}.png`;
+      controlIcon.src = `img/${control}.png`;
       controls.appendChild(controlIcon);
     });
     details.appendChild(controls);
