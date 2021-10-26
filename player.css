@@ -14,10 +14,22 @@ iframe {
   border: none;
   height: 100%;
   overflow: hidden;
-  width: 100%;
+  width: calc(100% - 60px);
 }
 
-.reset-button {
+.player-buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 60px;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player-button {
   align-items: center;
   background: black;
   border-radius: 3px;
@@ -27,26 +39,28 @@ iframe {
   display: flex;
   height: 48px;
   justify-content: center;
-  position: absolute;
-  right: 10px;
-  top: 10px;
   width: 48px;
-  transition: color 0.25s, background 0.25s;
+  transition: background 0.25s;
+  margin: 10px 0;
 }
 
-.reset-button:hover {
+.player-button:hover {
   background: #fff;
   color: #ff0000;
 }
 
 .reset-icon {
   border-radius: 50%;
-  border: 4px solid currentColor;
-  border-right: 4px solid transparent;
+  border: 4px solid transparent;
+  border-right: 4px solid currentColor;
+  border-top: 4px solid currentColor;
   display: block;
-  height: 30px;
+  height: 20px;
   position: relative;
-  width: 30px;
+  width: 20px;
+  transform: rotate(45deg);
+  top: 2px;
+  left: 6px;
 }
 
 .reset-icon::before {
@@ -58,23 +72,57 @@ iframe {
   display: block;
   height: 0;
   position: absolute;
-  right: -4px;
-  top: -3px;
-  transform: rotate(45deg);
+  right: 20px;
+  top: 4px;
+  transform: rotate(135deg);
   width: 0;
 }
 
 .reset-icon::after {
-  border-radius: 50%;
-  border: 4px solid transparent;
-  border-right-color: currentColor;
+  border-top: 4px solid currentColor;
+  border-bottom: 4px solid currentColor;
   box-sizing: border-box;
   content: "";
   display: block;
-  height: 30px;
+  height: 20px;
   position: absolute;
+  width: 20px;
+  top: 2.4px;
+  left: -10px;
+  transform: rotate(-45deg);
+}
+
+.full-screen-icon {
+  height: 30px;
   width: 30px;
-  top: -4px;
+  border: 4px solid currentColor;
+  transition: inherit;
+}
+
+.player-button:hover .full-screen-icon:before, .player-button:hover .full-screen-icon:after {
+  background: white;
+}
+
+.full-screen-icon:before {
+  position: relative;
+  content: '';
+  width: 30px;
+  height: 10px;
   left: -4px;
-  transform: rotate(60deg);
+  top: 6px;
+  background: black;
+  display: block;
+  transition: inherit;
+}
+
+.full-screen-icon:after {
+  position: relative;
+  content: '';
+  width: 10px;
+  height: 30px;
+  left: 6px;
+  top: -14px;
+  background: black;
+  display: block;
+  transition: inherit;
 }

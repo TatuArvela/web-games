@@ -12,8 +12,13 @@
 <body>
 <div class="player disabled" id="player">
   <iframe id="iframe"></iframe>
-  <div class="reset-button" onclick="reset()">
-    <div class="reset-icon"></div>
+  <div class="player-buttons">
+    <div class="player-button" onclick="exitGame()">
+      <div class="reset-icon"></div>
+    </div>
+    <div class="player-button" onclick="toggleFullscreen()">
+      <div class="full-screen-icon"></div>
+    </div>
   </div>
 </div>
 <div class="launcher" id="launcher">
