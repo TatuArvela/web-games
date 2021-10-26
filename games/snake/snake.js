@@ -196,32 +196,48 @@ function update() {
   }
 }
 
+function moveLeft() {
+  if (snake.vector.x !== 1) {
+    snake.vector.x = -1;
+    snake.vector.y = 0;
+  }
+}
+
+function moveUp() {
+  if (snake.vector.y !== 1) {
+    snake.vector.x = 0;
+    snake.vector.y = -1;
+  }
+}
+
+function moveRight() {
+  if (snake.vector.x !== -1) {
+    snake.vector.x = 1;
+    snake.vector.y = 0;
+  }
+}
+
+function moveDown() {
+  if (snake.vector.y !== -1) {
+    snake.vector.x = 0;
+    snake.vector.y = 1;
+  }
+}
+
 function handleInput(e) {
   e.preventDefault();
   switch (e.keyCode) {
-    case 37: // Left
-      if (snake.vector.x !== 1) {
-        snake.vector.x = -1;
-        snake.vector.y = 0;
-      }
+    case 37:
+      moveLeft();
       break;
-    case 38: // Up
-      if (snake.vector.y !== 1) {
-        snake.vector.x = 0;
-        snake.vector.y = -1;
-      }
+    case 38:
+      moveUp();
       break;
-    case 39: // Right
-      if (snake.vector.x !== -1) {
-        snake.vector.x = 1;
-        snake.vector.y = 0;
-      }
+    case 39:
+      moveRight();
       break;
-    case 40: // Down
-      if (snake.vector.y !== -1) {
-        snake.vector.x = 0;
-        snake.vector.y = 1;
-      }
+    case 40:
+      moveDown();
       break;
   }
 }
