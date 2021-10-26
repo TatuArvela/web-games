@@ -3,7 +3,7 @@ const games = [
     title: "Pong",
     href: "games/pong",
     players: 1,
-    controls: ['mouse'],
+    controls: ['mouse', 'touch'],
     image: ['img/pong.png']
   },
   {
@@ -17,14 +17,14 @@ const games = [
     title: "Tic-Tac-Toe",
     href: "games/tic-tac-toe",
     players: 2,
-    controls: ['mouse'],
+    controls: ['mouse', 'touch'],
     image: ['img/tic-tac-toe.png']
   },
   {
     title: "Super Mathgame",
     href: "https://tatuarvela.github.io/Super-Mathgame",
     players: 1,
-    controls: ['mouse'],
+    controls: ['mouse', 'touch'],
     image: ['img/super-mathgame.png']
   },
   {
