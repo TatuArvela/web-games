@@ -34,4 +34,11 @@ const games = [
     controls: ['mouse', 'keyboard'],
     image: ['img/sudoku.png']
   },
+  {
+    title: "Floaty Goat",
+    href: "https://tatuarvela.github.io/codecamp",
+    players: 1,
+    controls: ['mouse', 'keyboard', 'touch'],
+    image: ['img/floaty-goat.png']
+  },
 ];
