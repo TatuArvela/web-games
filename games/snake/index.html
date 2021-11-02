@@ -61,42 +61,51 @@
       cursor: pointer;
       position: absolute;
       margin: auto;
+      border: 2px solid white;
+      border-radius: 50%;
+      opacity: 0.1;
+    }
+
+    /* Shown on touch devices */
+    @media (hover: none) and (pointer: coarse) {
+      .moveLeft,
+      .moveUp,
+      .moveRight,
+      .moveDown {
+        opacity: 0.8;
+      }
     }
 
     .moveLeft {
-      border-left: 1px solid #333333;
       bottom: 0;
-      height: calc(100% - 200px);
-      left: -100px;
+      height: 200px;
+      left: 0;
       top: 0;
-      width: 300px;
+      width: 200px;
     }
 
     .moveUp {
-      border-top: 1px solid #333333;
-      height: 300px;
+      height: 200px;
       left: 0;
       right: 0;
-      top: -100px;
-      width: calc(100% - 500px);
+      top: 0;
+      width: 200px;
     }
 
     .moveRight {
-      border-right: 1px solid #333333;
       bottom: 0;
-      height: calc(100% - 200px);
-      right: -100px;
+      height: 200px;
+      right: 0;
       top: 0;
-      width: 300px;
+      width: 200px;
     }
 
     .moveDown {
-      border-bottom: 1px solid #333333;
-      bottom: -100px;
-      height: 300px;
+      bottom: 0;
+      height: 200px;
       left: 0;
       right: 0;
-      width: calc(100% - 500px);
+      width: 200px;
     }
   </style>
 </head>
