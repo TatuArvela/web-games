@@ -36,8 +36,14 @@ img {
   overflow: hidden;
   position: relative;
   text-align: center;
-  transform: scale(0.5);
+  transform: scale(0.25);
   width: 960px;
+}
+
+@media (min-width: 480px) and (min-height: 270px) {
+  .launcher {
+    transform: scale(0.5);
+  }
 }
 
 @media (min-width: 960px) and (min-height: 540px) {
