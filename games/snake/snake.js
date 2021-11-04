@@ -6,8 +6,8 @@ const screenWidth = 84;
 const screenHeight = 48;
 const black = '#322917';
 
-const scale = 10;
-const canvasPadding = 20;
+const scale = 9;
+const canvasPadding = 22;
 
 const canvas = document.getElementById('canvas');
 canvas.width = screenWidth * scale + canvasPadding * 2;
@@ -67,6 +67,7 @@ function Treat() {
 * State
 * */
 
+let alive = true;
 let snake = new Snake();
 let treat = new Treat();
 
@@ -74,10 +75,6 @@ let treat = new Treat();
 /*
 * Functions
 *  */
-
-function resetSnake() {
-  snake = new Snake();
-}
 
 function resetTreat() {
   treat = new Treat();
@@ -147,37 +144,54 @@ function drawTreat() {
 * Main
 * */
 
+function resetGame() {
+  snake = new Snake();
+  alive = true;
+}
+
+function endGame() {
+  alive = false;
+}
+
 function update() {
   snake.x += snake.vector.x;
   snake.y += snake.vector.y;
 
   // Snake hits left edge
   if (snake.x < 1) {
-    if (hardBorders) return resetSnake();
+    if (hardBorders) {
+      return endGame();
+    }
     snake.x = width;
   }
 
   // Snake hits right edge
   if (snake.x > width) {
-    if (hardBorders) return resetSnake();
+    if (hardBorders) {
+      return endGame();
+    }
     snake.x = 1;
   }
 
   // Snake hits top edge
   if (snake.y < 1) {
-    if (hardBorders) return resetSnake();
+    if (hardBorders) {
+      return endGame();
+    }
     snake.y = height;
   }
 
   // Snake hits bottom edge
   if (snake.y > height) {
-    if (hardBorders) return resetSnake();
+    if (hardBorders) {
+      return endGame();
+    }
     snake.y = 1;
   }
 
   // Snake bites their tail
-  if (snake.tail.length > 0 && overlapsWithSnakeTail(snake)) {
-    return resetSnake();
+  if (snake.tail.length > 1 && overlapsWithSnakeTail(snake)) {
+    return endGame();
   }
 
   // Grow the tail
@@ -196,28 +210,40 @@ function update() {
   }
 }
 
-function moveLeft() {
+function handleMoveLeft() {
+  if (!alive) {
+    resetGame();
+  }
   if (snake.vector.x !== 1) {
     snake.vector.x = -1;
     snake.vector.y = 0;
   }
 }
 
-function moveUp() {
+function handleMoveUp() {
+  if (!alive) {
+    resetGame();
+  }
   if (snake.vector.y !== 1) {
     snake.vector.x = 0;
     snake.vector.y = -1;
   }
 }
 
-function moveRight() {
+function handleMoveRight() {
+  if (!alive) {
+    resetGame();
+  }
   if (snake.vector.x !== -1) {
     snake.vector.x = 1;
     snake.vector.y = 0;
   }
 }
 
-function moveDown() {
+function handleMoveDown() {
+  if (!alive) {
+    resetGame();
+  }
   if (snake.vector.y !== -1) {
     snake.vector.x = 0;
     snake.vector.y = 1;
@@ -228,16 +254,16 @@ function handleInput(e) {
   e.preventDefault();
   switch (e.keyCode) {
     case 37:
-      moveLeft();
+      handleMoveLeft();
       break;
     case 38:
-      moveUp();
+      handleMoveUp();
       break;
     case 39:
-      moveRight();
+      handleMoveRight();
       break;
     case 40:
-      moveDown();
+      handleMoveDown();
       break;
   }
 }
@@ -261,14 +287,31 @@ function draw() {
   context.restore();
 }
 
-function displayScore() {
-  scoreDisplay.innerText = snake.tailLength;
+function drawGameOver() {
+  context.save();
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  const score = snake.tailLength;
+
+  context.font = '120px sans-serif';
+  context.fontWeight = "bold";
+  context.fillStyle = black;
+  context.fillText("Game over!", 50, 140);
+  context.fillText("Your score:", 50, 280);
+  context.fillText(score, 50, 420);
+
+  context.restore();
 }
+
+alive = false;
 
 setInterval(() => {
   update();
-  draw();
-  displayScore();
+  if (alive) {
+    draw()
+  } else {
+    drawGameOver();
+  }
 }, 1000 / tickRate);
 
 document.addEventListener("keydown", handleInput);

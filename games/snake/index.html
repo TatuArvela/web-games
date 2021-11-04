@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Snake</title>
-  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
   <style>
     body {
       background: linear-gradient(180deg, #1e1d1d 0%, #111111 100%);
@@ -115,10 +114,10 @@
 <div class="wrapper">
   <div class="inner">
     <canvas id="canvas"></canvas>
-    <div onClick="moveLeft()" class="moveLeft"></div>
-    <div onClick="moveUp()" class="moveUp"></div>
-    <div onClick="moveRight()" class="moveRight"></div>
-    <div onClick="moveDown()" class="moveDown"></div>
+    <div onClick="handleMoveLeft()" class="moveLeft"></div>
+    <div onClick="handleMoveUp()" class="moveUp"></div>
+    <div onClick="handleMoveRight()" class="moveRight"></div>
+    <div onClick="handleMoveDown()" class="moveDown"></div>
   </div>
 </div>
 <script src="snake.js"></script>
