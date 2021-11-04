@@ -3,24 +3,38 @@
 * */
 
 const canvas = document.getElementById('canvas');
-canvas.width = 640;
-canvas.height = 480;
+canvas.width = 800;
+canvas.height = 600;
 const context = canvas.getContext('2d');
 context.imageSmoothingEnabled = false;
 
 const frameRate = 10;
 
-const boxes = [
-  [60, 74],
-  [180, 74],
-  [300, 74],
-  [60, 194],
-  [180, 194],
-  [300, 194],
-  [60, 314],
-  [180, 314],
-  [300, 314]
-];
+
+const boxDiameter = 130;
+const boxMargin = 20;
+const getBoxes = () => {
+  const col1 = 80;
+  const col2 = col1 + boxDiameter + boxMargin;
+  const col3 = col2 + boxDiameter + boxMargin;
+  const row1 = 85;
+  const row2 = row1 + boxDiameter + boxMargin;
+  const row3 = row2 + boxDiameter + boxMargin;
+
+  return [
+    [col1, row1],
+    [col2, row1],
+    [col3, row1],
+    [col1, row2],
+    [col2, row2],
+    [col3, row2],
+    [col1, row3],
+    [col2, row3],
+    [col3, row3]
+  ]
+}
+
+const boxes = getBoxes();
 
 
 /*
@@ -117,9 +131,9 @@ function getBox(x, y) {
   for (const i in boxes) {
     if (
       x >= boxes[i][0] &&
-      x <= boxes[i][0] + 100 &&
+      x <= boxes[i][0] + boxDiameter &&
       y >= boxes[i][1] &&
-      y <= boxes[i][1] + 100
+      y <= boxes[i][1] + boxDiameter
     ) {
       return i;
     }
@@ -151,28 +165,28 @@ function draw() {
 
   context.fillStyle = '#a5a5ff'
   context.strokeStyle = '#a5a5ff'
-  context.lineWidth = 4;
+  context.lineWidth = 6;
 
-  context.font = '24px "Press Start 2P"';
+  context.font = '28px "Press Start 2P"';
   context.textAlign = 'center';
-  context.fillText('Tic-Tac-Toe', canvas.width / 2, 50);
-  context.fillText(actionText, canvas.width / 2, 464);
+  context.fillText('Tic-Tac-Toe', canvas.width / 2, 52);
+  context.fillText(actionText, canvas.width / 2, canvas.height - 24);
 
   context.textAlign = 'left';
-  const scoreXPos = 450;
-  context.fillText(`P.X${curr === 'X' ? '<' : ''}`, scoreXPos, 104);
-  context.fillText(`P.O${curr === 'O' ? '<' : ''}`, scoreXPos, 224);
-  context.fillText(scoreX, scoreXPos, 144);
-  context.fillText(scoreO, scoreXPos, 264);
+  const scoreXPos = canvas.width - 220;
+  context.fillText(`P.X${curr === 'X' ? '<' : ''}`, scoreXPos, 120);
+  context.fillText(`P.O${curr === 'O' ? '<' : ''}`, scoreXPos, 244);
+  context.fillText(scoreX, scoreXPos, 164);
+  context.fillText(scoreO, scoreXPos, 284);
 
   for (let i = 0; i < 9; i++) {
-    context.strokeRect(boxes[i][0], boxes[i][1], 100, 100);
+    context.strokeRect(boxes[i][0], boxes[i][1], boxDiameter, boxDiameter);
   }
 
   context.textAlign = 'center';
-  context.font = '90px "Press Start 2P"';
+  context.font = `${boxDiameter - 20}px "Press Start 2P"`;
   for (let i = 0; i < 9; i++) {
-    context.fillText(grid[i], boxes[i][0] + 56, boxes[i][1] + 100);
+    context.fillText(grid[i], boxes[i][0] + boxDiameter / 2 + 8, boxes[i][1] + boxDiameter - 2);
   }
 }
 
