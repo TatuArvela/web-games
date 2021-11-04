@@ -142,8 +142,9 @@ function getBox(x, y) {
 
 function getBoxForEvent(event) {
   const rect = canvas.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+  const scale = canvas.width / canvas.clientWidth;
+  const x = (event.clientX - rect.left) * scale;
+  const y = (event.clientY - rect.top) * scale;
   return getBox(x, y);
 }
 
