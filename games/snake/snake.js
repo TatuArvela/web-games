@@ -303,8 +303,6 @@ function drawGameOver() {
   context.restore();
 }
 
-alive = false;
-
 setInterval(() => {
   update();
   if (alive) {
