@@ -1,4 +1,5 @@
 let selectedIndex = 0;
+const launcherElement = document.getElementById('launcher');
 const gamesElement = document.getElementById('games');
 const titleElement = document.getElementById('title');
 
@@ -50,6 +51,16 @@ function getGamesToRender() {
     games[plus2],
     games[plus3],
   ]
+}
+
+function setScale() {
+  const documentWidth = document.documentElement.clientWidth;
+
+  if (documentWidth < 480) {
+    launcherElement.style.transform = `scale(${documentWidth / 960})`;
+  } else {
+    launcherElement.style.transform = "";
+  }
 }
 
 function renderGames() {
@@ -145,5 +156,8 @@ function handleInput(e) {
   }
 }
 
+setScale();
 renderGames();
 document.addEventListener("keydown", handleInput);
+
+window.addEventListener("resize", setScale)
