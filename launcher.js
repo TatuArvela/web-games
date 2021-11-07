@@ -175,7 +175,6 @@ function screensaver() {
   screensaverElement.style.position = "fixed";
   screensaverElement.style.width = "100%";
   screensaverElement.style.height = "100%";
-  screensaverElement.onclick = resetScreensaverTimeout;
   screensaverElement.onmousemove = resetScreensaverTimeout;
 
   const screensaverIframe = document.createElement("iframe");
