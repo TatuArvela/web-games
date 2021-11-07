@@ -168,7 +168,8 @@ function controlBall() {
 
 function movePlayer(event) {
   const rect = canvas.getBoundingClientRect();
-  player1.y = event.clientY - rect.top - player1.height / 2;
+  const scale = canvas.clientHeight / canvas.height;
+  player1.y = (event.clientY - rect.top) / scale - player1.height / 2;
 
   if (player1.y < 0) {
     player1.y = 0;
