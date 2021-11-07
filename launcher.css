@@ -316,7 +316,8 @@ footer {
 
 .logo {
   position: absolute;
-  top: 2px;
+  top: 4px;
+  height: 40px;
   left: 64px;
   pointer-events: none;
 }
