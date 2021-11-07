@@ -6,12 +6,14 @@ function exitGame() {
   iframe.removeAttribute("onload");
   iframe.removeAttribute("src");
   document.activeElement.blur();
+  resetScreensaverTimeout();
 }
 
 function play(url) {
   player.classList.remove("disabled");
   iframe.setAttribute("onload", "iframe.contentWindow.focus()");
   iframe.setAttribute("src", url);
+  clearTimeout(screensaverTimeout);
 }
 
 function toggleFullscreen() {

@@ -1,15 +1,20 @@
-let selectedIndex = 0;
+const IDLE_TIME = 60000;
+
 const launcherElement = document.getElementById('launcher');
 const gamesElement = document.getElementById('games');
 const titleElement = document.getElementById('title');
+let screensaverElement;
 
-let animation = "";
 const moveDuration = parseInt(
   getComputedStyle(document.documentElement)
     .getPropertyValue('--moveDuration')
     .replace('ms', '')
 );
+
+let selectedIndex = 0;
+let animation = "";
 let moveTimeout = null;
+let screensaverTimeout;
 
 function getGamesToRender() {
   let minus3 = selectedIndex - 3;
@@ -142,6 +147,7 @@ function nextGame() {
 
 function handleInput(e) {
   e.preventDefault();
+  resetScreensaverTimeout();
 
   switch (e.keyCode) {
     case 37: // Left
@@ -156,8 +162,33 @@ function handleInput(e) {
   }
 }
 
+function resetScreensaverTimeout() {
+  clearTimeout(screensaverTimeout);
+  screensaverTimeout = setTimeout(screensaver, IDLE_TIME);
+  if (screensaverElement) {
+    screensaverElement.remove();
+  }
+}
+
+function screensaver() {
+  screensaverElement = document.createElement("div");
+  screensaverElement.style.position = "fixed";
+  screensaverElement.style.width = "100%";
+  screensaverElement.style.height = "100%";
+  screensaverElement.onclick = resetScreensaverTimeout;
+  screensaverElement.onmousemove = resetScreensaverTimeout;
+
+  const screensaverIframe = document.createElement("iframe");
+  screensaverIframe.style.pointerEvents = "none";
+  screensaverIframe.src = "./extras/mystify";
+  screensaverElement.appendChild(screensaverIframe);
+
+  document.body.appendChild(screensaverElement);
+}
+
 setScale();
 renderGames();
-document.addEventListener("keydown", handleInput);
+resetScreensaverTimeout();
 
+document.addEventListener("keydown", handleInput);
 window.addEventListener("resize", setScale)
