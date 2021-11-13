@@ -158,7 +158,7 @@ img {
 
 .game-controls img {
   margin-right: 4px;
-  object-fit: cover;
+  height: 18px;
 }
 
 .game-players {
@@ -229,6 +229,7 @@ header {
 .instructions img {
   position: relative;
   top: 2px;
+  height: 46px;
 }
 
 footer {
