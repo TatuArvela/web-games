@@ -179,7 +179,7 @@ function screensaver() {
 
   const screensaverIframe = document.createElement("iframe");
   screensaverIframe.style.pointerEvents = "none";
-  screensaverIframe.src = "https://tatuarvela.github.io/mystify-scr/";
+  screensaverIframe.src = "https://tatuarvela.github.io/mystify.scr/";
   screensaverElement.appendChild(screensaverIframe);
 
   document.body.appendChild(screensaverElement);
