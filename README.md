@@ -1,4 +1,4 @@
-![WEB GAMES](_img/web-games.png?raw=true "WEB GAMES")
+![WEB GAMES](img/web-games.png?raw=true "WEB GAMES")
 
 A collection of little browser games, presented in a CRT monitor simulation.
 
