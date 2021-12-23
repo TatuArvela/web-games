@@ -46,7 +46,7 @@ function Snake() {
     x: 0,
     y: 0,
   };
-  this.tailLength = 1;
+  this.points = 1;
   this.tail = [{
     x: this.x,
     y: this.y
@@ -194,18 +194,18 @@ function update() {
     return endGame();
   }
 
-  // Grow the tail
-  snake.tail.push({
+  // Move tail
+  snake.tail.unshift({
     x: snake.x,
     y: snake.y
   })
-  while (snake.tail.length > snake.tailLength) {
-    snake.tail.shift();
+  while (snake.tail.length > snake.points) {
+    snake.tail.pop();
   }
 
   // If the snake eats the treat, generate a new treat
   if (treat.x === snake.x && treat.y === snake.y) {
-    snake.tailLength++;
+    snake.points++;
     resetTreat();
   }
 }
@@ -291,7 +291,7 @@ function drawGameOver() {
   context.save();
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  const score = snake.tailLength;
+  const score = snake.points;
 
   context.font = '120px sans-serif';
   context.fontWeight = "bold";
