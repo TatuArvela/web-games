@@ -10,7 +10,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400&display=swap');
 
     :root {
-      --footer-height: 56px;
+      --toolbar-height: 56px;
     }
 
     body {
@@ -30,25 +30,46 @@
       flex-direction: column;
     }
 
-    .footer {
+    .toolbar {
       align-items: center;
       backdrop-filter: blur(20px);
       background: rgb(23, 36, 57);
       color: white;
       display: flex;
-      height: var(--footer-height);
+      height: var(--toolbar-height);
       justify-content: space-between;
       padding: 4px 12px;
     }
 
-    h1 {
+    .title-container {
+      display: block;
+      width: 300px;
+    }
+
+    .title {
       font-size: 24px;
       line-height: 1em;
       color: white;
       text-shadow: 2px 2px rgba(0, 0, 0, 0.2);
     }
 
-    button {
+    .counter {
+      flex: 1;
+      text-align: center;
+    }
+
+    .counter-label {
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .button-container {
+      display: flex;
+      width: 300px;
+      justify-content: end;
+    }
+
+    .button {
       background: transparent;
       border-radius: 20px;
       border: 2px solid white;
@@ -62,50 +83,52 @@
       transition: background 200ms, color 200ms;
     }
 
-    button:hover {
+    .button:hover {
       background: rgba(255, 255, 255, 0.8);
       border-color: rgba(255, 255, 255, 0.8);
       cursor: pointer;
       color: black;
     }
 
-    button:focus {
+    .button:focus {
       outline: none;
     }
 
-    button:active {
+    .button:active {
       box-shadow: inset 2px 2px #aaaaaa;
       background: rgba(200, 200, 200, 0.8);
       padding: 11px 9px 9px 11px;
     }
 
     canvas {
-      height: calc(100vh - var(--footer-height));
+      height: calc(100vh - var(--toolbar-height));
       width: 100%;
-    }
-
-    .colors {
-      display: none;
     }
   </style>
 </head>
 <body>
 <div class="container">
   <canvas id="canvas"></canvas>
-  <div class="footer">
-    <h1>SameGame</h1>
-    <div id="score">Score: 0</div>
-    <div id="get">Get: 0</div>
-    <div id="left">Left: 0</div>
-    <button id="new-game" onClick="generateGame()">New Game</button>
+  <div class="toolbar">
+    <div class="title-container">
+      <h1 class="title">SameGame</h1>
+    </div>
+    <div class="counter">
+      <div class="counter-label">Score</div>
+      <span id="score">0</span>
+    </div>
+    <div class="counter">
+      <div class="counter-label">Get</div>
+      <span id="get">0</span>
+    </div>
+    <div class="counter">
+      <div class="counter-label">Left</div>
+      <span id="left">0</span>
+    </div>
+    <div class="button-container">
+      <button class="button" id="new-game" onClick="generateGame()">New Game</button>
+    </div>
   </div>
-</div>
-<div class="colors">
-  <img id="blue" src="blue.png" alt="blue"/>
-  <img id="green" src="green.png" alt="green"/>
-  <img id="purple" src="purple.png" alt="purple"/>
-  <img id="red" src="red.png" alt="red"/>
-  <img id="yellow" src="yellow.png" alt="yellow"/>
 </div>
 <script src="samegame.js"></script>
 </body>
