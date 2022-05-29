@@ -27,12 +27,13 @@ const games = [
     controls: ['mouse', 'touch'],
     image: 'img/tic-tac-toe.png'
   },
-  // {
-  //   title: "SameGame",
-  //   href: "games/samegame",
-  //   players: 1,
-  //   controls: ['mouse', 'touch'],
-  // },
+  {
+    title: "SameGame",
+    href: "games/samegame",
+    players: 1,
+    controls: ['mouse', 'touch'],
+    image: 'img/samegame.png'
+  },
   {
     title: "Super Mathgame",
     href: "https://tatuarvela.github.io/Super-Mathgame",
