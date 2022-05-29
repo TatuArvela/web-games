@@ -104,11 +104,40 @@
       height: calc(100vh - var(--toolbar-height));
       width: 100%;
     }
+
+    .pointer {
+      cursor: pointer;
+    }
+
+    .result {
+      align-items: center;
+      bottom: var(--toolbar-height);
+      display: flex;
+      font-size: 60px;
+      font-weight: bold;
+      height: calc(100% - var(--toolbar-height));
+      justify-content: center;
+      left: 0;
+      pointer-events: none;
+      position: absolute;
+      right: 0;
+      text-shadow: 0 0 8px white;
+      top: 0;
+      width: 100%;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .result-visible {
+      opacity: 1;
+    }
+
   </style>
 </head>
 <body>
 <div class="container">
   <canvas id="canvas"></canvas>
+  <div class="result" id="result">You Win!</div>
   <div class="toolbar">
     <div class="title-container">
       <h1 class="title">SameGame</h1>
@@ -126,7 +155,7 @@
       <span id="left">0</span>
     </div>
     <div class="button-container">
-      <button class="button" id="new-game" onClick="generateGame()">New Game</button>
+      <button class="button" id="new-game" onClick="newGame()">New Game</button>
     </div>
   </div>
 </div>

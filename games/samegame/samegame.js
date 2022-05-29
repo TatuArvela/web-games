@@ -31,8 +31,11 @@ const gameHeight = (tileYMargin + tileHeight) * rows + tileYMargin;
 const colorAssets = {};
 let assetsLoaded = false;
 let grid;
+let hoveredTiles = [];
 let shouldDraw;
 let score = 0;
+let gameOver = false;
+let win = false;
 
 
 /*
@@ -51,6 +54,16 @@ function generateGame() {
   }
 }
 
+function getResult() {
+  if (win) {
+    return "You Win!";
+  }
+  if (gameOver) {
+    return "Game Over!";
+  }
+  return "";
+}
+
 function countLeft() {
   let left = 0;
   for (const row of grid) {
@@ -63,6 +76,10 @@ function countLeft() {
   return left;
 }
 
+function countGet(tiles) {
+  return tiles.length > 1 ? tiles.length : 0;
+}
+
 const getColor = (row, column) => (grid[row] ? grid[row][column] : '') ?? '';
 
 const clearTiles = (list) => {
@@ -72,6 +89,82 @@ const clearTiles = (list) => {
     clearTile(row, column);
     score += 10 * (index + 1);
   });
+  shouldDraw = true;
+}
+
+function dropTiles() {
+  const findFreeRow = (row, column) => {
+    for (let i = row; i < rows - 1; i++) {
+      if (grid[i + 1][column]) {
+        return i;
+      }
+    }
+    return rows - 1;
+  }
+
+  // Iterate columns left to right, rows down to up
+  for (let column = 0; column < columns; column++) {
+    for (let row = rows - 2; row >= 0; row--) {
+      const color = grid[row][column];
+      const belowRow = getBelowCoordinates(row, column)[0];
+      if (!getColor(belowRow, column)) {
+        const freeRow = findFreeRow(row, column);
+        grid[row][column] = '';
+        grid[freeRow][column] = color;
+      }
+    }
+  }
+}
+
+function snapTiles() {
+  const lastRow = rows - 1;
+  const findFreeColumn = (column) => {
+    for (let i = column; i > 0; i--) {
+      if (grid[lastRow][i - 1]) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
+  for (let column = 1; column < columns; column++) {
+    const color = grid[lastRow][column];
+    const leftColumn = getLeftCoordinates(lastRow, column)[1];
+    if (color && !getColor(lastRow, leftColumn)) {
+      const freeColumn = findFreeColumn(column);
+      for (let row = 0; row < rows; row++) {
+        grid[row][freeColumn] = grid[row][column];
+        grid[row][column] = '';
+      }
+    }
+  }
+}
+
+function detectWin() {
+  const tiles = [].concat.apply([], grid);
+  win = tiles.every((tile) => tile === '');
+  if (win) {
+    shouldDraw = true;
+  }
+}
+
+function detectGameOver() {
+  for (let row = 0; row < rows; row++) {
+    for (let column = 0; column < columns; column++) {
+      const color = grid[row][column];
+      if (color) {
+        const getColorByCoordinates = ([row, column]) => getColor(row, column);
+        const aboveColor = getColorByCoordinates(getAboveCoordinates(row, column));
+        const rightColor = getColorByCoordinates(getRightCoordinates(row, column));
+        const belowColor = getColorByCoordinates(getBelowCoordinates(row, column));
+        const leftColor = getColorByCoordinates(getLeftCoordinates(row, column));
+        if (color === aboveColor || color === rightColor || color === belowColor || color === leftColor) {
+          return;
+        }
+      }
+    }
+  }
+  gameOver = true;
   shouldDraw = true;
 }
 
@@ -120,6 +213,35 @@ function getConnectedTargetTiles(e) {
     }
   }
   return [];
+}
+
+function updateHoveredTiles(targetTiles) {
+  const sortTiles = (a, b) => {
+    if (a[0] < b[0]) {
+      return 1;
+    }
+    if (a[0] > b[0]) {
+      return -1
+    }
+    if (a[1] <= b[1]) {
+      return 1;
+    }
+    if (a[1] > b[1]) {
+      return -1;
+    }
+  }
+
+  const tilesMatch = (tiles1, tiles2) => {
+    const tiles1Flat = [].concat.apply([], tiles1)
+    const tiles2Flat = [].concat.apply([], tiles2)
+    return (tiles1Flat.length === tiles2Flat.length && tiles1Flat.every((value, index) => value === tiles2Flat[index]));
+  }
+
+  const newHoveredTiles = (!gameOver && targetTiles.length > 1) ? targetTiles.slice().sort(sortTiles) : [];
+  if (!tilesMatch(newHoveredTiles, hoveredTiles)) {
+    hoveredTiles = newHoveredTiles;
+    shouldDraw = true;
+  }
 }
 
 
@@ -177,10 +299,18 @@ function loadAssets() {
 }
 
 function drawTile(row, column, color) {
-  const x = (column - 1) * tileWidth + (column * tileXMargin);
-  const y = (row - 1) * tileHeight + (row * tileYMargin);
+  const x = (column) * tileWidth + ((column + 1) * tileXMargin);
+  const y = (row) * tileHeight + ((row + 1) * tileYMargin);
   const img = colorAssets[color];
   c.drawImage(img, x, y);
+  if (hoveredTiles.find(([tileRow, tileColumn]) => tileRow === row && tileColumn === column)) {
+    c.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    const bgX = x - tileXMargin / 2;
+    const bgY = y - tileYMargin / 2;
+    const bgWidth = tileWidth + tileXMargin;
+    const bgHeight = tileHeight + tileYMargin;
+    c.fillRect(bgX, bgY, bgWidth, bgHeight);
+  }
 }
 
 function draw() {
@@ -195,7 +325,7 @@ function draw() {
 
   grid.forEach((row, rowIndex) => {
     row.forEach((color, columnIndex) => {
-      color && drawTile(rowIndex + 1, columnIndex + 1, color)
+      color && drawTile(rowIndex, columnIndex, color)
     })
   })
 
@@ -208,6 +338,8 @@ function drawController() {
     draw();
     document.getElementById('score').innerText = score.toString(10);
     document.getElementById('left').innerText = countLeft().toString(10);
+    document.getElementById('result').innerText = getResult();
+    getResult() ? document.getElementById('result').classList.add('result-visible') : document.getElementById('result').classList.remove('result-visible');
   }
 }
 
@@ -219,6 +351,9 @@ function drawController() {
 function newGame() {
   generateGame();
   score = 0;
+  gameOver = false;
+  win = false;
+  shouldDraw = true;
 }
 
 function initialize() {
@@ -233,19 +368,26 @@ function initialize() {
   });
 
   canvas.addEventListener('click', (e) => {
+    if (gameOver) {
+      return;
+    }
     const targetTiles = getConnectedTargetTiles(e);
-    clearTiles(targetTiles);
+    if (targetTiles.length > 1) {
+      clearTiles(targetTiles);
+      dropTiles();
+      snapTiles();
+      detectGameOver();
+      detectWin();
+      updateHoveredTiles(getConnectedTargetTiles(e));
+    }
   });
 
   canvas.addEventListener('mousemove', (e) => {
     const targetTiles = getConnectedTargetTiles(e);
-    document.getElementById('get').innerText = targetTiles.length.toString(10);
+    (!gameOver && targetTiles.length > 0) ? canvas.classList.add('pointer') : canvas.classList.remove('pointer');
+    updateHoveredTiles(targetTiles);
+    document.getElementById('get').innerText = countGet(targetTiles).toString(10);
   })
 }
 
 initialize();
-
-
-// TODO:
-// Move orbs down
-// Set cursor to pointer if target tiles
