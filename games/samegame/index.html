@@ -67,6 +67,7 @@
       display: flex;
       width: 300px;
       justify-content: end;
+      gap: 10px;
     }
 
     .button {
@@ -80,10 +81,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      transition: background 200ms, color 200ms;
+      transition: background 200ms, color 200ms, opacity 200ms;
     }
 
-    .button:hover {
+    .button:not(:disabled):hover {
       background: rgba(255, 255, 255, 0.8);
       border-color: rgba(255, 255, 255, 0.8);
       cursor: pointer;
@@ -98,6 +99,10 @@
       box-shadow: inset 2px 2px #aaaaaa;
       background: rgba(200, 200, 200, 0.8);
       padding: 11px 9px 9px 11px;
+    }
+
+    .button:disabled {
+      opacity: 0.5;
     }
 
     canvas {
@@ -155,6 +160,7 @@
       <span id="left">0</span>
     </div>
     <div class="button-container">
+      <button class="button" id="undo" onClick="undo()">Undo</button>
       <button class="button" id="new-game" onClick="newGame()">New Game</button>
     </div>
   </div>

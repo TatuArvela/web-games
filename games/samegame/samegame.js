@@ -31,6 +31,7 @@ const gameHeight = (tileYMargin + tileHeight) * rows + tileYMargin;
 const colorAssets = {};
 let assetsLoaded = false;
 let grid;
+let gridHistory = [];
 let hoveredTiles = [];
 let shouldDraw;
 let score = 0;
@@ -42,6 +43,7 @@ let win = false;
 * Game logic
 * */
 
+// TODO: Ensure playability
 function generateGame() {
   grid = [];
   for (let i = 1; i <= rows; i++) {
@@ -244,6 +246,18 @@ function updateHoveredTiles(targetTiles) {
   }
 }
 
+function saveCurrentGridToHistory() {
+  const gridCopy = JSON.parse(JSON.stringify(grid));
+  gridHistory.push(gridCopy);
+}
+
+function undo() {
+  if (gridHistory.length > 0) {
+    grid = gridHistory.pop();
+    shouldDraw = true;
+  }
+}
+
 
 /*
 * Geometry
@@ -339,6 +353,7 @@ function drawController() {
     document.getElementById('score').innerText = score.toString(10);
     document.getElementById('left').innerText = countLeft().toString(10);
     document.getElementById('result').innerText = getResult();
+    document.getElementById('undo').disabled = gridHistory.length === 0;
     getResult() ? document.getElementById('result').classList.add('result-visible') : document.getElementById('result').classList.remove('result-visible');
   }
 }
@@ -373,6 +388,7 @@ function initialize() {
     }
     const targetTiles = getConnectedTargetTiles(e);
     if (targetTiles.length > 1) {
+      saveCurrentGridToHistory();
       clearTiles(targetTiles);
       dropTiles();
       snapTiles();
