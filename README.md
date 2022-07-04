@@ -6,25 +6,29 @@ A collection of little browser games, presented in a CRT monitor simulation.
 
 ## Credits
 
-The design for the launcher is based
-on [Ruckage's SNES mini EmulationStation theme](https://github.com/ruckage/es-theme-snes-mini).
+The design for the launcher is based on [Ruckage's SNES mini EmulationStation theme](https://github.com/ruckage/es-theme-snes-mini).
+
+## SameGame
+
+Custom version of the puzzle classic. The interface counts remaining tiles and highlights possible moves, and allows undoing moves. No animations yet, and puzzle generation is fully random without finishability checks.
+
+## Floaty Goat
+
+A goaty clone of Flappy Bird made with Phaser. Created at Nitor Code Camp 2021.
+
+[Repository](https://github.com/TatuArvela/codecamp/tree/master/4%20-%20floaty%20goat)
 
 ## Pong
 
-A take on the all-time classic Pong. I must give credit
-to [this video by Gamkedo](https://www.youtube.com/watch?v=KoWqdEACyLI) for the base of this little game. I have
-rewritten most of the code, but the physics are still slightly flawed.
+A take on the all-time classic Pong. I must give credit to [this video by Gamkedo](https://www.youtube.com/watch?v=KoWqdEACyLI) for the base of this little game. I have rewritten most of the code, but the physics are still slightly flawed.
 
 ## Snake
 
-A take on the classic Nokia Snake game. This one was also based on
-a [video by Gamkedo](https://www.youtube.com/watch?v=xGmXxpIj6vs). Here I made a lot of changes to the scalability,
-appearance and structure of the game.
+A take on the classic Nokia Snake game. This one was also based on a [video by Gamkedo](https://www.youtube.com/watch?v=xGmXxpIj6vs). Here I made a lot of changes to the scalability, appearance and structure of the game.
 
 ## Tic-Tac-Toe
 
-This one is based on [my earlier Unity version of Tic-Tac-Toe](https://github.com/TatuArvela/Unity-Tic-Tac-Toe), and has
-a Commodore-inspired, brutalist look.
+This one is based on [my earlier Unity version of Tic-Tac-Toe](https://github.com/TatuArvela/Unity-Tic-Tac-Toe), and has a Commodore-inspired, brutalist look.
 
 ## Super Mathgame
 

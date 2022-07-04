@@ -1,5 +1,12 @@
 const games = [
   {
+    title: "SameGame",
+    href: "games/samegame",
+    players: 1,
+    controls: ['mouse', 'touch'],
+    image: 'img/samegame.png'
+  },
+  {
     title: "Floaty Goat",
     href: "https://tatuarvela.github.io/codecamp",
     players: 1,
@@ -26,13 +33,6 @@ const games = [
     players: 2,
     controls: ['mouse', 'touch'],
     image: 'img/tic-tac-toe.png'
-  },
-  {
-    title: "SameGame",
-    href: "games/samegame",
-    players: 1,
-    controls: ['mouse', 'touch'],
-    image: 'img/samegame.png'
   },
   {
     title: "Super Mathgame",
