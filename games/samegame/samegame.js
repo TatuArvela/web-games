@@ -35,6 +35,7 @@ let gridHistory = [];
 let hoveredTiles = [];
 let shouldDraw;
 let score = 0;
+let scoreHistory = [];
 let gameOver = false;
 let win = false;
 
@@ -249,11 +250,13 @@ function updateHoveredTiles(targetTiles) {
 function saveCurrentGridToHistory() {
   const gridCopy = JSON.parse(JSON.stringify(grid));
   gridHistory.push(gridCopy);
+  scoreHistory.push(score);
 }
 
 function undo() {
   if (gridHistory.length > 0) {
     grid = gridHistory.pop();
+    score = scoreHistory.pop();
     shouldDraw = true;
   }
 }
@@ -365,7 +368,9 @@ function drawController() {
 
 function newGame() {
   generateGame();
+  gridHistory = [];
   score = 0;
+  scoreHistory = [];
   gameOver = false;
   win = false;
   shouldDraw = true;
@@ -389,6 +394,7 @@ function initialize() {
     const targetTiles = getConnectedTargetTiles(e);
     if (targetTiles.length > 1) {
       saveCurrentGridToHistory();
+      saveCurrentScoreToHistory();
       clearTiles(targetTiles);
       dropTiles();
       snapTiles();
