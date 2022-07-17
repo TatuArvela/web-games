@@ -359,7 +359,7 @@ function drawController() {
     document.getElementById('score').innerText = score.toString(10);
     document.getElementById('left').innerText = countLeft().toString(10);
     document.getElementById('result').innerText = getResult();
-    document.getElementById('undo').disabled = gridHistory.length === 0;
+    document.getElementById('undo').disabled = gameOver || gridHistory.length === 0;
     getResult() ? document.getElementById('result').classList.add('result-visible') : document.getElementById('result').classList.remove('result-visible');
   }
 }
