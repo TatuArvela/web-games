@@ -250,6 +250,9 @@ function updateHoveredTiles(targetTiles) {
 function saveCurrentGridToHistory() {
   const gridCopy = JSON.parse(JSON.stringify(grid));
   gridHistory.push(gridCopy);
+}
+
+function saveCurrentScoreToHistory() {
   scoreHistory.push(score);
 }
 
