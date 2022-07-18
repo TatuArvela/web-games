@@ -32,22 +32,26 @@ img {
   flex-direction: column;
   flex-shrink: 0;
   font-family: "Press Start 2P", monospace;
-  height: 540px;
   overflow: hidden;
   position: relative;
   text-align: center;
+  height: 200%;
+  width: 200%;
   transform: scale(0.5);
-  width: 960px;
 }
 
 @media (min-width: 960px) and (min-height: 540px) {
   .launcher {
+    height: 100%;
+    width: 100%;
     transform: scale(1);
   }
 }
 
 @media (min-width: 1920px) and (min-height: 1080px) {
   .launcher {
+    height: 50%;
+    width: 50%;
     transform: scale(2);
   }
 }

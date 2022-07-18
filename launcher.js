@@ -58,16 +58,6 @@ function getGamesToRender() {
   ]
 }
 
-function setScale() {
-  const documentWidth = document.documentElement.clientWidth;
-
-  if (documentWidth < 480) {
-    launcherElement.style.transform = `scale(${documentWidth / 960})`;
-  } else {
-    launcherElement.style.transform = "";
-  }
-}
-
 function renderGames() {
   gamesElement.innerHTML = '';
   getGamesToRender().forEach((game) => {
@@ -185,9 +175,7 @@ function screensaver() {
   document.body.appendChild(screensaverElement);
 }
 
-setScale();
 renderGames();
 resetScreensaverTimeout();
 
 document.addEventListener("keydown", handleInput);
-window.addEventListener("resize", setScale)
