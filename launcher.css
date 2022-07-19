@@ -180,7 +180,7 @@ img {
 .movePrevious {
   animation-name: movePrevious;
   animation-duration: var(--moveDuration);
-  animation-timing-function: ease-in;
+  animation-timing-function: ease-out;
 }
 
 @keyframes movePrevious {
@@ -195,7 +195,7 @@ img {
 .moveNext {
   animation-name: moveNext;
   animation-duration: var(--moveDuration);
-  animation-timing-function: ease-in;
+  animation-timing-function: ease-out;
 }
 
 @keyframes moveNext {

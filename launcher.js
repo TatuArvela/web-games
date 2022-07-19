@@ -1,4 +1,5 @@
 const IDLE_TIME = 60000;
+const GAME_RENDER_LIMIT = 11;
 
 const launcherElement = document.getElementById('launcher');
 const gamesElement = document.getElementById('games');
@@ -17,45 +18,29 @@ let moveTimeout = null;
 let screensaverTimeout;
 
 function getGamesToRender() {
-  let minus3 = selectedIndex - 3;
-  if (minus3 < 0) {
-    minus3 = games.length + minus3;
+  let renderedGames = [];
+
+  const renderedPerSide = (GAME_RENDER_LIMIT - 1) / 2;
+
+  for (let i = renderedPerSide; i > 0; i--) {
+    const gameIndex = selectedIndex - i;
+    renderedGames.push(gameIndex < 0
+      ? games[gameIndex + games.length]
+      : games[gameIndex]
+    );
+  }
+  
+  renderedGames.push(games[selectedIndex]);
+
+  for (let i = 1; i <= renderedPerSide; i++) {
+    const gameIndex = selectedIndex + i;
+    renderedGames.push(gameIndex > games.length - 1
+      ? games[gameIndex - games.length]
+      : games[gameIndex]
+    );
   }
 
-  let minus2 = selectedIndex - 2;
-  if (minus2 < 0) {
-    minus2 = games.length + minus2;
-  }
-
-  let minus1 = selectedIndex - 1;
-  if (minus1 < 0) {
-    minus1 = games.length + minus1;
-  }
-
-  let plus1 = selectedIndex + 1;
-  if (plus1 > games.length - 1) {
-    plus1 = plus1 - games.length;
-  }
-
-  let plus2 = selectedIndex + 2;
-  if (plus2 > games.length - 1) {
-    plus2 = plus2 - games.length;
-  }
-
-  let plus3 = selectedIndex + 3;
-  if (plus3 > games.length - 1) {
-    plus3 = plus3 - games.length;
-  }
-
-  return [
-    games[minus3],
-    games[minus2],
-    games[minus1],
-    games[selectedIndex],
-    games[plus1],
-    games[plus2],
-    games[plus3],
-  ]
+  return renderedGames;
 }
 
 function renderGames() {
