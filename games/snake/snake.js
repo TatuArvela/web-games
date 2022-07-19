@@ -98,45 +98,79 @@ function overlapsWithSnakeTail(item) {
 
 const scaled = (value) => value * scale;
 
-function drawDot(x, y) {
-  context.fillStyle = black;
-  context.fillRect(scaled(x) + 0.5, scaled(y) + 0.5, scaled(1) - 1, scaled(1) - 1);
+function drawDot(x, y, c = context) {
+  c.fillStyle = black;
+  c.fillRect(scaled(x) + 0.5, scaled(y) + 0.5, scaled(1) - 1, scaled(1) - 1);
 }
 
-function drawHorizontalLine(from, to, height) {
-  for (let i = from; i <= to; i++) {
-    drawDot(i, height);
-  }
-}
-
-function drawVerticalLine(from, to, width) {
-  for (let i = from; i <= to; i++) {
-    drawDot(width, i);
-  }
-}
+let borderCache = null;
 
 function drawBorders() {
-  drawHorizontalLine(borders.left, borders.right, borders.top);
-  drawHorizontalLine(borders.left, borders.right, borders.bottom);
-  drawVerticalLine(borders.top + 1, borders.bottom - 1, borders.left);
-  drawVerticalLine(borders.top + 1, borders.bottom - 1, borders.right);
+  if (borderCache === null) {
+    borderCache = document.createElement('canvas')
+    const borderCacheContext = borderCache.getContext('2d');
+    borderCache.width = canvas.width;
+    borderCache.height = canvas.height;
+    borderCacheContext.translate(canvasPadding - scale, canvasPadding - scale);
+  
+    function drawHorizontalLine(from, to, height) {
+      for (let i = from; i <= to; i++) {
+        drawDot(i, height, borderCacheContext);
+      }
+    }
+    
+    function drawVerticalLine(from, to, width) {
+      for (let i = from; i <= to; i++) {
+        drawDot(width, i, borderCacheContext);
+      }
+    }
+  
+    drawHorizontalLine(borders.left, borders.right, borders.top);
+    drawHorizontalLine(borders.left, borders.right, borders.bottom);
+    drawVerticalLine(borders.top + 1, borders.bottom - 1, borders.left);
+    drawVerticalLine(borders.top + 1, borders.bottom - 1, borders.right);
+  }
+  context.drawImage(borderCache, 0, 0);
 }
 
+let snakeSectionCache = null;
+
 function drawSnakeSection(x, y) {
-  for (let xOffset = 0; xOffset <= 2; xOffset++) {
-    for (let yOffset = 0; yOffset <= 2; yOffset++) {
-      drawDot(x + xOffset, y + yOffset);
+  if (snakeSectionCache === null) {
+    snakeSectionCache = document.createElement('canvas');
+    const snakeSectionCacheContext = snakeSectionCache.getContext('2d');
+    
+    for (let xOffset = 0; xOffset <= 2; xOffset++) {
+      for (let yOffset = 0; yOffset <= 2; yOffset++) {
+        drawDot(xOffset, yOffset, snakeSectionCacheContext);
+      }
     }
+  }
+  context.drawImage(snakeSectionCache, scaled(x * 3), scaled(y * 3));
+}
+
+function drawSnake() {
+  for (let i = 0; i < snake.tail.length; i++) {
+    const section = snake.tail[i];
+    drawSnakeSection(section.x + 1, section.y + 1);
   }
 }
 
+let treatCache = null;
+
 function drawTreat() {
-  const x = treat.x * 3;
-  const y = treat.y * 3;
-  drawDot(x + 1, y);
-  drawDot(x, y + 1);
-  drawDot(x + 2, y + 1);
-  drawDot(x + 1, y + 2);
+  if (treatCache === null) {
+    treatCache = document.createElement('canvas');
+    const treatCacheContext = treatCache.getContext('2d');
+
+    drawDot(1, 0, treatCacheContext);
+    drawDot(0, 1, treatCacheContext);
+    drawDot(2, 1, treatCacheContext);
+    drawDot(1, 2, treatCacheContext);
+  }
+  const x = treat.x + 1;
+  const y = treat.y + 1;
+  context.drawImage(treatCache, scaled(x * 3), scaled(y * 3));
 }
 
 
@@ -269,22 +303,10 @@ function handleInput(e) {
 }
 
 function draw() {
-  context.save();
   context.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Top left pixel is 1,1
-  context.translate(canvasPadding - scale, canvasPadding - scale);
   drawBorders();
-  context.translate(scale, scale);
-
   drawTreat();
-
-  // Draw the snake
-  for (let i = 0; i < snake.tail.length; i++) {
-    const section = snake.tail[i];
-    drawSnakeSection(section.x * 3, section.y * 3);
-  }
-  context.restore();
+  drawSnake();
 }
 
 function drawGameOver() {
