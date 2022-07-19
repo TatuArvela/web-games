@@ -62,6 +62,7 @@ img {
   left: 0;
   bottom: 0;
   width: 365px;
+  max-width: 30%;
   cursor: pointer;
   opacity: 0;
   background: linear-gradient(90deg, #ffffff22, transparent);
@@ -78,6 +79,7 @@ img {
   right: 0;
   bottom: 0;
   width: 365px;
+  max-width: 30%;
   cursor: pointer;
   opacity: 0;
   background: linear-gradient(-90deg, #ffffff22, transparent);
