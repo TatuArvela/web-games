@@ -8,7 +8,7 @@ let screensaverElement;
 
 const moveDuration = parseInt(
   getComputedStyle(document.documentElement)
-    .getPropertyValue('--moveDuration')
+    .getPropertyValue('--move-duration')
     .replace('ms', '')
 );
 
@@ -101,23 +101,25 @@ function debounce(func, delay = 0) {
 }
 
 function previousGame() {
-  animation = "movePrevious";
+  animation = "move-previous";
   if (selectedIndex === 0) {
     selectedIndex = games.length - 1;
   } else {
     selectedIndex--;
   }
   renderGames();
+  resetScreensaverTimeout();
 }
 
 function nextGame() {
-  animation = "moveNext";
+  animation = "move-next";
   if (selectedIndex === games.length - 1) {
     selectedIndex = 0;
   } else {
     selectedIndex++;
   }
   renderGames();
+  resetScreensaverTimeout();
 }
 
 function handleInput(e) {

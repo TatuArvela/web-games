@@ -23,15 +23,18 @@
   </div>
 </div>
 <div class="launcher" id="launcher">
-  <div class="games" id="games"><!-- Dynamic --></div>
-  <div class="buttonPrevious" onclick="previousGame()"></div>
-  <div class="buttonNext" onclick="nextGame()"></div>
   <header>
     <div class="instructions">
       <img src="img/instructions.png" alt=""/>
+      <div class="button-fullscreen" onclick="toggleFullscreen()">
+        <div class="full-screen-icon"></div>
+      </div>
       <div class="h-lines"></div>
     </div>
   </header>
+  <div class="games" id="games"><!-- Dynamic --></div>
+  <div class="button-previous" onclick="previousGame()"></div>
+  <div class="button-next" onclick="nextGame()"></div>
   <footer>
     <div class="f0">
       <div class="f1">

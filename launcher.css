@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 :root {
-  --moveDuration: 300ms;
+  --move-duration: 300ms;
 }
 
 body {
@@ -56,7 +56,32 @@ img {
   }
 }
 
-.buttonPrevious {
+.button-fullscreen {
+  background: black;
+  cursor: pointer;
+  height: 50px;
+  position: absolute;
+  right: 0px;
+  top: 0;
+  width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.2;
+  transition: opacity 0.25s, background 0.25s;
+}
+
+.button-fullscreen:hover {
+  opacity: 0.4;
+  background: #fff;
+  color: #ff0000;
+}
+
+.button-fullscreen:hover .full-screen-icon:before, .button-fullscreen:hover .full-screen-icon:after {
+  background: white;
+}
+
+.button-previous {
   position: absolute;
   top: 0;
   left: 0;
@@ -69,11 +94,11 @@ img {
   transition: opacity 0.5s;
 }
 
-.buttonPrevious:hover {
+.button-previous:hover {
   opacity: 1;
 }
 
-.buttonNext {
+.button-next {
   position: absolute;
   top: 0;
   right: 0;
@@ -86,7 +111,7 @@ img {
   transition: opacity 0.5s;
 }
 
-.buttonNext:hover {
+.button-next:hover {
   opacity: 1;
 }
 
@@ -179,13 +204,13 @@ img {
   padding: 4px 6px 2px 6px;
 }
 
-.movePrevious {
-  animation-name: movePrevious;
-  animation-duration: var(--moveDuration);
+.move-previous {
+  animation-name: move-previous;
+  animation-duration: var(--move-duration);
   animation-timing-function: ease-out;
 }
 
-@keyframes movePrevious {
+@keyframes move-previous {
   from {
     transform: translateX(-180px)
   }
@@ -194,13 +219,13 @@ img {
   }
 }
 
-.moveNext {
-  animation-name: moveNext;
-  animation-duration: var(--moveDuration);
+.move-next {
+  animation-name: move-next;
+  animation-duration: var(--move-duration);
   animation-timing-function: ease-out;
 }
 
-@keyframes moveNext {
+@keyframes move-next {
   from {
     transform: translateX(180px)
   }
@@ -220,16 +245,17 @@ header {
 }
 
 .instructions {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
   background: #b1b1b1;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
+  bottom: 0;
   box-shadow: inset 0 -2px 0 0 #4d4d4d, inset 0 0 0 2px #c8c8c8, 0 -2px 0 0 #4d4d4d, 0 -4px 0 0 #6e6e6e;
   height: 52px;
+  left: 0;
   overflow: hidden;
+  position: absolute;
+  right: 0;
+  z-index: 2;
 }
 
 .instructions img {
