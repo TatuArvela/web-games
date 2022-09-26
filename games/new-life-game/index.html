@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>New Life Game</title>
+
+    <!-- Base styles -->
+    <style>
+      html {
+        align-items: center;
+        background-color: black;
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        width: 100%;
+        font-family: sans-serif;
+      }
+
+      body {
+        background-color: white;
+        margin: 0;
+        aspect-ratio: 16 / 9;
+        font-size: 16rem;
+      }
+
+      body * {
+        box-sizing: border-box;
+        margin: 0;
+        user-select: none !important;
+      }
+
+      section {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        display: none;
+      }
+
+      :root {
+        --red: #c90016;
+        --bright-red: rgb(219, 74, 91);
+        --gray: #aaaaaa;
+      }
+
+      .back-button {
+        background: #333;
+        border-radius: 50%;
+        border: none;
+        bottom: 4rem;
+        box-shadow: 2rem 2rem 2rem black;
+        color: white;
+        cursor: pointer;
+        font-size: 20rem;
+        height: 40rem;
+        left: 2rem;
+        position: absolute;
+        transition: filter 100ms;
+        width: 40rem;
+        z-index: 1000;
+      }
+      .back-button:hover {
+        filter: brightness(1.5);
+      }
+      .back-button:active {
+        left: 4rem;
+        bottom: 2rem;
+        box-shadow: 0rem 0rem 2rem black;
+      }
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .common-button {
+        background: var(--red);
+        border: none;
+        border-radius: 2rem;
+        box-shadow: 2rem 2rem 2rem black;
+        color: white;
+        cursor: pointer;
+        font-size: 30rem;
+        padding: 12rem;
+        position: relative;
+        transition: filter 100ms;
+        text-transform: uppercase;
+        font-weight: bold;
+      }
+      .common-button:hover {
+        filter: brightness(1.5);
+      }
+      .common-button:active {
+        left: 2rem;
+        top: 2rem;
+        box-shadow: 0rem 0rem 2rem black;
+      }
+    </style>
+
+    <!-- Base functions -->
+    <script>
+      function updateScale() {
+        if ((window.innerWidth * 9) / 16 > window.innerHeight) {
+          document.documentElement.style.fontSize = "0.16vh";
+          document.body.style.height = "100vh";
+          document.body.style.width = "unset";
+        } else {
+          document.documentElement.style.fontSize = "0.09vw";
+          document.body.style.height = "unset";
+          document.body.style.width = "100vw";
+        }
+      }
+
+      function goToScreen(id) {
+        document
+          .querySelectorAll("section")
+          .forEach((section) => (section.style.display = "none"));
+        document.querySelector("#screen-" + id).style.display = "block";
+      }
+    </script>
+  </head>
+  <body>
+    <section id="screen-menu">
+      <style>
+        #screen-menu .title {
+          animation: 4s menu-title linear;
+          color: white;
+          display: inline-block;
+          font-size: 64rem;
+          font-weight: 400;
+          position: absolute;
+          -webkit-text-stroke: 2rem var(--red);
+          transform-origin: center;
+          transform: rotate(-720deg) scale(1);
+          top: 45%;
+          left: 60rem;
+          font-weight: bold;
+          text-shadow: 4rem 4rem 0 var(--red);
+          text-transform: uppercase;
+        }
+        @keyframes menu-title {
+          from {
+            opacity: 0;
+            transform: rotate(0deg) scale(0.5);
+          }
+          to {
+            opacity: 1;
+            transform: rotate(-720deg) scale(1);
+          }
+        }
+        #screen-menu .title .new {
+          background: white;
+          border: 2rem solid var(--red);
+          box-shadow: 4rem 4rem 0 var(--red);
+          color: var(--red);
+          display: inline-block;
+          font-size: 40rem;
+          font-weight: normal;
+          height: 50rem;
+          line-height: 50rem;
+          position: relative;
+          right: -8rem;
+          text-align: center;
+          text-shadow: none;
+          text-transform: none;
+          top: -30rem;
+          transform: skewX(-20deg) rotate(-10deg);
+          width: 100rem;
+        }
+        #screen-menu .line {
+          animation: 0.5s menu-line linear;
+          width: 900rem;
+          height: 300rem;
+          position: absolute;
+          transform: rotate(-22.5deg);
+          background: var(--red);
+          opacity: 0.2;
+        }
+        #screen-menu .line-1 {
+          top: -250rem;
+          left: -120rem;
+        }
+        #screen-menu .line-2 {
+          top: -300rem;
+          left: -120rem;
+        }
+        #screen-menu .line-3 {
+          top: -350rem;
+          left: -120rem;
+        }
+        @keyframes menu-line {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 0.2;
+          }
+        }
+        #screen-menu .version,
+        #screen-menu .subtitle {
+          position: absolute;
+          color: var(--red);
+          font-size: 14rem;
+          font-weight: 500;
+        }
+        #screen-menu .version {
+          bottom: 5rem;
+          left: 10rem;
+        }
+        #screen-menu .subtitle {
+          bottom: 5rem;
+          right: 10rem;
+        }
+        #screen-menu .button {
+          border: none;
+          position: relative;
+          background: var(--red);
+          color: white;
+          font-weight: bold;
+          width: 300rem;
+          height: 60rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 18rem;
+          box-shadow: 2rem 2rem 2rem black;
+          cursor: pointer;
+          transition: box-shadow 50ms ease-out, top 50ms ease-out,
+            left 50ms ease-out, background-color 50ms ease-out;
+        }
+        #screen-menu .button:active {
+          top: 2rem;
+          left: 2rem;
+          box-shadow: 0 0 2rem black;
+        }
+        #screen-menu .button:hover {
+          background: var(--bright-red);
+        }
+        #screen-menu .start {
+          position: absolute;
+          right: 120rem;
+          top: 180rem;
+        }
+        #screen-menu .help {
+          position: absolute;
+          transform: rotate(1deg);
+          right: 130rem;
+          top: 250rem;
+        }
+        #screen-menu .scenes {
+          position: absolute;
+          right: 125rem;
+          top: 320rem;
+        }
+        #screen-menu .extras {
+          position: absolute;
+          transform: rotate(-2deg);
+          right: 120rem;
+          top: 390rem;
+        }
+        #screen-menu .lock-icon {
+          font-size: 40rem;
+          margin-right: 10rem;
+        }
+        #screen-menu .locked {
+          align-items: center;
+          background: var(--gray);
+          box-shadow: 0 0 2rem black;
+          color: white;
+          display: flex;
+          font-size: 20rem;
+          font-weight: bold;
+          height: 145rem;
+          justify-content: center;
+          opacity: 0.95;
+          position: absolute;
+          right: 110rem;
+          text-align: center;
+          text-shadow: 1rem 1rem black;
+          top: 318rem;
+          width: 320rem;
+        }
+      </style>
+
+      <h1 class="title"><span class="new">New!</span> Life Game</h1>
+      <div class="line line-1"></div>
+      <div class="line line-2"></div>
+      <div class="line line-3"></div>
+      <div class="version">Version 0.0.1</div>
+      <div class="subtitle">I can't believe they remade this 😩</div>
+      <div class="start">
+        <button class="button" onclick="goToScreen('select-character')">
+          START GAME
+        </button>
+      </div>
+      <div class="help">
+        <button class="button" onclick="goToScreen('help')" id="help-button">
+          HELP
+        </button>
+      </div>
+      <div class="scenes"><button class="button">SCENE SELECTION</button></div>
+      <div class="extras"><button class="button">EXTRAS</button></div>
+      <div class="locked">
+        <span class="lock-icon">🔒</span>
+        <span>PLAY THE GAME<br />TO ACCESS THESE</span>
+      </div>
+    </section>
+
+    <section id="screen-help">
+      <style>
+        #screen-help h1 {
+          position: absolute;
+          text-align: center;
+          left: 0;
+          right: 0;
+          top: 50rem;
+          font-size: 50rem;
+          color: var(--red);
+        }
+
+        #screen-help .icon-left {
+          font-size: 200rem;
+          position: absolute;
+          top: -30rem;
+          left: 10rem;
+          transform: rotate(10deg);
+        }
+
+        #screen-help .icon-right {
+          font-size: 200rem;
+          position: absolute;
+          top: -30rem;
+          right: 10rem;
+          transform: rotate(-10deg);
+        }
+
+        #screen-help ul {
+          position: absolute;
+          list-style: none;
+          color: var(--red);
+          top: 160rem;
+          left: 0;
+          right: 0;
+          margin: auto;
+          width: 700rem;
+          font-size: 20rem;
+        }
+
+        #screen-help ul li {
+          margin: 20rem 0;
+        }
+
+        #screen-help .error {
+          align-items: center;
+          animation: 0.2s ease-out 0.5s forwards fade-in;
+          background: black;
+          bottom: 0;
+          color: white;
+          display: flex;
+          flex-direction: column;
+          font-size: 20rem;
+          justify-content: center;
+          left: 0;
+          line-height: 30rem;
+          position: absolute;
+          right: 0;
+          text-align: center;
+          top: 0;
+          opacity: 0;
+          z-index: 1000;
+        }
+
+        #screen-help .close-button {
+          height: 50rem;
+          width: 200rem;
+          font-size: 20rem;
+          background: var(--gray);
+          border-top: 2rem solid white;
+          border-left: 2rem solid white;
+          border-right: 2rem solid #333;
+          border-bottom: 2rem solid #333;
+          cursor: pointer;
+        }
+
+        #screen-help .close-button:active {
+          border-top: 2rem solid #333;
+          border-left: 2rem solid #333;
+          border-right: 2rem solid white;
+          border-bottom: 2rem solid white;
+        }
+
+        #screen-help .close-button:active span {
+          position: relative;
+          left: 2rem;
+          top: 2rem;
+        }
+      </style>
+
+      <script>
+        function closeHelp() {
+          document.querySelector("#help-button").style.display = "none";
+          goToScreen("menu");
+        }
+      </script>
+
+      <button class="back-button" onclick="goToScreen('menu')">⬅</button>
+
+      <h1>HELP</h1>
+      <span class="icon-left">📖</span>
+      <span class="icon-right">📖</span>
+      <ul>
+        <li><b>New Life Game</b> is a fun new game about a new life</li>
+        <li>
+          The goal of <b>New Life Game</b> is to live the life of a given
+          character
+        </li>
+        <li>
+          You may try to head for success, or destroy the life of the character
+        </li>
+        <li>
+          Progress happens by clicking buttons on the screen, sometimes the
+          buttons are hidden
+        </li>
+        <li>
+          The game has various fun secrets to find, such as this help text
+        </li>
+        <li>Why are you reading this anyway?</li>
+      </ul>
+      <div class="error">
+        <div>
+          ERROR!<br /><br />
+          THERE IS NO HELP FOR YOU<br /><br />
+          <b>New Life Game</b> help was closed to prevent any spoilers to the
+          player.<br />
+          It is unsafe to wander here. Press OK to return to the menu.<br /><br />
+          <button class="close-button" onclick="closeHelp()">
+            <span>OK</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-select-character">
+      <style>
+        #screen-select-character .instructions {
+          width: 40%;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          height: 100%;
+          background: var(--red);
+          color: white;
+          position: absolute;
+          padding: 12rem 24rem;
+          box-shadow: 1rem 0 2rem black;
+        }
+        #screen-select-character h1 {
+          text-align: center;
+          font-size: 40rem;
+          padding: 12rem 0 36rem 0;
+        }
+        #screen-select-character .instructions p {
+          font-size: 18rem;
+          line-height: 24rem;
+        }
+        #screen-select-character .characters {
+          width: 60%;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: black;
+          position: absolute;
+          padding: 12rem;
+          font-size: 20rem;
+          flex-direction: column;
+          gap: 20rem;
+        }
+        #screen-select-character .character {
+          border-radius: 0;
+          border: none;
+          font-size: 20rem;
+          text-align: left;
+          box-shadow: 1rem 1rem 2rem black;
+          height: 160rem;
+          width: 90%;
+          position: relative;
+          padding: 20rem;
+          cursor: pointer;
+          transition: box-shadow 50ms ease-out, margin 20ms ease-out,
+            background-color 50ms ease-out;
+        }
+        #screen-select-character .character:active {
+          top: 2rem;
+          left: 2rem;
+          box-shadow: 0 0 2rem black;
+        }
+        #screen-select-character .character:hover {
+          background: linear-gradient(#fff, #eee);
+        }
+        #screen-select-character .stats {
+          display: flex;
+          gap: 20rem;
+          position: absolute;
+          right: 20rem;
+          top: 15rem;
+        }
+        #screen-select-character .stats div {
+          background: radial-gradient(#333, #000);
+          height: 60rem;
+          width: 60rem;
+          font-size: 60rem;
+          border-radius: 50%;
+          text-align: center;
+        }
+        #screen-select-character .stat-values {
+          display: flex;
+          position: absolute;
+          right: 10rem;
+          bottom: 10rem;
+        }
+        #screen-select-character .stat-values .minus {
+          height: 80rem;
+          width: 80rem;
+          font-size: 80rem;
+          line-height: 80rem;
+          text-align: center;
+          color: var(--bright-red);
+          font-weight: 700;
+          -webkit-text-stroke: 4rem var(--red);
+        }
+        #screen-select-character .stat-values .plus {
+          height: 80rem;
+          width: 80rem;
+          font-size: 80rem;
+          line-height: 80rem;
+          font-weight: 700;
+          text-align: center;
+          color: #00ee00;
+          -webkit-text-stroke: 4rem #00aa00;
+        }
+      </style>
+
+      <button class="back-button" onclick="goToScreen('menu')">⬅</button>
+
+      <div class="instructions">
+        <h1>CHARACTER SELECTION</h1>
+        <p>Select a character.</p>
+        <br />
+        <p>Your goal is to make your character intelligent, wealthy and fit.</p>
+        <br />
+        <p>
+          You can raise your intelligence by buying (or stealing) intelligence
+          books.
+        </p>
+        <br />
+        <p>Money can be obtained by working or selling found items.</p>
+        <br />
+        <p>Fitness can be improved by exercising.</p>
+        <br />
+        <p>
+          You win the game once your character has all of these stats maxed out.
+        </p>
+        <br />
+        <p>
+          The game has lots of hidden clickable things, so keep your eyes open.
+        </p>
+      </div>
+
+      <div class="characters">
+        <button class="character" onclick="goToScreen('bob-confirm')">
+          <h2>Bob Swole</h2>
+          <p>Age 21</p>
+          <div class="stats">
+            <div>💡</div>
+            <div>💰</div>
+            <div>💪</div>
+          </div>
+          <div class="stat-values">
+            <div class="minus">-</div>
+            <div class="plus">+</div>
+            <div class="plus">+</div>
+          </div>
+        </button>
+        <button class="character" onclick="goToScreen('willie-confirm')">
+          <h2>Willie Bold</h2>
+          <p>Age 25</p>
+          <div class="stats">
+            <div>💡</div>
+            <div>💰</div>
+            <div>💪</div>
+          </div>
+          <div class="stat-values">
+            <div class="plus">+</div>
+            <div class="minus">-</div>
+            <div class="minus">-</div>
+          </div>
+        </button>
+        <button class="character" onclick="goToScreen('peter-confirm')">
+          <h2>Peter Deuce</h2>
+          <p>Age ???</p>
+          <div class="stats">
+            <div>💡</div>
+            <div>💰</div>
+            <div>💪</div>
+          </div>
+          <div class="stat-values">
+            <div class="minus">-</div>
+            <div class="minus">-</div>
+            <div class="minus">-</div>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!--
+      TODO:
+      * Scene selection
+        * Keep track of shown scenes
+      * Extras
+        * Fight between Loser and Jam Dude
+    -->
+
+    <!-- Confirm screen styles -->
+    <style>
+      .confirm-screen .details {
+        width: 40%;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100%;
+        background: var(--red);
+        color: white;
+        position: absolute;
+        padding: 12rem 24rem;
+        box-shadow: 1rem 0 2rem black;
+      }
+      .confirm-screen .details h1 {
+        text-align: center;
+        font-size: 36rem;
+        padding: 12rem 0 36rem 0;
+        text-transform: uppercase;
+      }
+      .confirm-screen .details h1 .name {
+        display: block;
+        font-size: 60rem;
+        margin-top: 10rem;
+        font-weight: 700;
+        text-shadow: 0 0 5rem white;
+      }
+      .confirm-screen .details ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      .confirm-screen .details ul li {
+        font-size: 20rem;
+        margin-bottom: 16rem;
+      }
+      .confirm-screen .confirm-button-container {
+        position: absolute;
+        bottom: 20rem;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60%;
+      }
+    </style>
+
+    <section id="screen-bob-confirm" class="confirm-screen">
+      <button class="back-button" onclick="goToScreen('select-character')">
+        ⬅
+      </button>
+
+      <div class="details">
+        <h1>You have selected <span class="name">BOB</span></h1>
+        <ul>
+          <li>Bob has a difficulty level of Easy.</li>
+          <li>Bob is 21 years old.</li>
+          <li>Bob has red hair.</li>
+          <li>Bob has low intelligence.</li>
+          <li>Bob has 500 money.</li>
+          <li>Bob is fit.</li>
+          <li>Bob enjoys the nature.</li>
+          <li>Bob likes mushrooms.</li>
+        </ul>
+      </div>
+
+      <div class="confirm-button-container">
+        <button class="common-button">Confirm</button>
+      </div>
+    </section>
+
+    <!--
+      TODO:
+      * Confirm screen
+        * Character portraits
+        * "Uhh what?" / "OK"
+        * Shared button styles
+      * 1: Let's go!
+      * 2: Loading: Continue
+      * 3: Still loading: Continue
+      * 4: Outside home: Go inside your home
+      * 5: Inside home: Go to work
+      * 6: Loading: Continue
+      * 7: Still loading: Continue
+      * 8: Outside work: Go inside
+      * 9: Inside work: Got money, got fired
+      * 10: Fired: Steal or leave?
+      * 11A: Steal from boss, find brain manual book
+      * 12A: Read book
+      * 13A: Get smart
+      * 14A: Win
+      * 11B: Leave
+      * 12B: Go back to town
+      * 13B: Loading
+      * 14B: Still loading
+      * 15B: Hit by bus
+      * 16B: Game over
+      * Uhh what -> Game over
+    -->
+
+    <section id="screen-willie-confirm" class="confirm-screen">
+      <button class="back-button" onclick="goToScreen('select-character')">
+        ⬅
+      </button>
+
+      <div class="details">
+        <h1>You have selected <span class="name">WILLIE</span></h1>
+        <ul>
+          <li>Willie has a difficulty level of Medium.</li>
+          <li>Willie is 25 years old.</li>
+          <li>Willie has yellow hair.</li>
+          <li>Willie has high intelligence.</li>
+          <li>Willie has 150 money.</li>
+          <li>Willie is not very fit.</li>
+          <li>Willie has a high work motivation.</li>
+          <li>Willie likes tomatoes.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!--
+      TODO:
+      * Confirm screen
+        * Character portraits
+        * "Uhh what?" / "OK"
+        * Shared button styles
+      * 1: Let's go!
+      * 2: Loading: Continue
+      * 3: Still loading: Continue
+      * 4: Outside home: Go inside your home or click hidden bottle
+      * 5A: Hit by bus inside home
+      * 6A: Game over
+      * 5B: Find bottle of distilled cheese
+      * 6B: Drink bottle of distilled cheese
+      * 7B: Magical magnetized donkey makes you rich and strong
+      * 8B: Win
+      * Uhh what -> Game over
+    -->
+
+    <section id="screen-peter-confirm" class="confirm-screen">
+      <button class="back-button" onclick="goToScreen('select-character')">
+        ⬅
+      </button>
+
+      <div class="details">
+        <h1>You have selected <span class="name">PETER</span></h1>
+        <ul>
+          <li>Peter has a difficulty level of Hard.</li>
+          <li>Peter is ??? years old.</li>
+          <li>Peter has no hair.</li>
+          <li>Peter has no intelligence.</li>
+          <li>Peter has no money.</li>
+          <li>Peter is not fit.</li>
+          <li>Peter is highly unstable.</li>
+          <li>Peter emits unusual levels of radiation.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!--
+      TODO:
+      * Confirm screen
+        * Character portraits
+        * "Uhh what?" / "OK"
+        * Shared button styles
+      * 1: Let's go!
+      * 2: Loading: Continue
+      * 3: Still loading: Continue
+      * 4: You are a bus driver. Your brakes don't work. Do you drive into a residential building or into a pedestrian? Or do you press the hidden teleport button?
+      * 5A: You crash into a building, killing Willie and dying yourself
+      * 6A: Game over
+      * 5B: You crash into Bob and a lamp post and die
+      * 6B: Game over
+      * 5C: You teleport into a debug menu
+      * 6C: You max all three stats
+      * 7C: Win
+    -->
+
+    <!-- Game initialization -->
+    <script>
+      window.onresize = () => {
+        updateScale();
+      };
+      updateScale();
+      goToScreen("menu");
+    </script>
+  </body>
+</html>

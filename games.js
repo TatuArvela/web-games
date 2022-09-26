@@ -48,4 +48,11 @@ const games = [
     controls: ['mouse', 'keyboard'],
     image: 'img/sudoku.png'
   },
+  // {
+  //   title: "New Life Game",
+  //   href: "games/new-life-game",
+  //   players: 1,
+  //   controls: ['mouse'],
+  //   image: 'img/new-life-game.png'
+  // },
 ];
