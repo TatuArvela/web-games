@@ -16,8 +16,9 @@ const context = canvas.getContext('2d');
 context.imageSmoothingEnabled = false;
 const scoreDisplay = document.getElementById('score');
 
-const tickRate = 8;
-const hardBorders = false;
+const updateInterval = 100; // ms
+const gameOverScreenInputGrace = 1500;
+const hardBorders = true;
 
 const borders = {
   top: 2,
@@ -68,6 +69,10 @@ function Treat() {
 * */
 
 let alive = true;
+let gameOverScreenTimeout;
+let gameOverDrawn = false;
+
+let inputEnabled = true;
 let snake = new Snake();
 let treat = new Treat();
 
@@ -181,13 +186,22 @@ function drawTreat() {
 function resetGame() {
   snake = new Snake();
   alive = true;
+  gameOverDrawn = false;
 }
 
 function endGame() {
   alive = false;
+  inputEnabled = false;
+  gameOverScreenTimeout = setTimeout(() => {
+    inputEnabled = true;
+  }, gameOverScreenInputGrace)
 }
 
 function update() {
+  if (!alive) {
+    return;
+  }
+
   snake.x += snake.vector.x;
   snake.y += snake.vector.y;
 
@@ -245,6 +259,9 @@ function update() {
 }
 
 function handleMoveLeft() {
+  if (!inputEnabled) {
+    return;
+  }
   if (!alive) {
     resetGame();
   }
@@ -255,6 +272,9 @@ function handleMoveLeft() {
 }
 
 function handleMoveUp() {
+  if (!inputEnabled) {
+    return;
+  }
   if (!alive) {
     resetGame();
   }
@@ -265,6 +285,9 @@ function handleMoveUp() {
 }
 
 function handleMoveRight() {
+  if (!inputEnabled) {
+    return;
+  }
   if (!alive) {
     resetGame();
   }
@@ -275,6 +298,9 @@ function handleMoveRight() {
 }
 
 function handleMoveDown() {
+  if (!inputEnabled) {
+    return;
+  }
   if (!alive) {
     resetGame();
   }
@@ -303,6 +329,11 @@ function handleInput(e) {
 }
 
 function draw() {
+  if (!alive) {
+    drawGameOver();
+    return;
+  }
+
   context.clearRect(0, 0, canvas.width, canvas.height);
   drawBorders();
   drawTreat();
@@ -310,6 +341,10 @@ function draw() {
 }
 
 function drawGameOver() {
+  if (gameOverDrawn) {
+    return;
+  }
+
   context.save();
   context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -327,11 +362,7 @@ function drawGameOver() {
 
 setInterval(() => {
   update();
-  if (alive) {
-    draw()
-  } else {
-    drawGameOver();
-  }
-}, 1000 / tickRate);
+  draw();
+}, updateInterval);
 
 document.addEventListener("keydown", handleInput);
