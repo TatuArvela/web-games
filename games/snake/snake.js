@@ -69,6 +69,10 @@ function Treat() {
 * */
 
 let alive = true;
+let sceneDrawn = false;
+let treatDrawn = false;
+let snakeDrawn = false;
+let sectionsToClear = [];
 let gameOverScreenTimeout;
 let gameOverDrawn = false;
 
@@ -83,7 +87,8 @@ let treat = new Treat();
 
 function resetTreat() {
   treat = new Treat();
-  if (overlapsWithSnakeTail(treat)) {
+  treatDrawn = false;
+  while (overlapsWithSnakeTail(treat)) {
     treat = new Treat();
   }
 }
@@ -154,11 +159,29 @@ function drawSnakeSection(x, y) {
   context.drawImage(snakeSectionCache, scaled(x * 3), scaled(y * 3));
 }
 
+function clearSnakeSection(x, y) {
+  context.clearRect(scaled(x * 3), scaled(y * 3), scaled(3), scaled(3));
+}
+
 function drawSnake() {
   for (let i = 0; i < snake.tail.length; i++) {
     const section = snake.tail[i];
     drawSnakeSection(section.x + 1, section.y + 1);
   }
+}
+
+function redrawSnake() {
+  sectionsToClear.forEach(section => {
+    clearSnakeSection(section.x + 1, section.y + 1);
+  })
+  sectionsToClear = [];
+
+  const sectionsToRedraw = snake.tail.length > 1 ? [...snake.tail.slice(0), ...snake.tail.slice(-1)] : [...snake.tail.slice(0)];
+
+  sectionsToRedraw.forEach((section) => {
+    clearSnakeSection(section.x + 1, section.y + 1);
+    drawSnakeSection(section.x + 1, section.y + 1);
+  })
 }
 
 let treatCache = null;
@@ -186,11 +209,14 @@ function drawTreat() {
 function resetGame() {
   snake = new Snake();
   alive = true;
+  sceneDrawn = false;
+  treatDrawn = false;
+  snakeDrawn = false;
   gameOverDrawn = false;
+  sectionsToClear = [];
 }
 
 function endGame() {
-  console.log(snake);
   alive = false;
   inputEnabled = false;
   gameOverScreenTimeout = setTimeout(() => {
@@ -249,7 +275,7 @@ function update() {
     y: snake.y
   })
   while (snake.tail.length > snake.points) {
-    snake.tail.pop();
+    sectionsToClear.push(snake.tail.pop());
   }
 
   // If the snake eats the treat, generate a new treat
@@ -335,10 +361,23 @@ function draw() {
     return;
   }
 
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  drawBorders();
-  drawTreat();
-  drawSnake();
+  if (!sceneDrawn) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    drawBorders();
+    sceneDrawn = true;
+  }
+
+  if (!treatDrawn) {
+    drawTreat();
+    treatDrawn = true;
+  }
+
+  if (!snakeDrawn) {
+    drawSnake();
+    snakeDrawn = true;
+  } else {
+    redrawSnake();
+  }
 }
 
 function drawGameOver() {
