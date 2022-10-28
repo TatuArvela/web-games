@@ -190,6 +190,7 @@ function resetGame() {
 }
 
 function endGame() {
+  console.log(snake);
   alive = false;
   inputEnabled = false;
   gameOverScreenTimeout = setTimeout(() => {
@@ -238,7 +239,7 @@ function update() {
   }
 
   // Snake bites their tail
-  if (snake.tail.length > 1 && overlapsWithSnakeTail(snake)) {
+  if (snake.tail.length > 3 && overlapsWithSnakeTail(snake)) {
     return endGame();
   }
 
