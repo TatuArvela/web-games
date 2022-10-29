@@ -2,16 +2,35 @@
 * Globals
 * */
 
+// Virtual screen pixels
 const screenWidth = 84;
 const screenHeight = 48;
+const screenPadding = 3;
+
+// Game units = virtual screen pixels / 3
+const gameUnitRatio = 3;
+const borders = {
+  top: 0,
+  left: 0,
+  right: (screenWidth - 1) / 3,
+  bottom: (screenHeight - 1) / 3,
+};
+const playArea = {
+  top: 1,
+  right: (screenWidth - 2) / 3,
+  bottom: (screenHeight - 2) / 3,
+  left: 1,
+};
+const playAreaWidth = playArea.right - playArea.left;
+const playAreaHeight = playArea.bottom - playArea.top ;
+
+const scale = 10;
+const scaled = (value) => value * scale;
 const black = '#322917';
 
-const scale = 9;
-const canvasPadding = 22;
-
 const canvas = document.getElementById('canvas');
-canvas.width = screenWidth * scale + canvasPadding * 2;
-canvas.height = screenHeight * scale + canvasPadding * 2;
+canvas.width = scaled(screenPadding + screenWidth + screenPadding);
+canvas.height = scaled(screenPadding + screenHeight + screenPadding);
 const context = canvas.getContext('2d');
 context.imageSmoothingEnabled = false;
 const scoreDisplay = document.getElementById('score');
@@ -19,21 +38,6 @@ const scoreDisplay = document.getElementById('score');
 const updateInterval = 100; // ms
 const gameOverScreenInputGrace = 1500;
 const hardBorders = true;
-
-const borders = {
-  top: 2,
-  left: 2,
-  right: screenWidth - 1,
-  bottom: screenHeight - 1,
-}
-const playArea = {
-  top: 4,
-  right: screenWidth - 3,
-  bottom: screenHeight - 3,
-  left: 4,
-};
-const width = (playArea.right - playArea.left + 1) / 3;
-const height = (playArea.bottom - playArea.top + 1) / 3;
 
 
 /*
@@ -59,8 +63,8 @@ function Treat() {
     return Math.floor(Math.random() * (max - min - 1) + min)
   }
 
-  this.x = randomNumber(1, width);
-  this.y = randomNumber(1, height);
+  this.x = randomNumber(1, playAreaWidth - 1);
+  this.y = randomNumber(1, playAreaHeight - 1);
 }
 
 
@@ -72,7 +76,7 @@ let alive = true;
 let sceneDrawn = false;
 let treatDrawn = false;
 let snakeDrawn = false;
-let sectionsToClear = [];
+let sectionToClear = null;
 let gameOverScreenTimeout;
 let gameOverDrawn = false;
 
@@ -106,11 +110,10 @@ function overlapsWithSnakeTail(item) {
 * Graphics utilities
 * */
 
-const scaled = (value) => value * scale;
-
+// Takes screen pixels by number, starting from 1
 function drawDot(x, y, c = context) {
   c.fillStyle = black;
-  c.fillRect(scaled(x) + 0.5, scaled(y) + 0.5, scaled(1) - 1, scaled(1) - 1);
+  c.fillRect(scaled(x) + 1, scaled(y) + 1, scaled(1) - 1, scaled(1) - 1);
 }
 
 let borderCache = null;
@@ -121,24 +124,28 @@ function drawBorders() {
     const borderCacheContext = borderCache.getContext('2d');
     borderCache.width = canvas.width;
     borderCache.height = canvas.height;
-    borderCacheContext.translate(canvasPadding - scale, canvasPadding - scale);
   
     function drawHorizontalLine(from, to, height) {
       for (let i = from; i <= to; i++) {
-        drawDot(i, height, borderCacheContext);
+        drawDot(screenPadding + i - 1, screenPadding + height - 1, borderCacheContext);
       }
     }
     
     function drawVerticalLine(from, to, width) {
       for (let i = from; i <= to; i++) {
-        drawDot(width, i, borderCacheContext);
+        drawDot(screenPadding + width - 1, screenPadding + i - 1, borderCacheContext);
       }
     }
   
-    drawHorizontalLine(borders.left, borders.right, borders.top);
-    drawHorizontalLine(borders.left, borders.right, borders.bottom);
-    drawVerticalLine(borders.top + 1, borders.bottom - 1, borders.left);
-    drawVerticalLine(borders.top + 1, borders.bottom - 1, borders.right);
+    const topLeft = [borders.left * gameUnitRatio, borders.top * gameUnitRatio];
+    const topRight = [borders.right * gameUnitRatio, borders.top * gameUnitRatio];
+    const bottomLeft = [borders.left * gameUnitRatio, borders.bottom * gameUnitRatio];
+    const bottomRight = [borders.right * gameUnitRatio, borders.bottom * gameUnitRatio];
+
+    drawHorizontalLine(topLeft[0] + 2, topRight[0], topLeft[1] + 2);
+    drawHorizontalLine(bottomLeft[0] + 2, bottomRight[0], bottomLeft[1]);
+    drawVerticalLine(topLeft[1] + 3, bottomLeft[1] - 1, topLeft[0] + 2);
+    drawVerticalLine(topRight[1] + 3, bottomRight[1] - 1, topRight[0]);
   }
   context.drawImage(borderCache, 0, 0);
 }
@@ -150,38 +157,36 @@ function drawSnakeSection(x, y) {
     snakeSectionCache = document.createElement('canvas');
     const snakeSectionCacheContext = snakeSectionCache.getContext('2d');
     
-    for (let xOffset = 0; xOffset <= 2; xOffset++) {
-      for (let yOffset = 0; yOffset <= 2; yOffset++) {
-        drawDot(xOffset, yOffset, snakeSectionCacheContext);
+    for (let x = 0; x <= 2; x++) {
+      for (let y = 0; y <= 2; y++) {
+        drawDot(screenPadding + x, screenPadding + y, snakeSectionCacheContext);
       }
     }
   }
-  context.drawImage(snakeSectionCache, scaled(x * 3), scaled(y * 3));
+  context.drawImage(snakeSectionCache, scaled(x * gameUnitRatio), scaled(y * gameUnitRatio));
 }
 
 function clearSnakeSection(x, y) {
-  context.clearRect(scaled(x * 3), scaled(y * 3), scaled(3), scaled(3));
+  context.clearRect(scaled(x * 3 + screenPadding), scaled(y * 3 + screenPadding), scaled(3), scaled(3));
 }
 
 function drawSnake() {
   for (let i = 0; i < snake.tail.length; i++) {
     const section = snake.tail[i];
-    drawSnakeSection(section.x + 1, section.y + 1);
+    drawSnakeSection(section.x, section.y);
   }
 }
 
 function redrawSnake() {
-  sectionsToClear.forEach(section => {
-    clearSnakeSection(section.x + 1, section.y + 1);
-  })
-  sectionsToClear = [];
+  if (sectionToClear) {
+    clearSnakeSection(sectionToClear.x, sectionToClear.y);
+    sectionToClear = null;
+  }
 
-  const sectionsToRedraw = snake.tail.length > 1 ? [...snake.tail.slice(0), ...snake.tail.slice(-1)] : [...snake.tail.slice(0)];
-
-  sectionsToRedraw.forEach((section) => {
-    clearSnakeSection(section.x + 1, section.y + 1);
-    drawSnakeSection(section.x + 1, section.y + 1);
-  })
+  drawSnakeSection(snake.tail[0].x, snake.tail[0].y);
+  if (snake.tail.length > 1) {
+    drawSnakeSection(snake.tail[snake.tail.length - 1].x, snake.tail[snake.tail.length - 1].y);
+  }
 }
 
 let treatCache = null;
@@ -196,9 +201,53 @@ function drawTreat() {
     drawDot(2, 1, treatCacheContext);
     drawDot(1, 2, treatCacheContext);
   }
-  const x = treat.x + 1;
-  const y = treat.y + 1;
-  context.drawImage(treatCache, scaled(x * 3), scaled(y * 3));
+  const x = treat.x;
+  const y = treat.y;
+  context.drawImage(treatCache, scaled(x * 3 + screenPadding), scaled(y * 3 + screenPadding));
+}
+
+function drawGameOver() {
+  if (gameOverDrawn) {
+    return;
+  }
+
+  context.save();
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  const score = snake.points;
+
+  context.font = '120px sans-serif';
+  context.fontWeight = "bold";
+  context.fillStyle = black;
+  context.fillText("Game over!", 50, 140);
+  context.fillText("Your score:", 50, 280);
+  context.fillText(score, 50, 420);
+
+  context.restore();
+}
+
+function drawDebugGrid() {
+  context.save();
+  context.strokeStyle = '#333';
+
+  const maxWidth = screenWidth + screenPadding * 2;
+  const maxHeight = screenHeight + screenPadding * 2;
+
+  for (x = 0; x <= maxWidth; x++) {
+    context.beginPath();
+    context.moveTo(scaled(x), 0);
+    context.lineTo(scaled(x), scaled(maxHeight));
+    context.stroke();
+  }
+
+  for (y = 0; y <= maxHeight; y++) {
+    context.beginPath();
+    context.moveTo(0, scaled(y));
+    context.lineTo(scaled(maxWidth), scaled(y));
+    context.stroke();
+  }
+
+  context.restore();
 }
 
 
@@ -213,7 +262,7 @@ function resetGame() {
   treatDrawn = false;
   snakeDrawn = false;
   gameOverDrawn = false;
-  sectionsToClear = [];
+  sectionToClear = null;
 }
 
 function endGame() {
@@ -237,11 +286,11 @@ function update() {
     if (hardBorders) {
       return endGame();
     }
-    snake.x = width;
+    snake.x = playAreaWidth;
   }
 
   // Snake hits right edge
-  if (snake.x > width) {
+  if (snake.x > playAreaWidth) {
     if (hardBorders) {
       return endGame();
     }
@@ -253,11 +302,11 @@ function update() {
     if (hardBorders) {
       return endGame();
     }
-    snake.y = height;
+    snake.y = playAreaHeight;
   }
 
   // Snake hits bottom edge
-  if (snake.y > height) {
+  if (snake.y > playAreaHeight) {
     if (hardBorders) {
       return endGame();
     }
@@ -274,8 +323,8 @@ function update() {
     x: snake.x,
     y: snake.y
   })
-  while (snake.tail.length > snake.points) {
-    sectionsToClear.push(snake.tail.pop());
+  if (snake.tail.length > snake.points) {
+    sectionToClear = snake.tail.pop();
   }
 
   // If the snake eats the treat, generate a new treat
@@ -292,7 +341,7 @@ function handleMoveLeft() {
   if (!alive) {
     resetGame();
   }
-  if (snake.vector.x !== 1) {
+  if (snake.tail.length === 1 || snake.tail[1].x >= snake.x) {
     snake.vector.x = -1;
     snake.vector.y = 0;
   }
@@ -305,7 +354,7 @@ function handleMoveUp() {
   if (!alive) {
     resetGame();
   }
-  if (snake.vector.y !== 1) {
+  if (snake.tail.length === 1 || snake.tail[1].y >= snake.y) {
     snake.vector.x = 0;
     snake.vector.y = -1;
   }
@@ -318,7 +367,7 @@ function handleMoveRight() {
   if (!alive) {
     resetGame();
   }
-  if (snake.vector.x !== -1) {
+  if (snake.tail.length === 1 || snake.tail[1].x <= snake.x) {
     snake.vector.x = 1;
     snake.vector.y = 0;
   }
@@ -331,7 +380,7 @@ function handleMoveDown() {
   if (!alive) {
     resetGame();
   }
-  if (snake.vector.y !== -1) {
+  if (snake.tail.length === 1 || snake.tail[1].y <= snake.y) {
     snake.vector.x = 0;
     snake.vector.y = 1;
   }
@@ -378,26 +427,8 @@ function draw() {
   } else {
     redrawSnake();
   }
-}
 
-function drawGameOver() {
-  if (gameOverDrawn) {
-    return;
-  }
-
-  context.save();
-  context.clearRect(0, 0, canvas.width, canvas.height);
-
-  const score = snake.points;
-
-  context.font = '120px sans-serif';
-  context.fontWeight = "bold";
-  context.fillStyle = black;
-  context.fillText("Game over!", 50, 140);
-  context.fillText("Your score:", 50, 280);
-  context.fillText(score, 50, 420);
-
-  context.restore();
+  //drawDebugGrid();
 }
 
 setInterval(() => {
