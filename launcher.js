@@ -50,7 +50,8 @@ function renderGames() {
     const gameElement = document.createElement("div");
     gameElement.className = [
       "game",
-      animation
+      animation,
+      game.incomplete && 'incomplete',
     ].filter(Boolean).join(" ");
 
     if (isSelected) {
@@ -60,9 +61,16 @@ function renderGames() {
 
     const imageContainer = document.createElement("div");
     imageContainer.className = "game-image";
-    const image = document.createElement("img");
-    image.src = game.image ?? '';
-    imageContainer.appendChild(image);
+    let imageElement;
+    if (game.image) {
+      imageElement = document.createElement("img");
+      imageElement.src = game.image;
+    } else {
+      imageElement = document.createElement("div");
+      imageElement.className = "image-placeholder";
+      imageElement.innerText = game.title;
+    }
+    imageContainer.appendChild(imageElement);
 
     const details = document.createElement("div");
     details.className = "game-details";

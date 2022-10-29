@@ -48,11 +48,19 @@ const games = [
     controls: ['mouse', 'keyboard'],
     image: 'img/sudoku.png'
   },
-  // {
-  //   title: "New Life Game",
-  //   href: "games/new-life-game",
-  //   players: 1,
-  //   controls: ['mouse'],
-  //   image: 'img/new-life-game.png'
-  // },
+  {
+    title: "Marbles",
+    href: "games/marbles",
+    players: 1,
+    controls: ['mouse'],
+    incomplete: true,
+  },
+  {
+    title: "New Life Game",
+    href: "games/new-life-game",
+    players: 1,
+    controls: ['mouse'],
+    image: 'img/new-life-game.png',
+    incomplete: true,
+  },
 ];
