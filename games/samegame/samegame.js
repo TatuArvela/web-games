@@ -278,8 +278,8 @@ function updateCanvasSize() {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
   shouldDraw = true;
-  if (canvas.width <= 800) {
-    scale = canvas.width / 1000;
+  if (canvas.width <= 800 || canvas.height <= 600) {
+    scale = Math.min(canvas.width / 800, canvas.height / 600);
   } else {
     scale = 1;
   }
