@@ -6,6 +6,7 @@ const canvas = document.getElementById('canvas');
 const c = canvas.getContext('2d');
 
 const frameRate = 60;
+let scale = 0.75;
 
 const colors = ["red", "blue", "yellow", "green", "purple"];
 
@@ -269,21 +270,30 @@ function undo() {
 * Geometry
 * */
 
+function scaled(number) {
+  return number * scale;
+}
+
 function updateCanvasSize() {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
   shouldDraw = true;
+  if (canvas.width <= 800) {
+    scale = canvas.width / 1000;
+  } else {
+    scale = 1;
+  }
 }
 
-const getGridLeftEdge = () => (canvas.width - gameWidth) / 2;
-const getGridTopEdge = () => (canvas.height - gameHeight) / 2;
+const getGridLeftEdge = () => (canvas.width - scaled(gameWidth)) / 2;
+const getGridTopEdge = () => (canvas.height - scaled(gameHeight)) / 2;
 
 function getTargetTileCoordinates({clientX, clientY}) {
   const fromLeft = clientX - getGridLeftEdge();
   const fromTop = clientY - getGridTopEdge();
   if (fromLeft > 0 && fromTop > 0) {
-    const column = Math.floor(fromLeft / (tileWidth + tileXMargin));
-    const row = Math.floor(fromTop / (tileHeight + tileYMargin));
+    const column = Math.floor(fromLeft / scaled(tileWidth + tileXMargin));
+    const row = Math.floor(fromTop / scaled(tileHeight + tileYMargin));
     if (column < columns && row < rows) {
       return ([row, column]);
     }
@@ -319,17 +329,17 @@ function loadAssets() {
 }
 
 function drawTile(row, column, color) {
-  const x = (column) * tileWidth + ((column + 1) * tileXMargin);
-  const y = (row) * tileHeight + ((row + 1) * tileYMargin);
+  const x = scaled((column) * tileWidth + ((column + 1) * tileXMargin));
+  const y = scaled((row) * tileHeight + ((row + 1) * tileYMargin));
   const img = colorAssets[color];
-  c.drawImage(img, x, y);
+  c.drawImage(img, x, y, scaled(tileWidth), scaled(tileHeight));
   if (hoveredTiles.find(([tileRow, tileColumn]) => tileRow === row && tileColumn === column)) {
     c.fillStyle = 'rgba(255, 255, 255, 0.2)';
     const bgX = x - tileXMargin / 2;
     const bgY = y - tileYMargin / 2;
     const bgWidth = tileWidth + tileXMargin;
     const bgHeight = tileHeight + tileYMargin;
-    c.fillRect(bgX, bgY, bgWidth, bgHeight);
+    c.fillRect(bgX, bgY, scaled(bgWidth), scaled(bgHeight));
   }
 }
 
@@ -339,9 +349,9 @@ function draw() {
 
   c.translate(getGridLeftEdge(), getGridTopEdge());
   c.fillStyle = 'rgba(0, 0, 0, 0.3)';
-  c.fillRect(0 - gamePadding, 0 - gamePadding, gameWidth + gamePadding * 2, gameHeight + gamePadding * 2);
+  c.fillRect(scaled(0 - gamePadding), scaled(0 - gamePadding), scaled(gameWidth + gamePadding * 2), scaled(gameHeight + gamePadding * 2));
   c.strokeStyle = 'white';
-  c.strokeRect(0 - gamePadding, 0 - gamePadding, gameWidth + gamePadding * 2, gameHeight + gamePadding * 2);
+  c.strokeRect(scaled(0 - gamePadding), scaled(0 - gamePadding), scaled(gameWidth + gamePadding * 2), scaled(gameHeight + gamePadding * 2));
 
   grid.forEach((row, rowIndex) => {
     row.forEach((color, columnIndex) => {

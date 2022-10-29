@@ -1,170 +1,188 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>SameGame</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400&display=swap');
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>SameGame</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400&display=swap");
 
-    :root {
-      --toolbar-height: 56px;
-    }
+      :root {
+        --toolbar-height: 3.5rem;
+      }
 
-    body {
-      background: linear-gradient(to bottom, #c7bdbd, #615c5c);
-      overflow: hidden;
-      font-family: "Quicksand", sans-serif;
-    }
+      html {
+        font-size: 16px;
+      }
 
-    * {
-      margin: 0;
-      user-select: none;
-      box-sizing: border-box;
-    }
+      @media only screen and (max-width: 800px) {
+        html {
+          font-size: 14px;
+        }
+      }
 
-    .container {
-      display: flex;
-      flex-direction: column;
-    }
+      body {
+        touch-action: pan-x pan-y;
+        background: linear-gradient(to bottom, #c7bdbd, #615c5c);
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        position: relative;
+        margin: 0;
+        font-family: "Quicksand", sans-serif;
+      }
 
-    .toolbar {
-      align-items: center;
-      backdrop-filter: blur(20px);
-      background: rgb(23, 36, 57);
-      color: white;
-      display: flex;
-      height: var(--toolbar-height);
-      justify-content: space-between;
-      padding: 4px 12px;
-    }
+      * {
+        user-select: none;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    .title-container {
-      display: block;
-      width: 300px;
-    }
+      .container {
+        display: flex;
+        flex-direction: column;
+      }
 
-    .title {
-      font-size: 24px;
-      line-height: 1em;
-      color: white;
-      text-shadow: 2px 2px rgba(0, 0, 0, 0.2);
-    }
+      .toolbar {
+        align-items: center;
+        backdrop-filter: blur(1.25rem);
+        background: rgb(23, 36, 57);
+        color: white;
+        display: flex;
+        height: var(--toolbar-height);
+        justify-content: space-between;
+        padding: 0.25rem 0.75rem;
+      }
 
-    .counter {
-      flex: 1;
-      text-align: center;
-    }
+      .title-container {
+        display: block;
+        width: 18.75rem;
+      }
 
-    .counter-label {
-      text-transform: uppercase;
-      font-size: 12px;
-    }
+      .title {
+        font-size: 1.5rem;
+        line-height: 1.5rem;
+        color: white;
+        text-shadow: 0.125rem 0.125rem rgba(0, 0, 0, 0.2);
+      }
 
-    .button-container {
-      display: flex;
-      width: 300px;
-      justify-content: end;
-      gap: 10px;
-    }
+      .counter {
+        flex: 1;
+        text-align: center;
+      }
 
-    .button {
-      background: transparent;
-      border-radius: 20px;
-      border: 2px solid white;
-      color: white;
-      font-size: 14px;
-      height: 40px;
-      padding: 0 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background 200ms, color 200ms, opacity 200ms;
-    }
+      .counter-label {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+      }
 
-    .button:not(:disabled):hover {
-      background: rgba(255, 255, 255, 0.8);
-      border-color: rgba(255, 255, 255, 0.8);
-      cursor: pointer;
-      color: black;
-    }
+      .button-container {
+        display: flex;
+        width: 18.75rem;
+        justify-content: end;
+        gap: 0.75rem;
+      }
 
-    .button:focus {
-      outline: none;
-    }
+      .button {
+        background: transparent;
+        border-radius: 1.25rem;
+        border: 0.125rem solid white;
+        color: white;
+        font-size: 0.75rem;
+        height: 2.5rem;
+        padding: 0 0.625rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background 200ms, color 200ms, opacity 200ms;
+      }
 
-    .button:active {
-      box-shadow: inset 2px 2px #aaaaaa;
-      background: rgba(200, 200, 200, 0.8);
-      padding: 11px 9px 9px 11px;
-    }
+      .button:not(:disabled):hover {
+        background: rgba(255, 255, 255, 0.8);
+        border-color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        color: black;
+      }
 
-    .button:disabled {
-      opacity: 0.5;
-    }
+      .button:focus {
+        outline: none;
+      }
 
-    canvas {
-      height: calc(100vh - var(--toolbar-height));
-      width: 100%;
-    }
+      .button:active {
+        box-shadow: inset 0.125rem 0.125rem #aaaaaa;
+        background: rgba(200, 200, 200, 0.8);
+        padding: 0.6875rem 0.5625rem 0.5625rem 0.6875rem;
+      }
 
-    .pointer {
-      cursor: pointer;
-    }
+      .button:disabled {
+        opacity: 0.5;
+      }
 
-    .result {
-      align-items: center;
-      bottom: var(--toolbar-height);
-      display: flex;
-      font-size: 60px;
-      font-weight: bold;
-      height: calc(100% - var(--toolbar-height));
-      justify-content: center;
-      left: 0;
-      pointer-events: none;
-      position: absolute;
-      right: 0;
-      text-shadow: 0 0 8px white;
-      top: 0;
-      width: 100%;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
+      canvas {
+        height: calc(100vh - var(--toolbar-height));
+      }
 
-    .result-visible {
-      opacity: 1;
-    }
+      .pointer {
+        cursor: pointer;
+      }
 
-  </style>
-</head>
-<body>
-<div class="container">
-  <canvas id="canvas"></canvas>
-  <div class="result" id="result">You Win!</div>
-  <div class="toolbar">
-    <div class="title-container">
-      <h1 class="title">SameGame</h1>
+      .result {
+        align-items: center;
+        bottom: var(--toolbar-height);
+        display: flex;
+        font-size: 3.75rem;
+        font-weight: bold;
+        height: calc(100% - var(--toolbar-height));
+        justify-content: center;
+        left: 0;
+        pointer-events: none;
+        position: absolute;
+        right: 0;
+        text-shadow: 0 0 0.5rem white;
+        top: 0;
+        width: 100%;
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+
+      .result-visible {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <canvas id="canvas"></canvas>
+      <div class="result" id="result">You Win!</div>
+      <div class="toolbar">
+        <div class="title-container">
+          <h1 class="title">SameGame</h1>
+        </div>
+        <div class="counter">
+          <div class="counter-label">Score</div>
+          <span id="score">0</span>
+        </div>
+        <div class="counter">
+          <div class="counter-label">Get</div>
+          <span id="get">0</span>
+        </div>
+        <div class="counter">
+          <div class="counter-label">Left</div>
+          <span id="left">0</span>
+        </div>
+        <div class="button-container">
+          <button class="button" id="undo" onClick="undo()">Undo</button>
+          <button class="button" id="new-game" onClick="newGame()">
+            New Game
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="counter">
-      <div class="counter-label">Score</div>
-      <span id="score">0</span>
-    </div>
-    <div class="counter">
-      <div class="counter-label">Get</div>
-      <span id="get">0</span>
-    </div>
-    <div class="counter">
-      <div class="counter-label">Left</div>
-      <span id="left">0</span>
-    </div>
-    <div class="button-container">
-      <button class="button" id="undo" onClick="undo()">Undo</button>
-      <button class="button" id="new-game" onClick="newGame()">New Game</button>
-    </div>
-  </div>
-</div>
-<script src="samegame.js"></script>
-</body>
+    <script src="samegame.js"></script>
+  </body>
 </html>
