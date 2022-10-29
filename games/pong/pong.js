@@ -10,7 +10,13 @@ context.imageSmoothingEnabled = false;
 
 const updateRate = 100;
 const frameRate = 60;
-const aiRate = 5;
+
+const aiRate = 100;
+const minAiSpeed = 2;
+const maxAiSpeed = 8;
+const getRandomAiSpeed = () => Math.floor((Math.random() * maxAiSpeed) + minAiSpeed);
+let aiSpeed = getRandomAiSpeed();
+let previousAiDirection = 'down';
 
 const paddleHeight = 80;
 const paddleWidth = 10;
@@ -139,6 +145,7 @@ function controlBall() {
   if (detectPaddleCollision(player2)) {
     ball.x += calculateBounce(player2.x, ball.x + ball.size);
     reflectBall(player2);
+    aiSpeed = getRandomAiSpeed();
   }
 
   // Ball hits the ceiling
@@ -188,12 +195,20 @@ function moveAi() {
 
   if (ball.y < player2Center) {
     const requiredMove = player2Center - ball.y;
-    player2.y -= Math.abs(requiredMove);
+    player2.y -= Math.min(Math.abs(requiredMove), aiSpeed);
+    if (previousAiDirection !== 'up') {
+      aiSpeed = getRandomAiSpeed();
+      previousAiDirection = 'up';
+    }
   }
 
   if (ball.y > player2Center) {
     const requiredMove = ball.y - player2Center;
-    player2.y += requiredMove;
+    player2.y += Math.min(requiredMove, aiSpeed);
+    if (previousAiDirection !== 'down') {
+      aiSpeed = getRandomAiSpeed();
+      previousAiDirection = 'down';
+    }
   }
 
   if (player2.y < 0) {
