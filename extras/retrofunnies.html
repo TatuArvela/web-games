@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Retro Funnies</title>
+    <style>
+      body {
+        align-items: flex-start;
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 0;
+        margin: 0;
+        background: lightgray;
+      }
+
+      .box {
+        background: white;
+        border-top: 2px solid gray;
+        border-left: 2px solid gray;
+        border-right: 2px solid black;
+        border-bottom: 2px solid black;
+        box-sizing: border-box;
+        font-size: 16px;
+        margin: 1%;
+        overflow: clip;
+        position: relative;
+        width: 23%;
+      }
+
+      .box:before {
+        content: "";
+        display: block;
+        padding-top: 100%;
+      }
+
+      .content {
+        bottom: 0;
+        height: 100%;
+        left: 0;
+        line-height: 100%;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+
+      .flex {
+        display: flex;
+      }
+
+      .flex-col {
+        flex-direction: column;
+      }
+
+      .center-v {
+        justify-content: center;
+      }
+
+      .center-h {
+        align-items: center;
+      }
+
+      .bold {
+        font-weight: bold;
+      }
+
+      .italic {
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="content flex flex-col center-v" style="color: blue">
+        <div class="marquee">Marquees are cool</div>
+        <div class="marquee bold">
+          The quick brown fox jumps over the lazy dog
+        </div>
+        <div class="marquee">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        </div>
+        <div class="marquee italic">Where do you want to go today?</div>
+        <div class="marquee">Short text</div>
+        <div class="marquee">
+          "The only way to do great work is to love what you do."
+        </div>
+        <div class="marquee">
+          Sesquipedalian: Characterized by long words; long-winded.
+        </div>
+        <div class="marquee italic bold">
+          The magnificent peacock is known for its vibrant plumage and
+          impressive courtship display.
+        </div>
+        <div class="marquee">May the Force be with you.</div>
+        <div class="marquee">
+          JavaScript is a popular programming language used for building
+          interactive web applications.
+        </div>
+        <div class="marquee" style="letter-spacing: 3px">
+          Uncle ChatGPT had a farm. AI, AI-O
+        </div>
+      </div>
+      <style>
+        .marquee {
+          animation: marquee var(--duration) linear infinite;
+          white-space: nowrap;
+          width: fit-content;
+        }
+
+        @keyframes marquee {
+          0% {
+            transform: translateX(var(--start-position));
+          }
+          100% {
+            transform: translate(-100%);
+          }
+        }
+      </style>
+      <script>
+        document.querySelectorAll(".marquee").forEach((element) => {
+          element.style.setProperty(
+            "--start-position",
+            `${element.parentElement.clientWidth}px`
+          );
+          const childWidth = element.clientWidth;
+          const parentWidth = element.parentElement.clientWidth;
+          const pixelsPerSecond = 48;
+          element.style.setProperty(
+            "--duration",
+            `${(childWidth + parentWidth) / pixelsPerSecond}s`
+          );
+        });
+      </script>
+    </div>
+
+    <div class="box">
+      <div class="content flex center-v" style="color: blue">
+        <div class="marquee-v sliding-block"></div>
+        <div class="marquee-v sliding-block"></div>
+        <div class="marquee-v sliding-block"></div>
+        <div class="marquee-v sliding-block"></div>
+        <div class="marquee-v sliding-block"></div>
+        <div class="marquee-v sliding-block"></div>
+        <div class="marquee-v sliding-block"></div>
+        <div class="marquee-v sliding-block"></div>
+      </div>
+      <style>
+        .marquee-v {
+          animation: marquee-v var(--duration) linear infinite;
+          white-space: nowrap;
+          width: fit-content;
+        }
+
+        .sliding-block {
+          background: lightgray;
+          border-bottom: 2px solid black;
+          border-left: 2px solid gray;
+          border-right: 2px solid black;
+          border-top: 2px solid gray;
+          width: 10%;
+        }
+
+        @keyframes marquee-v {
+          0% {
+            transform: translateY(var(--start-position));
+          }
+          100% {
+            transform: translateY(-100%);
+          }
+        }
+      </style>
+      <script>
+        document.querySelectorAll(".sliding-block").forEach((element) => {
+          element.style.setProperty(
+            "height",
+            `${Math.floor(Math.random() * (200 - 20 + 1)) + 20}px`
+          );
+        });
+        document.querySelectorAll(".marquee-v").forEach((element) => {
+          element.style.setProperty(
+            "--start-position",
+            `${element.parentElement.clientHeight}px`
+          );
+          const childHeight = element.clientHeight;
+          const parentHeight = element.parentElement.clientHeight;
+          const pixelsPerSecond = 200;
+          element.style.setProperty(
+            "--duration",
+            `${(childHeight + parentHeight) / pixelsPerSecond}s`
+          );
+        });
+      </script>
+    </div>
+
+    <div class="box">
+      <div class="content only-scroll-y">
+        <table class="fancy-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Age</th>
+              <th>City</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>John Doe</td>
+              <td>35</td>
+              <td>New York</td>
+            </tr>
+            <tr>
+              <td>Jane Smith</td>
+              <td>28</td>
+              <td>Los Angeles</td>
+            </tr>
+            <tr>
+              <td>Michael Johnson</td>
+              <td>42</td>
+              <td>Chicago</td>
+            </tr>
+            <tr>
+              <td>Emily Davis</td>
+              <td>31</td>
+              <td>San Francisco</td>
+            </tr>
+            <tr>
+              <td>David Wilson</td>
+              <td>39</td>
+              <td>Miami</td>
+            </tr>
+            <tr>
+              <td>Sarah Thompson</td>
+              <td>25</td>
+              <td>Seattle</td>
+            </tr>
+            <tr>
+              <td>Christopher Lee</td>
+              <td>36</td>
+              <td>Boston</td>
+            </tr>
+            <tr>
+              <td>Amy Roberts</td>
+              <td>33</td>
+              <td>Denver</td>
+            </tr>
+            <tr>
+              <td>Thomas Walker</td>
+              <td>29</td>
+              <td>Phoenix</td>
+            </tr>
+            <tr>
+              <td>Olivia Harris</td>
+              <td>27</td>
+              <td>San Diego</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <style>
+        .only-scroll-y {
+          overflow-y: auto;
+          overflow-x: clip;
+          overscroll-behavior: none;
+        }
+
+        .fancy-table {
+          border-collapse: collapse;
+          margin: -1px -1px -5px -1px;
+          width: calc(100% + 2px);
+          overflow: hidden;
+          position: relative;
+          z-index: 1;
+        }
+
+        .fancy-table * {
+          box-sizing: border-box;
+        }
+
+        .fancy-table th {
+          position: relative;
+          border: 1px solid black;
+          cursor: pointer;
+        }
+
+        .fancy-table td {
+          position: relative;
+          background: transparent;
+        }
+
+        .fancy-table th:hover,
+        .fancy-table td:hover {
+          background: blue;
+          color: white;
+        }
+
+        .fancy-table th:hover::before,
+        .fancy-table td:hover::before {
+          background: lightblue;
+          content: "";
+          height: 10000px;
+          left: 0;
+          opacity: 0.5;
+          position: absolute;
+          top: -5000px;
+          width: 100%;
+          z-index: -1;
+        }
+
+        .fancy-table th:hover::after,
+        .fancy-table td:hover::after {
+          background: lightblue;
+          content: "";
+          width: 10000px;
+          top: 0;
+          opacity: 0.5;
+          position: absolute;
+          left: -5000px;
+          height: 100%;
+          z-index: -1;
+        }
+
+        .fancy-table td {
+          border: 1px solid black;
+          cursor: pointer;
+        }
+      </style>
+    </div>
+
+    <div class="box">
+      <div class="content">
+        <img class="colorize" src="https://loremflickr.com/500/500" />
+      </div>
+      <style>
+        .colorize {
+          height: 100%;
+          width: 100%;
+          filter: sepia(1) hue-rotate(90deg);
+        }
+      </style>
+    </div>
+
+    <div class="box">
+      <div class="content">
+        <div class="ball"><div class="ball-inner"></div></div>
+      </div>
+      <style>
+        .ball {
+          animation: bounce-vertical 0.5s ease-out alternate infinite;
+        }
+        .ball-inner {
+          width: 1rem;
+          height: 1rem;
+          background: red;
+          border-radius: 50%;
+          animation: bounce-horizontal 2s ease-in-out alternate infinite;
+        }
+
+        @keyframes bounce-vertical {
+          0% {
+            transform: translateY(calc(var(--container-height) - 1rem));
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes bounce-horizontal {
+          0% {
+            transform: translateX(calc(var(--container-width) - 1rem));
+          }
+          100% {
+            transform: translateX(0);
+          }
+        }
+      </style>
+      <script>
+        document.querySelectorAll(".ball").forEach((element) => {
+          element.style.setProperty(
+            "--container-height",
+            `${element.parentElement.clientHeight}px`
+          );
+          element.style.setProperty(
+            "--container-width",
+            `${element.parentElement.clientWidth}px`
+          );
+        });
+      </script>
+    </div>
+
+    <div class="box">
+      <div class="content">
+        <canvas id="fade-out-image" class="fade-out-image-canvas"></canvas>
+        <div style="opacity: 0">
+          <img
+            id="fade-out-image-src"
+            style="height: 500px; width: 500px"
+            src="https://loremflickr.com/500/500"
+          />
+        </div>
+      </div>
+      <style>
+        .fade-out-image-canvas {
+          width: 100%;
+          height: 100%;
+        }
+      </style>
+    </div>
+
+    <div class="box">
+      <div class="content">
+        <canvas id="fade-in-image" class="fade-in-image-canvas"></canvas>
+      </div>
+
+      <style>
+        .fade-in-image-canvas {
+          width: 100%;
+          height: 100%;
+        }
+      </style>
+      <script>
+        const fadeOutCanvas = document.querySelector("#fade-out-image");
+        const fadeOutCtx = fadeOutCanvas.getContext("2d");
+        const fadeInCanvas = document.querySelector("#fade-in-image");
+        const fadeInCtx = fadeInCanvas.getContext("2d");
+
+        const divisionCount = 100;
+
+        const shuffleArray = (array) => {
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+          }
+        };
+
+        let sections = [];
+        for (let row = 0; row < divisionCount; row++) {
+          for (let column = 0; column < divisionCount; column++) {
+            sections.push([row, column]);
+          }
+        }
+
+        shuffleArray(sections);
+
+        const clearNextTile = () => {
+          if (sections.length > 0) {
+            const coordinates = sections.shift();
+            const row = coordinates[0];
+            const column = coordinates[1];
+            const size = fadeOutCanvas.width / divisionCount;
+
+            fadeInCtx.drawImage(
+              fadeOutCanvas,
+              column * size,
+              row * size,
+              size,
+              size,
+              column * size,
+              row * size,
+              size,
+              size
+            );
+            fadeOutCtx.clearRect(column * size, row * size, size, size);
+          }
+        };
+
+        const image = document.querySelector("#fade-out-image-src");
+        function drawImage() {
+          fadeOutCanvas.width = image.naturalWidth;
+          fadeOutCanvas.height = image.naturalHeight;
+          fadeInCanvas.width = image.naturalWidth;
+          fadeInCanvas.height = image.naturalHeight;
+          fadeOutCtx.drawImage(this, 0, 0, this.width, this.height);
+
+          setTimeout(() => {
+            setInterval(clearNextTile, 0.001);
+          }, 2000);
+        }
+        image.onload = drawImage;
+      </script>
+    </div>
+  </body>
+</html>
