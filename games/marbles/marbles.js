@@ -11,14 +11,21 @@ context.imageSmoothingEnabled = false;
 const updateRate = 100;
 const frameRate = 60;
 
-const ballRadius = 20;
+const ballRadius = 12;
 
-function Ball(x, y, color) {
+let nextIdentifier = 1;
+function getNextIdentifier() {
+  return nextIdentifier && nextIdentifier++;
+}
+
+function Ball(x, y, color, identifier) {
+  this.identifier = identifier ?? getNextIdentifier();
   this.x = x;
   this.y = y;
   this.speedX = 0;
   this.speedY = 0;
   this.color = color;
+  this.touched = false;
 }
 
 let isMouseDown = false;
@@ -79,6 +86,9 @@ function collideBalls(ball1, ball2) {
     ball1.speedY -= speed * vCollisionNorm.y;
     ball2.speedX += speed * vCollisionNorm.x;
     ball2.speedY += speed * vCollisionNorm.y;
+
+    ball1.touched = true;
+    ball2.touched = true;
   }
 }
 
@@ -106,17 +116,24 @@ function bounceBallOnEdges(ball) {
  * State
  * */
 
-let playerBall = new Ball(canvas.width / 2, canvas.height / 2, "#eee");
-let otherBalls = [
-  new Ball(canvas.width / 4, (1 * canvas.height) / 5, "#48f"),
-  new Ball(canvas.width / 4, (2 * canvas.height) / 5, "#77f"),
-  new Ball(canvas.width / 4, (3 * canvas.height) / 5, "#94f"),
-  new Ball(canvas.width / 4, (4 * canvas.height) / 5, "#b4e"),
-  new Ball((3 * canvas.width) / 4, (1 * canvas.height) / 5, "#c59"),
-  new Ball((3 * canvas.width) / 4, (2 * canvas.height) / 5, "#d64"),
-  new Ball((3 * canvas.width) / 4, (3 * canvas.height) / 5, "#c80"),
-  new Ball((3 * canvas.width) / 4, (4 * canvas.height) / 5, "#ba0"),
+let balls = [
+  new Ball(canvas.width / 6, canvas.height / 2, "#eee", "player"),
+  new Ball(canvas.width / 4, (2 * canvas.height) / 7, "#77f"),
+  new Ball(canvas.width / 4, (3 * canvas.height) / 7, "#94f"),
+  new Ball(canvas.width / 4, (4 * canvas.height) / 7, "#b4e"),
+  new Ball(canvas.width / 4, (5 * canvas.height) / 7, "#48f"),
+  new Ball((2 * canvas.width) / 4, (2 * canvas.height) / 7, "#ba0"),
+  new Ball((2 * canvas.width) / 4, (3 * canvas.height) / 7, "#ba0"),
+  new Ball((2 * canvas.width) / 4, (4 * canvas.height) / 7, "#ba0"),
+  new Ball((2 * canvas.width) / 4, (5 * canvas.height) / 7, "#ba0"),
+  new Ball((3 * canvas.width) / 4, (2 * canvas.height) / 7, "#d64"),
+  new Ball((3 * canvas.width) / 4, (3 * canvas.height) / 7, "#c80"),
+  new Ball((3 * canvas.width) / 4, (4 * canvas.height) / 7, "#ba0"),
+  new Ball((3 * canvas.width) / 4, (5 * canvas.height) / 7, "#c59"),
 ];
+function getPlayerBall() {
+  return balls.find((ball) => ball.identifier === "player");
+}
 
 const minX = 0 + ballRadius;
 const maxX = canvas.width - ballRadius;
@@ -124,18 +141,17 @@ const minY = 0 + ballRadius;
 const maxY = canvas.height - ballRadius;
 
 function update() {
-  moveBall(playerBall);
-  otherBalls.forEach((ball) => moveBall(ball));
-  const allBalls = [playerBall, ...otherBalls];
-  for (let i = 0; i < allBalls.length; i++) {
-    for (let j = 0; j < allBalls.length; j++) {
+  balls.forEach((ball) => {
+    moveBall(ball);
+  });
+  for (let i = 0; i < balls.length; i++) {
+    for (let j = 0; j < balls.length; j++) {
       if (i !== j) {
-        collideBalls(allBalls[i], allBalls[j]);
+        collideBalls(balls[i], balls[j]);
       }
     }
   }
-  bounceBallOnEdges(playerBall);
-  otherBalls.forEach((ball) => bounceBallOnEdges(ball));
+  balls.forEach((ball) => bounceBallOnEdges(ball));
 }
 
 function drawGrass() {
@@ -146,7 +162,7 @@ function drawGrass() {
 function drawBall(ball) {
   context.beginPath();
   context.arc(ball.x, ball.y, ballRadius, 0, 2 * Math.PI, false);
-  context.fillStyle = ball.color;
+  context.fillStyle = ball.touched ? "white" : ball.color;
   context.fill();
 }
 
@@ -155,23 +171,24 @@ function getAbsDistance(a, b) {
 }
 
 function drawLine() {
+  const playerBall = getPlayerBall();
   context.beginPath();
   context.moveTo(playerBall.x, playerBall.y);
   context.strokeStyle = "blue";
-  context.lineWidth = 5;
+  context.lineWidth = 3;
   const [x, y] = mouseMovePosition;
-
   context.lineTo(x, y);
   context.stroke();
 }
 
 function draw() {
   drawGrass();
-  if (isMouseDown) {
+  if (isMouseDown && !getPlayerBall().touched) {
     drawLine();
   }
-  drawBall(playerBall);
-  otherBalls.forEach((ball) => drawBall(ball));
+  balls.forEach((ball) => {
+    drawBall(ball);
+  });
 }
 
 setInterval(() => update(), 1000 / updateRate);
@@ -186,6 +203,9 @@ function getCanvasEventPosition(event) {
 }
 
 canvas.addEventListener("mousedown", function (downEvent) {
+  if (getPlayerBall().touched) {
+    return;
+  }
   isMouseDown = true;
   mouseMovePosition = getCanvasEventPosition(downEvent);
   const mousemoveEventListener = document.addEventListener(
@@ -198,6 +218,7 @@ canvas.addEventListener("mousedown", function (downEvent) {
     "mouseup",
     function () {
       isMouseDown = false;
+      const playerBall = getPlayerBall();
       const xSign = playerBall.x > mouseMovePosition[0] ? 1 : -1;
       const ySign = playerBall.y > mouseMovePosition[1] ? 1 : -1;
       playerBall.speedX +=
@@ -209,3 +230,13 @@ canvas.addEventListener("mousedown", function (downEvent) {
     { once: true }
   );
 });
+
+// # TODO
+// Generate random ball positions
+// Count and show score
+// Restart button
+// Allow multiple moves
+// Level system (increase amount of balls, decrease amount of moves)
+// Random, unique ball colors
+// Allow starting move from any ball
+// "Level Complete!" splash
