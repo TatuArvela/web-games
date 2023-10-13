@@ -9,7 +9,6 @@ const context = canvas.getContext('2d');
 context.imageSmoothingEnabled = false;
 
 const updateRate = 100;
-const frameRate = 60;
 
 const aiRate = 100;
 const minAiSpeed = 2;
@@ -243,11 +242,13 @@ function draw() {
   context.font = `${fontWidth}px 'Press Start 2P'`;
   context.fillText(player1.score, 300 - fontWidth, 100);
   context.fillText(player2.score, (canvas.width - 300), 100);
+
+  window.requestAnimationFrame(draw);
 }
 
 setInterval(() => update(), 1000 / updateRate);
 setInterval(() => moveAi(), 1000 / aiRate);
-setInterval(() => draw(), 1000 / frameRate);
+window.requestAnimationFrame(draw);
 
 canvas.addEventListener('mousemove', function (event) {
   movePlayer(event);
