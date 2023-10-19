@@ -44,6 +44,23 @@ function getBoardOffsetY() {
   return (canvas.height - boardHeight) / 2;
 }
 
+function getCanvasEventPosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  const scale = canvas.width / canvas.clientWidth;
+  const x = (event.clientX - rect.left) * scale;
+  const y = (event.clientY - rect.top) * scale;
+  return [x, y];
+}
+
+function getBoardEventPosition(event) {
+  const [canvasX, canvasY] = getCanvasEventPosition(event);
+  const boardOffsetX = getBoardOffsetX();
+  const boardOffsetY = getBoardOffsetY();
+  const boardX = canvasX - boardOffsetX;
+  const boardY = canvasY - boardOffsetY;
+  return [boardX, boardY];
+}
+
 function moveMarble(marble) {
   marble.x += marble.speedX;
   marble.y += marble.speedY;
@@ -61,14 +78,20 @@ function moveMarble(marble) {
   }
 }
 
-function checkMarbleIntersect(marble1, marble2) {
+function isMarbleInMarble(marble1, marble2) {
   let dx = marble1.x - marble2.x;
   let dy = marble1.y - marble2.y;
   return Math.sqrt(dx * dx + dy * dy) < 2 * marbleRadius;
 }
 
+function isPointInMarble(marble, mouseX, mouseY) {
+  let dx = marble.x - mouseX;
+  let dy = marble.y - mouseY;
+  return Math.sqrt(dx * dx + dy * dy) < marbleRadius;
+}
+
 function collideMarbles(marble1, marble2) {
-  if (checkMarbleIntersect(marble1, marble2)) {
+  if (isMarbleInMarble(marble1, marble2)) {
     const vCollision = { x: marble2.x - marble1.x, y: marble2.y - marble1.y };
     const distance = Math.sqrt(
       (marble2.x - marble1.x) * (marble2.x - marble1.x) +
@@ -157,9 +180,7 @@ function generateMarbles(numMarbles, boardWidth, boardHeight, marbleRadius) {
 
       newMarble = new Marble(x, y, color, i, i === 0);
 
-      overlap = marbles.some((marble) =>
-        checkMarbleIntersect(marble, newMarble)
-      );
+      overlap = marbles.some((marble) => isMarbleInMarble(marble, newMarble));
 
       attempts++;
 
@@ -181,12 +202,17 @@ function generateMarbles(numMarbles, boardWidth, boardHeight, marbleRadius) {
 let marbleRadius = 12;
 let numMarbles = 50;
 let marbles = [];
+let activeMarble = null;
 
-let isMouseDown = false;
 let mouseMovePosition = null;
 
-function getPlayerMarble() {
-  return marbles[0];
+function findActiveMarble(event) {
+  const [mouseX, mouseY] = getBoardEventPosition(event);
+  return (
+    marbles.find(
+      (marble) => marble.controllable && isPointInMarble(marble, mouseX, mouseY)
+    ) ?? null
+  );
 }
 
 function initialize() {
@@ -265,12 +291,10 @@ function getAbsDistance(a, b) {
 }
 
 function drawLine() {
-  const playerMarble = getPlayerMarble();
-
   context.beginPath();
   context.moveTo(
-    playerMarble.x + getBoardOffsetX(),
-    playerMarble.y + getBoardOffsetY()
+    activeMarble.x + getBoardOffsetX(),
+    activeMarble.y + getBoardOffsetY()
   );
 
   context.strokeStyle = "blue";
@@ -283,14 +307,14 @@ function drawLine() {
 }
 
 function draw() {
-  clearCanvas()
+  clearCanvas();
   drawBoard();
 
   marbles.forEach((marble) => {
     drawMarble(marble);
   });
 
-  if (isMouseDown) {
+  if (activeMarble) {
     drawLine();
   }
 
@@ -307,20 +331,17 @@ updateCanvasSize();
 setInterval(() => update(), 1000 / updateRate);
 requestAnimationFrame(draw);
 
-function getCanvasEventPosition(event) {
-  const rect = canvas.getBoundingClientRect();
-  const scale = canvas.width / canvas.clientWidth;
-  const x = (event.clientX - rect.left) * scale;
-  const y = (event.clientY - rect.top) * scale;
-  return [x, y];
-}
-
-document.addEventListener('resize', function () {
+document.addEventListener("resize", function () {
   updateCanvasSize();
 });
 
 canvas.addEventListener("mousedown", function (downEvent) {
-  isMouseDown = true;
+  activeMarble = findActiveMarble(downEvent);
+
+  if (!activeMarble) {
+    return;
+  }
+
   mouseMovePosition = getCanvasEventPosition(downEvent);
 
   const mousemoveEventListener = document.addEventListener(
@@ -333,26 +354,27 @@ canvas.addEventListener("mousedown", function (downEvent) {
   document.addEventListener(
     "mouseup",
     function () {
-      isMouseDown = false;
-      const playerMarble = getPlayerMarble();
-      const xSign =
-        playerMarble.x + getBoardOffsetX() > mouseMovePosition[0] ? 1 : -1;
-      const ySign =
-        playerMarble.y + getBoardOffsetY() > mouseMovePosition[1] ? 1 : -1;
-      playerMarble.speedX +=
-        (xSign *
-          getAbsDistance(
-            playerMarble.x + getBoardOffsetX(),
-            mouseMovePosition[0]
-          )) /
-        10;
-      playerMarble.speedY +=
-        (ySign *
-          getAbsDistance(
-            playerMarble.y + getBoardOffsetY(),
-            mouseMovePosition[1]
-          )) /
-        10;
+      if (activeMarble) {
+        const xSign =
+          activeMarble.x + getBoardOffsetX() > mouseMovePosition[0] ? 1 : -1;
+        const ySign =
+          activeMarble.y + getBoardOffsetY() > mouseMovePosition[1] ? 1 : -1;
+        activeMarble.speedX +=
+          (xSign *
+            getAbsDistance(
+              activeMarble.x + getBoardOffsetX(),
+              mouseMovePosition[0]
+            )) /
+          10;
+        activeMarble.speedY +=
+          (ySign *
+            getAbsDistance(
+              activeMarble.y + getBoardOffsetY(),
+              mouseMovePosition[1]
+            )) /
+          10;
+        activeMarble = null;
+      }
       document.removeEventListener("mousemove", mousemoveEventListener);
     },
     { once: true }
@@ -360,9 +382,8 @@ canvas.addEventListener("mousedown", function (downEvent) {
 });
 
 // # TODO
-// Allow flicking all controllable marbles
 // Falling off the board
-// Count and show score
+// Count and show score (combos, moves)
 // Restart button
 // Level system (change number of marbles, change size of board)
 // "Level Complete!" splash
