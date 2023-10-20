@@ -11,9 +11,10 @@ context.imageSmoothingEnabled = false;
 const boardWidth = 600;
 const boardHeight = 400;
 
-const updateRate = 100;
+const updateIntervalMs = 10;
 const maxVectorLength = 50;
 const slowDownRate = 0.005;
+const maxFallTime = 2000 / updateIntervalMs;
 
 class Marble {
   constructor(x, y, color, id, controllable) {
@@ -24,6 +25,8 @@ class Marble {
     this.speedY = 0;
     this.color = color;
     this.controllable = controllable;
+    this.falling = false;
+    this.fallTime = 0;
   }
 }
 
@@ -61,9 +64,40 @@ function getBoardEventPosition(event) {
   return [boardX, boardY];
 }
 
+function isMarbleInMarble(marble1, marble2) {
+  let dx = marble1.x - marble2.x;
+  let dy = marble1.y - marble2.y;
+  return Math.sqrt(dx * dx + dy * dy) < 2 * marbleRadius;
+}
+
+function isPointInMarble(marble, mouseX, mouseY) {
+  let dx = marble.x - mouseX;
+  let dy = marble.y - mouseY;
+  return Math.sqrt(dx * dx + dy * dy) < marbleRadius;
+}
+
+function isMarbleInsideBoard(marble) {
+  return (
+    marble.x >= 0 &&
+    marble.x <= boardWidth &&
+    marble.y >= 0 &&
+    marble.y <= boardHeight
+  );
+}
+
 function moveMarble(marble) {
-  marble.x += marble.speedX;
-  marble.y += marble.speedY;
+  const scale = Math.exp(-marble.fallTime / (100 / Math.log(100)));
+
+  marble.x += marble.speedX * scale;
+  marble.y += marble.speedY * scale;
+
+  if (!isMarbleInsideBoard(marble)) {
+    marble.falling = true;
+  }
+
+  if (marble.falling) {
+    marble.fallTime = Math.min(marble.fallTime + 1, maxFallTime);
+  }
 
   if (Math.abs(marble.speedX) < 0.1) {
     marble.speedX = 0;
@@ -78,19 +112,11 @@ function moveMarble(marble) {
   }
 }
 
-function isMarbleInMarble(marble1, marble2) {
-  let dx = marble1.x - marble2.x;
-  let dy = marble1.y - marble2.y;
-  return Math.sqrt(dx * dx + dy * dy) < 2 * marbleRadius;
-}
-
-function isPointInMarble(marble, mouseX, mouseY) {
-  let dx = marble.x - mouseX;
-  let dy = marble.y - mouseY;
-  return Math.sqrt(dx * dx + dy * dy) < marbleRadius;
-}
-
 function collideMarbles(marble1, marble2) {
+  if (marble1.falling || marble2.falling) {
+    return;
+  }
+
   if (isMarbleInMarble(marble1, marble2)) {
     const vCollision = { x: marble2.x - marble1.x, y: marble2.y - marble1.y };
     const distance = Math.sqrt(
@@ -237,6 +263,19 @@ function clearCanvas() {
   context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
+function drawBoardShadow() {
+  context.save();
+
+  context.translate(getBoardOffsetX(), getBoardOffsetY());
+
+  context.shadowColor = "rgba(0, 0, 0, 0.5)";
+  context.shadowBlur = 10;
+  context.fillStyle = "black";
+  context.fillRect(0, 0, boardWidth, boardHeight);
+
+  context.restore();
+}
+
 function drawBoard() {
   const stripeWidth = 20;
   const stripeColor1 = "#ddd";
@@ -273,17 +312,24 @@ function drawBoard() {
 }
 
 function drawMarble(marble) {
+  context.save();
+
   context.beginPath();
   context.arc(
     marble.x + getBoardOffsetX(),
     marble.y + getBoardOffsetY(),
-    marbleRadius,
+    marbleRadius *
+      Math.exp(-marble.fallTime / (maxFallTime / Math.log(maxFallTime))),
     0,
     2 * Math.PI,
     false
   );
+  context.shadowColor = "rgba(0, 0, 0, 0.5)";
+  context.shadowBlur = 5;
   context.fillStyle = marble.controllable ? "white" : marble.color;
   context.fill();
+
+  context.restore();
 }
 
 function getAbsDistance(a, b) {
@@ -308,6 +354,8 @@ function drawLine() {
 
 function draw() {
   clearCanvas();
+
+  drawBoardShadow();
   drawBoard();
 
   marbles.forEach((marble) => {
@@ -328,10 +376,10 @@ function draw() {
 initialize();
 
 updateCanvasSize();
-setInterval(() => update(), 1000 / updateRate);
+setInterval(() => update(), updateIntervalMs);
 requestAnimationFrame(draw);
 
-document.addEventListener("resize", function () {
+window.addEventListener("resize", function () {
   updateCanvasSize();
 });
 
@@ -382,7 +430,7 @@ canvas.addEventListener("mousedown", function (downEvent) {
 });
 
 // # TODO
-// Falling off the board
+// Better collision physics at high speeds
 // Count and show score (combos, moves)
 // Restart button
 // Level system (change number of marbles, change size of board)
