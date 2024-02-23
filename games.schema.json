@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Games List",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri-reference"
+    },
+    "games": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "players": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "controls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["keyboard", "mouse", "touch"]
+            },
+            "minItems": 1
+          },
+          "image": {
+            "type": "string",
+            "format": "uri-reference"
+          }
+        },
+        "required": ["title", "href", "players", "controls"]
+      }
+    }
+  },
+  "required": ["$schema", "games"]
+}

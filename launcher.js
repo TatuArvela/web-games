@@ -1,3 +1,4 @@
+let games = [];
 const IDLE_TIME = 60000;
 const GAME_RENDER_LIMIT = 11;
 
@@ -170,7 +171,14 @@ function screensaver() {
   document.body.appendChild(screensaverElement);
 }
 
-renderGames();
-resetScreensaverTimeout();
+async function launcher() {
+  games = await fetch('./games.json')
+    .then((response) => response.json())
+    .then((data) => data.games);
 
-document.addEventListener("keydown", handleInput);
+  renderGames();
+  resetScreensaverTimeout();
+
+  document.addEventListener("keydown", handleInput);
+}
+launcher();
