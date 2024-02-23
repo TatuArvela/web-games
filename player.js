@@ -9,10 +9,15 @@ function exitGame() {
   resetScreensaverTimeout();
 }
 
-function play(url) {
+function play(game) {
+  if (game.isExternal) {
+    window.location.href = game.href;
+    return;
+  }
+
   player.classList.remove("disabled");
   iframe.setAttribute("onload", "iframe.contentWindow.focus()");
-  iframe.setAttribute("src", url);
+  iframe.setAttribute("src", game.url);
   clearTimeout(screensaverTimeout);
 }
 

@@ -6,7 +6,8 @@
       "href": "https://itch.io/embed-upload/9789380?color=000000",
       "players": 1,
       "controls": ["mouse"],
-      "image": "img/lost-control.png"
+      "image": "img/lost-control.png",
+      "isExternal": true
     },
     {
       "title": "SameGame",
@@ -62,7 +63,7 @@
       "href": "games/marbles",
       "players": 1,
       "controls": ["mouse"],
-      "incomplete": true
+      "isIncomplete": true
     },
     {
       "title": "New Life Game",
@@ -70,7 +71,7 @@
       "players": 1,
       "controls": ["mouse"],
       "image": "img/new-life-game.png",
-      "incomplete": true
+      "isIncomplete": true
     }
   ]
 }

@@ -52,12 +52,12 @@ function renderGames() {
     gameElement.className = [
       "game",
       animation,
-      game.incomplete && 'incomplete',
+      game.isIncomplete && 'incomplete',
     ].filter(Boolean).join(" ");
 
     if (isSelected) {
       gameElement.id = "selected";
-      gameElement.onclick = () => play(game.href);
+      gameElement.onclick = () => play(game);
     }
 
     const imageContainer = document.createElement("div");
@@ -144,7 +144,7 @@ function handleInput(e) {
       break;
     case 32:
     case 13:
-      play(games[selectedIndex].href);
+      play(games[selectedIndex]);
   }
 }
 
