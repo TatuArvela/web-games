@@ -3,7 +3,7 @@
   "games": [
     {
       "title": "Lost Control",
-      "href": "https://itch.io/embed-upload/9789380?color=333333",
+      "href": "https://itch.io/embed-upload/9789380?color=000000",
       "players": 1,
       "controls": ["mouse"],
       "image": "img/lost-control.png"
