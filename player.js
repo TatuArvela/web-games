@@ -11,7 +11,7 @@ function exitGame() {
 
 function play(game) {
   if (game.isExternal) {
-    window.location.href = game.href;
+    window.location.href = game.url;
     return;
   }
 
