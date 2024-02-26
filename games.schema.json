@@ -42,7 +42,7 @@
             "type": "boolean"
           }
         },
-        "required": ["title", "href", "players", "controls"]
+        "required": ["title", "url", "players", "controls"]
       }
     }
   },
