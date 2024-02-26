@@ -71,6 +71,13 @@
       "controls": ["mouse"],
       "image": "img/new-life-game.png",
       "isIncomplete": true
+    },
+    {
+      "title": "Jackpot",
+      "url": "games/jackpot",
+      "players": 1,
+      "controls": ["mouse"],
+      "isIncomplete": true
     }
   ]
 }
