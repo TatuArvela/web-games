@@ -161,6 +161,8 @@ img {
     content: 'Under Construction';
     background-image: linear-gradient(45deg, #000000 25%, #ffff00 25%, #ffff00 50%, #000000 50%, #000000 75%, #ffff00 75%, #ffff00 100%);
     background-size: 56.57px 56.57px;
+    transform: skewY(10deg);
+    display: block;
     box-shadow: 2px 2px 2px black, -2px -2px 2px black;
     color: white;
     font-size: 12px;
