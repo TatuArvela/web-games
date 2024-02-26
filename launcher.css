@@ -126,13 +126,17 @@ img {
 }
 
 .game {
+  --shadow-color-1: #747474;
+  --shadow-color-2: white;
+  --shadow-color-3: black;
+
   border-radius: 14px;
   border: 2px solid black;
-  box-shadow: inset -2px -2px 0 0 #747474, inset 0 -2px 0 0 #747474, inset -2px 0 0 0 #747474,
-  inset 2px 2px 0 0 white, inset 0 2px 0 0 white, inset 2px 0 0 0 white,
-  inset -2px -2px 0 2px white, inset 0 -2px 0 2px white, inset -2px 0 0 2px white,
-  inset 2px 2px 0 2px #747474, inset 0 2px 0 2px #747474, inset 2px 0 0 2px #747474,
-  inset 0 0 0 6px black;
+  box-shadow: inset -2px -2px 0 0 var(--shadow-color-1), inset 0 -2px 0 0 var(--shadow-color-1), inset -2px 0 0 0 var(--shadow-color-1),
+  inset 2px 2px 0 0 var(--shadow-color-2), inset 0 2px 0 0 var(--shadow-color-2), inset 2px 0 0 0 var(--shadow-color-2),
+  inset -2px -2px 0 2px var(--shadow-color-2), inset 0 -2px 0 2px var(--shadow-color-2), inset -2px 0 0 2px var(--shadow-color-2),
+  inset 2px 2px 0 2px var(--shadow-color-1), inset 0 2px 0 2px var(--shadow-color-1), inset 2px 0 0 2px var(--shadow-color-1),
+  inset 0 0 0 6px var(--shadow-color-3);
   padding: 6px;
   height: 208px;
   opacity: 0.25;
@@ -154,23 +158,29 @@ img {
 }
 
 .game.incomplete {
+  --shadow-color-1: yellow;
+  --shadow-color-2: rgb(255, 255, 112);
+  --shadow-color-3: rgb(37, 37, 0);
+
   opacity: 0.125;
   position: relative;
 
-  &:before {
-    content: 'Under Construction';
-    background-image: linear-gradient(45deg, #000000 25%, #ffff00 25%, #ffff00 50%, #000000 50%, #000000 75%, #ffff00 75%, #ffff00 100%);
-    background-size: 56.57px 56.57px;
-    transform: skewY(10deg);
+  &:before, &:after {
+    background-image: linear-gradient(-45deg, #000000 25%, #ffff00 25%, #ffff00 50%, #000000 50%, #000000 75%, #ffff00 75%, #ffff00 100%);
+    background-size: 30px 30px;
+    content: '';
     display: block;
     box-shadow: 2px 2px 2px black, -2px -2px 2px black;
-    color: white;
-    font-size: 12px;
-    height: 40px;
-    line-height: 20px;
+    height: 6px;
     position: absolute;
     text-shadow: 2px 2px 2px black, -2px -2px 2px black;
     width: 192px;
+  }
+  &:before {
+    top: 6px;
+  }
+  &:after {
+    bottom: 38px;
   }
 }
 
