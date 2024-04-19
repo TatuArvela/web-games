@@ -8,24 +8,23 @@ canvas.height = 600;
 const context = canvas.getContext("2d");
 context.imageSmoothingEnabled = false;
 
+const MARBLES_HI_SCORE_KEY = "MARBLES_HI_SCORE";
+
 const boardWidth = 600;
 const boardHeight = 400;
 
 const updateIntervalMs = 10;
-const maxVectorLength = 50;
-const slowDownRate = 0.005;
+const friction = 0.98;
+const marbleRadius = 12;
 const maxFallTime = 2000 / updateIntervalMs;
 
 const pointsForElimination = 20;
 const pointsForClear = 500;
 
-const MARBLES_HI_SCORE_KEY = "MARBLES_HI_SCORE";
-
 /*
  * State
  * */
 
-let marbleRadius = 12;
 let numMarbles = 50;
 let marbles = [];
 let activeMarble = null;
@@ -87,32 +86,17 @@ function getBoardEventPosition(event) {
   return [boardX, boardY];
 }
 
-function isMarbleInMarble(marble1, marble2) {
-  let dx = marble1.x - marble2.x;
-  let dy = marble1.y - marble2.y;
-  return Math.sqrt(dx * dx + dy * dy) < 2 * marbleRadius;
-}
-
-function isPointInMarble(marble, mouseX, mouseY) {
-  let dx = marble.x - mouseX;
-  let dy = marble.y - mouseY;
-  return Math.sqrt(dx * dx + dy * dy) < marbleRadius;
-}
-
-function isMarbleInsideBoard(marble) {
-  return (
-    marble.x >= 0 &&
-    marble.x <= boardWidth &&
-    marble.y >= 0 &&
-    marble.y <= boardHeight
-  );
-}
-
 function moveMarble(marble) {
-  const scale = Math.exp(-marble.fallTime / (100 / Math.log(100)));
+  marble.x += marble.speedX;
+  marble.y += marble.speedY;
 
-  marble.x += marble.speedX * scale;
-  marble.y += marble.speedY * scale;
+  marble.speedX *= friction;
+  marble.speedY *= friction;
+
+  if (Math.hypot(marble.speedX, marble.speedY) < 0.05) {
+    marble.speedX = 0;
+    marble.speedY = 0;
+  }
 
   if (!isMarbleInsideBoard(marble)) {
     marble.isFalling = true;
@@ -133,30 +117,48 @@ function moveMarble(marble) {
       marble.enabled = false;
     }
   }
+}
 
-  if (Math.abs(marble.speedX) < 0.05) {
-    marble.speedX = 0;
-  } else {
-    marble.speedX = marble.speedX * (1 - slowDownRate);
-  }
+function isMarbleInsideBoard(marble) {
+  return (
+    marble.x >= 0 &&
+    marble.x <= boardWidth &&
+    marble.y >= 0 &&
+    marble.y <= boardHeight
+  );
+}
 
-  if (Math.abs(marble.speedY) < 0.05) {
-    marble.speedY = 0;
-  } else {
-    marble.speedY = marble.speedY * (1 - slowDownRate);
-  }
+function isMarbleInMarble(marble1, marble2) {
+  const dx = marble1.x - marble2.x;
+  const dy = marble1.y - marble2.y;
+  return Math.sqrt(dx * dx + dy * dy) < 2 * marbleRadius;
+}
+
+function isPointInMarble(marble, mouseX, mouseY) {
+  const dx = marble.x - mouseX;
+  const dy = marble.y - mouseY;
+  return Math.sqrt(dx * dx + dy * dy) < marbleRadius;
+}
+
+function isStill(marble) {
+  return marble.speedX === 0 && marble.speedY === 0;
 }
 
 function collideMarbles(marble1, marble2) {
-  if (marble1.isFalling || marble2.isFalling) {
+  if (
+    marble1 === marble2 ||
+    marble1.isFalling || marble2.isFalling ||
+    !marble1.enabled || !marble2.enabled ||
+    (isStill(marble1) && isStill(marble2))
+  ) {
     return;
   }
 
   if (isMarbleInMarble(marble1, marble2)) {
-    const vCollision = { x: marble2.x - marble1.x, y: marble2.y - marble1.y };
+    const vCollision = {x: marble2.x - marble1.x, y: marble2.y - marble1.y};
     const distance = Math.sqrt(
       (marble2.x - marble1.x) * (marble2.x - marble1.x) +
-        (marble2.y - marble1.y) * (marble2.y - marble1.y)
+      (marble2.y - marble1.y) * (marble2.y - marble1.y)
     );
     const vCollisionNorm = {
       x: vCollision.x / distance,
@@ -301,18 +303,11 @@ function update() {
     return;
   }
 
-  marbles.forEach((marble) => {
-    if (marble.enabled) {
-      moveMarble(marble);
-    }
-  });
-  for (let i = 0; i < marbles.length; i++) {
-    for (let j = 0; j < marbles.length; j++) {
-      if (i !== j) {
-        if (marbles[i].enabled && marbles[j].enabled) {
-          collideMarbles(marbles[i], marbles[j]);
-        }
-      }
+  marbles.forEach(moveMarble);
+
+  for (let i = 0; i < marbles.length - 1; i++) {
+    for (let j = i + 1; j < marbles.length; j++) {
+      collideMarbles(marbles[i], marbles[j]);
     }
   }
 
@@ -394,7 +389,7 @@ function drawMarble(marble) {
     marble.x + getBoardOffsetX(),
     marble.y + getBoardOffsetY(),
     marbleRadius *
-      Math.exp(-marble.fallTime / (maxFallTime / Math.log(maxFallTime))),
+    Math.exp(-marble.fallTime / (maxFallTime / Math.log(maxFallTime))),
     0,
     2 * Math.PI,
     false
@@ -466,7 +461,11 @@ function drawCombo() {
   const fontSize = 60;
   context.fillStyle = "red";
   applyFontStyle(context, fontSize);
-  context.fillText(combo > 1 ? `COMBO! x${combo}` : `x${combo}`, canvas.width / 2, canvas.height / 2);
+  context.fillText(
+    combo > 1 ? `COMBO! x${combo}` : `x${combo}`,
+    canvas.width / 2,
+    canvas.height / 2
+  );
   context.restore();
 }
 
@@ -569,11 +568,13 @@ canvas.addEventListener("mousedown", function (downEvent) {
 
   mouseMovePosition = getCanvasEventPosition(downEvent);
 
-  const mousemoveEventListener = document.addEventListener(
+  const mousemoveEventListener = function (moveEvent) {
+    mouseMovePosition = getCanvasEventPosition(moveEvent);
+  };
+
+  document.addEventListener(
     "mousemove",
-    function (moveEvent) {
-      mouseMovePosition = getCanvasEventPosition(moveEvent);
-    }
+    mousemoveEventListener,
   );
 
   document.addEventListener(
@@ -603,6 +604,6 @@ canvas.addEventListener("mousedown", function (downEvent) {
       }
       document.removeEventListener("mousemove", mousemoveEventListener);
     },
-    { once: true }
+    {once: true}
   );
 });
