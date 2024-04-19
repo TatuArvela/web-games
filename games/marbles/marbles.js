@@ -16,17 +16,36 @@ const maxVectorLength = 50;
 const slowDownRate = 0.005;
 const maxFallTime = 2000 / updateIntervalMs;
 
+const pointsForElimination = 10;
+
+/*
+ * State
+ * */
+
+let marbleRadius = 12;
+let numMarbles = 50;
+let marbles = [];
+let activeMarble = null;
+
+let mouseMovePosition = null;
+
+let combo = 0;
+let score = 0;
+let isGameOver = false;
+
 class Marble {
-  constructor(x, y, color, id, controllable) {
+  constructor(x, y, color, id, isControllable) {
     this.id = id;
     this.x = x;
     this.y = y;
     this.speedX = 0;
     this.speedY = 0;
     this.color = color;
-    this.controllable = controllable;
-    this.falling = false;
+    this.isControllable = isControllable;
+    this.isFalling = false;
     this.fallTime = 0;
+    this.eliminated = false;
+    this.enabled = true;
   }
 }
 
@@ -92,20 +111,32 @@ function moveMarble(marble) {
   marble.y += marble.speedY * scale;
 
   if (!isMarbleInsideBoard(marble)) {
-    marble.falling = true;
+    marble.isFalling = true;
   }
 
-  if (marble.falling) {
+  if (marble.isFalling) {
+    if (!marble.eliminated) {
+      combo++;
+      score += combo * pointsForElimination;
+      marble.eliminated = true;
+      window.dispatchEvent(new Event("forceDraw"));
+    }
+
     marble.fallTime = Math.min(marble.fallTime + 1, maxFallTime);
+    if (marble.fallTime === maxFallTime) {
+      marble.speedX = 0;
+      marble.speedY = 0;
+      marble.enabled = false;
+    }
   }
 
-  if (Math.abs(marble.speedX) < 0.1) {
+  if (Math.abs(marble.speedX) < 0.05) {
     marble.speedX = 0;
   } else {
     marble.speedX = marble.speedX * (1 - slowDownRate);
   }
 
-  if (Math.abs(marble.speedY) < 0.1) {
+  if (Math.abs(marble.speedY) < 0.05) {
     marble.speedY = 0;
   } else {
     marble.speedY = marble.speedY * (1 - slowDownRate);
@@ -113,7 +144,7 @@ function moveMarble(marble) {
 }
 
 function collideMarbles(marble1, marble2) {
-  if (marble1.falling || marble2.falling) {
+  if (marble1.isFalling || marble2.isFalling) {
     return;
   }
 
@@ -144,8 +175,8 @@ function collideMarbles(marble1, marble2) {
     marble2.speedX += speed * vCollisionNorm.x;
     marble2.speedY += speed * vCollisionNorm.y;
 
-    marble1.controllable = true;
-    marble2.controllable = true;
+    marble1.isControllable = true;
+    marble2.isControllable = true;
   }
 }
 
@@ -222,39 +253,61 @@ function generateMarbles(numMarbles, boardWidth, boardHeight, marbleRadius) {
 }
 
 /*
- * State
+ * Control
  * */
-
-let marbleRadius = 12;
-let numMarbles = 50;
-let marbles = [];
-let activeMarble = null;
-
-let mouseMovePosition = null;
 
 function findActiveMarble(event) {
   const [mouseX, mouseY] = getBoardEventPosition(event);
   return (
     marbles.find(
-      (marble) => marble.controllable && isPointInMarble(marble, mouseX, mouseY)
+      (marble) =>
+        marble.isControllable && isPointInMarble(marble, mouseX, mouseY)
     ) ?? null
   );
 }
 
+function areMarblesOnTheBoardMoving() {
+  return marbles.some((marble) => {
+    if (!marble.enabled) {
+      return false;
+    }
+    const isMoving = Boolean(
+      Math.abs(marble.speedX) > 0 || Math.abs(marble.speedY) > 0
+    );
+    return !marble.isFalling && isMoving;
+  });
+}
+
 function initialize() {
+  score = 0;
+  combo = 0;
+  isGameOver = false;
+
   marbles = generateMarbles(numMarbles, boardWidth, boardHeight, marbleRadius);
 }
 
 function update() {
   marbles.forEach((marble) => {
-    moveMarble(marble);
+    if (marble.enabled) {
+      moveMarble(marble);
+    }
   });
   for (let i = 0; i < marbles.length; i++) {
     for (let j = 0; j < marbles.length; j++) {
       if (i !== j) {
-        collideMarbles(marbles[i], marbles[j]);
+        if (marbles[i].enabled && marbles[j].enabled) {
+          collideMarbles(marbles[i], marbles[j]);
+        }
       }
     }
+  }
+
+  isGameOver = !marbles.some((marble) => {
+    return marble.enabled && marble.isControllable;
+  });
+
+  if (!areMarblesOnTheBoardMoving()) {
+    combo = 0;
   }
 }
 
@@ -326,7 +379,7 @@ function drawMarble(marble) {
   );
   context.shadowColor = "rgba(0, 0, 0, 0.5)";
   context.shadowBlur = 5;
-  context.fillStyle = marble.controllable ? "white" : marble.color;
+  context.fillStyle = marble.isControllable ? "white" : marble.color;
   context.fill();
 
   context.restore();
@@ -352,6 +405,62 @@ function drawLine() {
   context.stroke();
 }
 
+function applyFontStyle(context, fontSize) {
+  context.textAlign = "center";
+  context.font = `${fontSize}px "Jersey 10"`;
+  context.fontWeight = "bold";
+
+  context.shadowOffsetX = 3;
+  context.shadowOffsetY = 3;
+  context.shadowBlur = 4;
+  context.shadowColor = "rgba(0,0,0,0.3)";
+}
+
+function drawOverlay() {
+  context.fillStyle = "rgba(0,0,0,0.2)";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawScore() {
+  context.save();
+  const fontSize = 40;
+  context.fillStyle = "white";
+  applyFontStyle(context, fontSize);
+  context.fillText(`Score: ${score}`, canvas.width / 2, 10 + fontSize);
+  context.restore();
+}
+
+function drawCombo() {
+  context.save();
+  const fontSize = 60;
+  context.fillStyle = "red";
+  applyFontStyle(context, fontSize);
+  context.fillText(`COMBO! ${combo}`, canvas.width / 2, canvas.height / 2);
+  context.restore();
+}
+
+function drawGameOver() {
+  context.save();
+  const fontSize = 80;
+  context.fillStyle = "black";
+  applyFontStyle(context, fontSize);
+  context.fillText(`GAME OVER!`, canvas.width / 2, canvas.height / 2);
+  context.restore();
+}
+
+function drawClickToRestart() {
+  context.save();
+  const fontSize = 40;
+  context.fillStyle = "black";
+  applyFontStyle(context, fontSize);
+  context.fillText(
+    `Click to restart`,
+    canvas.width / 2,
+    canvas.height / 2 + fontSize
+  );
+  context.restore();
+}
+
 function draw() {
   clearCanvas();
 
@@ -366,7 +475,23 @@ function draw() {
     drawLine();
   }
 
-  requestAnimationFrame(draw);
+  if (areMarblesOnTheBoardMoving()) {
+    drawOverlay();
+  }
+
+  drawScore();
+  if (combo > 1) {
+    drawCombo();
+  }
+  if (isGameOver) {
+    drawGameOver();
+    drawClickToRestart();
+  }
+}
+
+function drawLoop() {
+  draw();
+  requestAnimationFrame(drawLoop);
 }
 
 /*
@@ -377,13 +502,25 @@ initialize();
 
 updateCanvasSize();
 setInterval(() => update(), updateIntervalMs);
-requestAnimationFrame(draw);
+requestAnimationFrame(drawLoop);
 
 window.addEventListener("resize", function () {
   updateCanvasSize();
 });
 
+window.addEventListener("forceDraw", function () {
+  draw();
+});
+
 canvas.addEventListener("mousedown", function (downEvent) {
+  if (isGameOver) {
+    initialize();
+  }
+
+  if (areMarblesOnTheBoardMoving()) {
+    return;
+  }
+
   activeMarble = findActiveMarble(downEvent);
 
   if (!activeMarble) {
@@ -403,6 +540,7 @@ canvas.addEventListener("mousedown", function (downEvent) {
     "mouseup",
     function () {
       if (activeMarble) {
+        combo = 0;
         const xSign =
           activeMarble.x + getBoardOffsetX() > mouseMovePosition[0] ? 1 : -1;
         const ySign =
@@ -430,8 +568,5 @@ canvas.addEventListener("mousedown", function (downEvent) {
 });
 
 // # TODO
+// Store hi-score
 // Better collision physics at high speeds
-// Count and show score (combos, moves)
-// Restart button
-// Level system (change number of marbles, change size of board)
-// "Level Complete!" splash
