@@ -16,7 +16,10 @@ const maxVectorLength = 50;
 const slowDownRate = 0.005;
 const maxFallTime = 2000 / updateIntervalMs;
 
-const pointsForElimination = 10;
+const pointsForElimination = 20;
+const pointsForClear = 500;
+
+const MARBLES_HI_SCORE_KEY = "MARBLES_HI_SCORE";
 
 /*
  * State
@@ -31,6 +34,7 @@ let mouseMovePosition = null;
 
 let combo = 0;
 let score = 0;
+let hiScore = localStorage.getItem(MARBLES_HI_SCORE_KEY) ?? 0;
 let isGameOver = false;
 
 class Marble {
@@ -278,6 +282,12 @@ function areMarblesOnTheBoardMoving() {
   });
 }
 
+function areMarblesCleared() {
+  return marbles.every((marble) => {
+    return !marble.enabled;
+  });
+}
+
 function initialize() {
   score = 0;
   combo = 0;
@@ -287,6 +297,10 @@ function initialize() {
 }
 
 function update() {
+  if (isGameOver) {
+    return;
+  }
+
   marbles.forEach((marble) => {
     if (marble.enabled) {
       moveMarble(marble);
@@ -302,12 +316,16 @@ function update() {
     }
   }
 
+  if (!areMarblesOnTheBoardMoving()) {
+    combo = 0;
+  }
+
   isGameOver = !marbles.some((marble) => {
     return marble.enabled && marble.isControllable;
   });
 
-  if (!areMarblesOnTheBoardMoving()) {
-    combo = 0;
+  if (isGameOver && areMarblesCleared()) {
+    score += pointsForClear;
   }
 }
 
@@ -365,6 +383,10 @@ function drawBoard() {
 }
 
 function drawMarble(marble) {
+  if (!marble.enabled) {
+    return;
+  }
+
   context.save();
 
   context.beginPath();
@@ -421,12 +443,21 @@ function drawOverlay() {
   context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
+function drawHiScore() {
+  context.save();
+  const fontSize = 40;
+  context.fillStyle = "white";
+  applyFontStyle(context, fontSize);
+  context.fillText(`Hi-Score: ${hiScore}`, canvas.width / 2, 10 + fontSize);
+  context.restore();
+}
+
 function drawScore() {
   context.save();
   const fontSize = 40;
   context.fillStyle = "white";
   applyFontStyle(context, fontSize);
-  context.fillText(`Score: ${score}`, canvas.width / 2, 10 + fontSize);
+  context.fillText(`Score: ${score}`, canvas.width / 2, 40 + fontSize);
   context.restore();
 }
 
@@ -435,7 +466,7 @@ function drawCombo() {
   const fontSize = 60;
   context.fillStyle = "red";
   applyFontStyle(context, fontSize);
-  context.fillText(`COMBO! ${combo}`, canvas.width / 2, canvas.height / 2);
+  context.fillText(combo > 1 ? `COMBO! x${combo}` : `x${combo}`, canvas.width / 2, canvas.height / 2);
   context.restore();
 }
 
@@ -444,7 +475,11 @@ function drawGameOver() {
   const fontSize = 80;
   context.fillStyle = "black";
   applyFontStyle(context, fontSize);
-  context.fillText(`GAME OVER!`, canvas.width / 2, canvas.height / 2);
+  context.fillText(
+    `${areMarblesCleared() ? "CLEAR!" : "GAME OVER!"}`,
+    canvas.width / 2,
+    canvas.height / 2
+  );
   context.restore();
 }
 
@@ -479,13 +514,18 @@ function draw() {
     drawOverlay();
   }
 
+  drawHiScore();
   drawScore();
-  if (combo > 1) {
+  if (combo > 0) {
     drawCombo();
   }
   if (isGameOver) {
     drawGameOver();
     drawClickToRestart();
+    if (score > hiScore) {
+      hiScore = score;
+      localStorage.setItem(MARBLES_HI_SCORE_KEY, hiScore);
+    }
   }
 }
 
@@ -566,7 +606,3 @@ canvas.addEventListener("mousedown", function (downEvent) {
     { once: true }
   );
 });
-
-// # TODO
-// Store hi-score
-// Better collision physics at high speeds
