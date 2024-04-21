@@ -5,70 +5,97 @@
       "title": "Lost Control",
       "url": "https://itch.io/embed-upload/9805375?color=000000",
       "players": 1,
-      "controls": ["mouse"],
+      "controls": [
+        "mouse"
+      ],
       "image": "img/lost-control.png"
     },
     {
       "title": "SameGame",
       "url": "games/samegame",
       "players": 1,
-      "controls": ["mouse", "touch"],
+      "controls": [
+        "mouse",
+        "touch"
+      ],
       "image": "img/samegame.png"
     },
     {
       "title": "Floaty Goat",
       "url": "https://tatuarvela.github.io/codecamp",
       "players": 1,
-      "controls": ["mouse", "keyboard", "touch"],
+      "controls": [
+        "mouse",
+        "keyboard",
+        "touch"
+      ],
       "image": "img/floaty-goat.png"
     },
     {
       "title": "Pong",
       "url": "games/pong",
       "players": 1,
-      "controls": ["mouse", "touch"],
+      "controls": [
+        "mouse",
+        "touch"
+      ],
       "image": "img/pong.png"
     },
     {
       "title": "Snake",
       "url": "games/snake",
       "players": 1,
-      "controls": ["keyboard", "touch"],
+      "controls": [
+        "keyboard",
+        "touch"
+      ],
       "image": "img/snake.png"
     },
     {
       "title": "Tic-Tac-Toe",
       "url": "games/tic-tac-toe",
       "players": 2,
-      "controls": ["mouse", "touch"],
+      "controls": [
+        "mouse",
+        "touch"
+      ],
       "image": "img/tic-tac-toe.png"
     },
     {
       "title": "Super Mathgame",
       "url": "https://tatuarvela.github.io/Super-Mathgame",
       "players": 1,
-      "controls": ["mouse", "touch"],
+      "controls": [
+        "mouse",
+        "touch"
+      ],
       "image": "img/super-mathgame.png"
     },
     {
       "title": "Sudoku",
       "url": "https://tatuarvela.github.io/Sudoku",
       "players": 1,
-      "controls": ["mouse", "keyboard"],
+      "controls": [
+        "mouse",
+        "keyboard"
+      ],
       "image": "img/sudoku.png"
     },
     {
-      "title": "Marbles",
+      "title": "Lose Your Marbles",
       "url": "games/marbles",
       "players": 1,
-      "controls": ["mouse"],
-      "isIncomplete": true
+      "controls": [
+        "mouse"
+      ]
     },
     {
       "title": "New Life Game",
       "url": "games/new-life-game",
       "players": 1,
-      "controls": ["mouse"],
+      "controls": [
+        "mouse"
+      ],
       "image": "img/new-life-game.png",
       "isIncomplete": true
     },
@@ -76,7 +103,9 @@
       "title": "Jackpot",
       "url": "games/jackpot",
       "players": 1,
-      "controls": ["mouse"],
+      "controls": [
+        "mouse"
+      ],
       "isIncomplete": true
     }
   ]
