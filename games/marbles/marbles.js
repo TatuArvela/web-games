@@ -400,12 +400,12 @@ function drawMarble(marble) {
 
   context.beginPath();
 
-  const lineWidth = 4;
+  const lineWidth = 3;
 
   context.arc(
     marble.x + getBoardOffsetX(),
     marble.y + getBoardOffsetY(),
-    (marbleRadius - 3 / 2) *
+    (marbleRadius - lineWidth / 2) *
     Math.exp(-marble.fallTime / (maxFallTime / Math.log(maxFallTime))),
     0,
     2 * Math.PI,
@@ -415,7 +415,7 @@ function drawMarble(marble) {
   context.fillStyle = marble.color;
   context.fill();
 
-  context.lineWidth = 3;
+  context.lineWidth = lineWidth;
   context.strokeStyle = marble.isControllable ? 'black' : 'gray';
   context.stroke();
 
