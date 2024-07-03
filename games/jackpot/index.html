@@ -1,46 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Jackpot</title>
-    <style>
-      html {
-        background: rgb(116, 20, 20);
-      }
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
 
-      body {
-        touch-action: pan-x pan-y;
-        height: 100vh;
-        width: 100vw;
-        overflow: hidden;
-        position: relative;
-        margin: 0;
-      }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ultra&display=swap" rel="stylesheet">
 
-      * {
-        user-select: none;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+  <title>Jackpot</title>
+  <style>
+    html {
+      background: linear-gradient(
+        0deg,
+        rgb(50, 50, 50) 0%,
+        rgb(60, 60, 60) 12%,
+        rgb(70, 70, 70) 25%,
+        rgb(45, 45, 45) 39%,
+        rgb(30, 30, 30) 50%,
+        rgb(0, 0, 0) 51%,
+        rgb(10, 10, 10) 60%,
+        rgb(30, 30, 30) 76%,
+        rgb(20, 20, 20) 91%,
+        rgb(10, 10, 10) 100%
+      );
+    }
 
-      canvas {
-        bottom: 0;
-        left: 0;
-        margin: auto;
-        max-height: 100vh;
-        max-width: 100vw;
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
-    </style>
-  </head>
+    body {
+      touch-action: pan-x pan-y;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: relative;
+      margin: 0;
+    }
 
-  <body>
-    <canvas id="canvas"></canvas>
-    <script src="jackpot.js"></script>
-  </body>
+    * {
+      user-select: none;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    canvas {
+      bottom: 0;
+      left: 0;
+      margin: auto;
+      max-height: 100vh;
+      max-width: 100vw;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+  </style>
+</head>
+
+<body>
+<canvas id="canvas"></canvas>
+<script src="jackpot.js"></script>
+</body>
 </html>
