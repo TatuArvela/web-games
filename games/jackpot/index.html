@@ -12,19 +12,7 @@
   <title>Jackpot</title>
   <style>
     html {
-      background: linear-gradient(
-        0deg,
-        rgb(50, 50, 50) 0%,
-        rgb(60, 60, 60) 12%,
-        rgb(70, 70, 70) 25%,
-        rgb(45, 45, 45) 39%,
-        rgb(30, 30, 30) 50%,
-        rgb(0, 0, 0) 51%,
-        rgb(10, 10, 10) 60%,
-        rgb(30, 30, 30) 76%,
-        rgb(20, 20, 20) 91%,
-        rgb(10, 10, 10) 100%
-      );
+      background: rgb(20, 20, 20);
     }
 
     body {
@@ -58,6 +46,9 @@
 
 <body>
 <canvas id="canvas"></canvas>
+<div style="display:none;">
+  <img id="wins" src="./assets/wins.png" width="762" height="144"/>
+</div>
 <script src="jackpot.js"></script>
 </body>
 </html>
