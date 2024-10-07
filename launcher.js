@@ -30,7 +30,7 @@ function getGamesToRender() {
       : games[gameIndex]
     );
   }
-  
+
   renderedGames.push(games[selectedIndex]);
 
   for (let i = 1; i <= renderedPerSide; i++) {
@@ -181,4 +181,5 @@ async function launcher() {
 
   document.addEventListener("keydown", handleInput);
 }
+
 launcher();
