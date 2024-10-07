@@ -1,110 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Snake</title>
-    <style>
-      html {
-        background-color: #000;
-      }
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <title>Snake</title>
+  <style>
+    html {
+      background-color: #000;
+      overscroll-behavior: none;
+    }
 
-      body {
-        touch-action: pan-x pan-y;
-        background: linear-gradient(180deg, #1e1d1d 0%, #111111 100%);
-        height: 100vh;
-        width: 100vw;
-        overflow: hidden;
-        position: relative;
-        margin: 0;
-      }
+    body {
+      touch-action: pan-x pan-y;
+      background: linear-gradient(180deg, #1e1d1d 0%, #111111 100%);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: relative;
+      margin: 0;
+    }
 
-      * {
-        user-select: none;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+    * {
+      user-select: none;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      canvas {
-        background: linear-gradient(90deg, #1e1d1d90 0%, rgba(0, 0, 0, 0) 5%),
-          linear-gradient(
-            180deg,
-            #88b330 0%,
-            #84b005 20%,
-            #a1ce02 50%,
-            #90bc03 90%,
-            #add209 100%
-          );
-        border-radius: 5px;
-        bottom: 0;
-        left: 0;
-        margin: auto;
-        max-height: 100vh;
-        max-width: 100vw;
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
+    canvas {
+      background: linear-gradient(90deg, #1e1d1d90 0%, rgba(0, 0, 0, 0) 5%),
+      linear-gradient(
+        180deg,
+        #88b330 0%,
+        #84b005 20%,
+        #a1ce02 50%,
+        #90bc03 90%,
+        #add209 100%
+      );
+      border-radius: 5px;
+      bottom: 0;
+      left: 0;
+      margin: auto;
+      max-height: 100vh;
+      max-width: 100vw;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
 
-      .controls {
-        bottom: 20px;
-        left: -50px;
-        position: fixed;
-        right: -50px;
-        height: 250px;
-        width: 400px;
-        margin: auto;
-      }
+    .controls {
+      bottom: 20px;
+      left: -50px;
+      position: fixed;
+      right: -50px;
+      height: 250px;
+      width: 400px;
+      margin: auto;
+    }
 
-      .moveLeft,
-      .moveUp,
-      .moveRight,
-      .moveDown {
-        cursor: pointer;
-        position: absolute;
-        border: 2px solid white;
-        border-radius: 50%;
-        height: 100px;
-        width: 100px;
-        margin: auto;
-      }
+    .moveLeft,
+    .moveUp,
+    .moveRight,
+    .moveDown {
+      cursor: pointer;
+      position: absolute;
+      border: 2px solid white;
+      border-radius: 50%;
+      height: 100px;
+      width: 100px;
+      margin: auto;
+    }
 
-      .moveLeft {
-        bottom: 0;
-        left: 0;
-        top: 0;
-      }
+    .moveLeft {
+      bottom: 0;
+      left: 0;
+      top: 0;
+    }
 
-      .moveUp {
-        left: 0;
-        top: 0;
-        right: 0;
-      }
+    .moveUp {
+      left: 0;
+      top: 0;
+      right: 0;
+    }
 
-      .moveRight {
-        right: 0;
-        top: 0;
-        bottom: 0;
-      }
+    .moveRight {
+      right: 0;
+      top: 0;
+      bottom: 0;
+    }
 
-      .moveDown {
-        bottom: 0;
-        left: 0;
-        right: 0;
-      }
-    </style>
-  </head>
+    .moveDown {
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  </style>
+</head>
 
-  <body onTouchMove="{e => e.preventDefault()}">
-    <canvas id="canvas"></canvas>
-    <div class="controls">
-      <div onClick="handleMoveLeft()" class="moveLeft"></div>
-      <div onClick="handleMoveUp()" class="moveUp"></div>
-      <div onClick="handleMoveRight()" class="moveRight"></div>
-      <div onClick="handleMoveDown()" class="moveDown"></div>
-    </div>
-    <script src="snake.js"></script>
-  </body>
+<body onTouchMove="{e => e.preventDefault()}">
+<canvas id="canvas"></canvas>
+<div class="controls">
+  <div onClick="handleMoveLeft()" class="moveLeft"></div>
+  <div onClick="handleMoveUp()" class="moveUp"></div>
+  <div onClick="handleMoveRight()" class="moveRight"></div>
+  <div onClick="handleMoveDown()" class="moveDown"></div>
+</div>
+<script src="snake.js"></script>
+</body>
 </html>

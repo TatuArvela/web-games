@@ -4,6 +4,10 @@
   --move-duration: 300ms;
 }
 
+html {
+  overscroll-behavior: none;
+}
+
 body {
   align-items: center;
   background: black;
