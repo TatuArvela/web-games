@@ -2,6 +2,16 @@
   "$schema": "./games.schema.json",
   "games": [
     {
+      "title": "Flop",
+      "url": "https://itch.io/embed-upload/3274331?color=000000",
+      "players": 1,
+      "controls": [
+        "mouse",
+        "keyboard"
+      ],
+      "image": "img/flop.png"
+    },
+    {
       "title": "Lost Control",
       "url": "https://itch.io/embed-upload/9805375?color=000000",
       "players": 1,
