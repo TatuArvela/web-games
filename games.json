@@ -97,7 +97,8 @@
       "players": 1,
       "controls": [
         "mouse"
-      ]
+      ],
+      "image": "img/marbles.png"
     },
     {
       "title": "New Life Game",
