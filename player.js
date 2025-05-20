@@ -1,5 +1,6 @@
 const player = document.getElementById("player");
 const iframe = document.getElementById("iframe");
+let gameUrl;
 
 function exitGame() {
   player.classList.add("disabled");
@@ -10,6 +11,8 @@ function exitGame() {
 }
 
 function play(game) {
+  gameUrl = game.url;
+
   if (game.isExternal) {
     window.location.href = game.url;
     return;
@@ -22,5 +25,11 @@ function play(game) {
 }
 
 function toggleFullscreen() {
-  return document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen({navigationUI: "show"});
+  return document.fullscreenElement
+    ? document.exitFullscreen()
+    : document.documentElement.requestFullscreen({ navigationUI: "show" });
+}
+
+function popOut() {
+  window.open(gameUrl, '_blank').focus();
 }

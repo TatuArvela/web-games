@@ -27,7 +27,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["keyboard", "mouse", "touch"]
+              "enum": ["keyboard", "mouse", "touch", "controller"]
             },
             "minItems": 1
           },

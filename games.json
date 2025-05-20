@@ -2,6 +2,17 @@
   "$schema": "./games.schema.json",
   "games": [
     {
+      "title": "Starfire Assault",
+      "url": "https://itch.io/embed-upload/13532544?color=0d0e47",
+      "players": 1,
+      "controls": [
+        "mouse",
+        "keyboard",
+        "controller"
+      ],
+      "image": "img/starfire-assault.png"
+    },
+    {
       "title": "Flop",
       "url": "https://itch.io/embed-upload/12608721?color=333333",
       "players": 1,
