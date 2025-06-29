@@ -1,65 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta
-    name="viewport"
-    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-  />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-  <title>Web Games</title>
-  <link rel="icon" href="favicon.ico"/>
-  <link rel="stylesheet" href="./launcher.css"/>
-  <link rel="stylesheet" href="./player.css"/>
-</head>
-<body>
-<div class="player disabled" id="player">
-  <iframe credentialless allow="cross-origin-isolated" id="iframe"></iframe>
-  <div class="player-buttons">
-    <div class="player-button" onclick="exitGame()">
-      <div class="reset-icon"></div>
-    </div>
-    <div class="player-button" onclick="toggleFullscreen()">
-      <div class="full-screen-icon"></div>
-    </div>
-    <div class="player-button" onclick="popOut()">
-      <div class="pop-out-icon"></div>
-    </div>
-  </div>
-</div>
-<div class="launcher" id="launcher">
-  <header>
-    <div class="instructions">
-      <img src="img/instructions.png" alt=""/>
-      <div class="button-fullscreen" onclick="toggleFullscreen()">
-        <div class="full-screen-icon"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Web Games</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="./launcher.css" />
+    <link rel="stylesheet" href="./player.css" />
+  </head>
+  <body>
+    <div class="player disabled" id="player">
+      <iframe credentialless allow="cross-origin-isolated" id="iframe"></iframe>
+      <div class="player-buttons">
+        <div class="player-button" onclick="exitGame()">
+          <div class="reset-icon"></div>
+        </div>
+        <div class="player-button" onclick="toggleFullscreen()">
+          <div class="full-screen-icon"></div>
+        </div>
+        <div class="player-button" onclick="popOut()">
+          <div class="pop-out-icon"></div>
+        </div>
       </div>
-      <div class="h-lines"></div>
     </div>
-  </header>
-  <div class="games" id="games"><!-- Dynamic --></div>
-  <div class="button-previous" onclick="previousGame()"></div>
-  <div class="button-next" onclick="nextGame()"></div>
-  <footer>
-    <div class="f0">
-      <div class="f1">
-        <div class="f2">
-          <div class="f3">
-            <div class="f4">
-              <div class="f5">
-                <div class="f6"></div>
+    <div class="launcher" id="launcher">
+      <header>
+        <div class="instructions">
+          <img src="img/instructions.png" alt="" />
+          <div class="button-fullscreen" onclick="toggleFullscreen()">
+            <div class="full-screen-icon"></div>
+          </div>
+          <div class="h-lines"></div>
+        </div>
+      </header>
+      <div class="game-count-container">
+        <div class="game-count" id="game-count"></div>
+      </div>
+      <div class="games" id="games"><!-- Dynamic --></div>
+      <div class="button-previous" onclick="previousGame()"></div>
+      <div class="button-next" onclick="nextGame()"></div>
+      <footer>
+        <div class="f0">
+          <div class="f1">
+            <div class="f2">
+              <div class="f3">
+                <div class="f4">
+                  <div class="f5">
+                    <div class="f6"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+          <div class="f-lines"></div>
         </div>
-      </div>
-      <div class="f-lines"></div>
+        <img class="logo" src="img/web-games.png" alt="Web Games" />
+        <h2 class="game-title" id="title"><!-- Dynamic --></h2>
+      </footer>
     </div>
-    <img class="logo" src="img/web-games.png" alt="Web Games"/>
-    <h2 class="game-title" id="title"><!-- Dynamic --></h2>
-  </footer>
-</div>
-<script src="./launcher.js"></script>
-<script src="./player.js"></script>
-</body>
+    <script src="./launcher.js"></script>
+    <script src="./player.js"></script>
+  </body>
 </html>

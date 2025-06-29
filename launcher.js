@@ -3,6 +3,7 @@ const IDLE_TIME = 60000;
 const GAME_RENDER_LIMIT = 11;
 
 const launcherElement = document.getElementById("launcher");
+const gameCountElement = document.getElementById("game-count");
 const gamesElement = document.getElementById("games");
 const titleElement = document.getElementById("title");
 let screensaverElement;
@@ -17,6 +18,14 @@ let selectedIndex = 0;
 let animation = "";
 let moveTimeout = null;
 let screensaverTimeout;
+let showTechnologyAndReleaseYear = true;
+
+function renderGameCount() {
+  const gameCount = games.length;
+  gameCountElement.innerText = `${gameCount} GAME${
+    gameCount !== 1 ? "S" : ""
+  } AVAILABLE`;
+}
 
 function getGamesToRender() {
   const renderedGames = [];
@@ -68,21 +77,35 @@ function renderGames() {
     const details = document.createElement("div");
     details.className = "game-details";
 
-    // Controls
-    const controls = document.createElement("div");
-    controls.className = "game-controls";
-    game.controls.forEach((control) => {
-      const controlIcon = document.createElement("img");
-      controlIcon.src = `img/${control}.png`;
-      controls.appendChild(controlIcon);
-    });
-    details.appendChild(controls);
+    if (showTechnologyAndReleaseYear) {
+      // Technology
+      const technology = document.createElement("div");
+      technology.className = "game-technology";
+      technology.innerText = game.technology || "Unknown";
+      details.appendChild(technology);
 
-    // Players
-    const players = document.createElement("div");
-    players.className = "game-players";
-    players.innerText = `${game.players}P`;
-    details.appendChild(players);
+      // Release Year
+      const releaseYear = document.createElement("div");
+      releaseYear.className = "game-release-year";
+      releaseYear.innerText = game.releaseYear || "????";
+      details.appendChild(releaseYear);
+    } else {
+      // Controls
+      const controls = document.createElement("div");
+      controls.className = "game-controls";
+      game.controls.forEach((control) => {
+        const controlIcon = document.createElement("img");
+        controlIcon.src = `img/${control}.png`;
+        controls.appendChild(controlIcon);
+      });
+      details.appendChild(controls);
+
+      // Players
+      const players = document.createElement("div");
+      players.className = "game-players";
+      players.innerText = `${game.players}P`;
+      details.appendChild(players);
+    }
 
     gameElement.appendChild(imageContainer);
     gameElement.appendChild(details);
@@ -132,18 +155,20 @@ function nextGame() {
 }
 
 function handleInput(e) {
-  e.preventDefault();
   resetScreensaverTimeout();
 
   switch (e.keyCode) {
     case 37: // Left
+      e.preventDefault();
       debounce(previousGame, moveDuration);
       break;
     case 39: // Right
+      e.preventDefault();
       debounce(nextGame, moveDuration);
       break;
     case 32:
     case 13:
+      e.preventDefault();
       play(games[selectedIndex]);
   }
 }
@@ -176,6 +201,7 @@ async function launcher() {
     .then((response) => response.json())
     .then((data) => data.games);
 
+  renderGameCount();
   renderGames();
   resetScreensaverTimeout();
 

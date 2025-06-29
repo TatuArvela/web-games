@@ -5,130 +5,117 @@
       "title": "Starfire Assault",
       "url": "https://itch.io/embed-upload/13532544?color=0d0e47",
       "players": 1,
-      "controls": [
-        "mouse",
-        "keyboard",
-        "controller"
-      ],
-      "image": "img/starfire-assault.png"
+      "controls": ["mouse", "keyboard", "controller"],
+      "image": "img/starfire-assault.png",
+      "technology": "Godot",
+      "releaseYear": 2025
     },
     {
       "title": "Flop",
       "url": "https://itch.io/embed-upload/12608721?color=333333",
       "players": 1,
-      "controls": [
-        "mouse",
-        "keyboard"
-      ],
-      "image": "img/flop.png"
+      "controls": ["mouse", "keyboard"],
+      "image": "img/flop.png",
+      "technology": "Godot",
+      "releaseYear": 2025
     },
     {
       "title": "Lost Control",
       "url": "https://itch.io/embed-upload/9805375?color=000000",
       "players": 1,
-      "controls": [
-        "mouse"
-      ],
-      "image": "img/lost-control.png"
-    },
-    {
-      "title": "SameGame",
-      "url": "games/samegame",
-      "players": 1,
-      "controls": [
-        "mouse",
-        "touch"
-      ],
-      "image": "img/samegame.png"
-    },
-    {
-      "title": "Floaty Goat",
-      "url": "https://tatuarvela.github.io/codecamp",
-      "players": 1,
-      "controls": [
-        "mouse",
-        "keyboard",
-        "touch"
-      ],
-      "image": "img/floaty-goat.png"
-    },
-    {
-      "title": "Pong",
-      "url": "games/pong",
-      "players": 1,
-      "controls": [
-        "mouse",
-        "touch"
-      ],
-      "image": "img/pong.png"
-    },
-    {
-      "title": "Snake",
-      "url": "games/snake",
-      "players": 1,
-      "controls": [
-        "keyboard",
-        "touch"
-      ],
-      "image": "img/snake.png"
-    },
-    {
-      "title": "Tic-Tac-Toe",
-      "url": "games/tic-tac-toe",
-      "players": 2,
-      "controls": [
-        "mouse",
-        "touch"
-      ],
-      "image": "img/tic-tac-toe.png"
-    },
-    {
-      "title": "Super Mathgame",
-      "url": "https://tatuarvela.github.io/Super-Mathgame",
-      "players": 1,
-      "controls": [
-        "mouse",
-        "touch"
-      ],
-      "image": "img/super-mathgame.png"
-    },
-    {
-      "title": "Sudoku",
-      "url": "https://tatuarvela.github.io/Sudoku",
-      "players": 1,
-      "controls": [
-        "mouse",
-        "keyboard"
-      ],
-      "image": "img/sudoku.png"
+      "controls": ["mouse"],
+      "image": "img/lost-control.png",
+      "technology": "Godot",
+      "releaseYear": 2024
     },
     {
       "title": "Lose Your Marbles",
       "url": "games/marbles",
       "players": 1,
-      "controls": [
-        "mouse"
-      ],
-      "image": "img/marbles.png"
+      "controls": ["mouse"],
+      "image": "img/marbles.png",
+      "technology": "HTML5",
+      "releaseYear": 2024
+    },
+    {
+      "title": "SameGame",
+      "url": "games/samegame",
+      "players": 1,
+      "controls": ["mouse", "touch"],
+      "image": "img/samegame.png",
+      "technology": "HTML5",
+      "releaseYear": 2023
+    },
+    {
+      "title": "Floaty Goat",
+      "url": "https://tatuarvela.github.io/codecamp",
+      "players": 1,
+      "controls": ["mouse", "keyboard", "touch"],
+      "image": "img/floaty-goat.png",
+      "technology": "Phaser",
+      "releaseYear": 2021
+    },
+    {
+      "title": "Tic-Tac-Toe",
+      "url": "games/tic-tac-toe",
+      "players": 2,
+      "controls": ["mouse", "touch"],
+      "image": "img/tic-tac-toe.png",
+      "technology": "HTML5",
+      "releaseYear": 2019
+    },
+    {
+      "title": "Pong",
+      "url": "games/pong",
+      "players": 1,
+      "controls": ["mouse", "touch"],
+      "image": "img/pong.png",
+      "technology": "HTML5",
+      "releaseYear": 2018
+    },
+    {
+      "title": "Snake",
+      "url": "games/snake",
+      "players": 1,
+      "controls": ["keyboard", "touch"],
+      "image": "img/snake.png",
+      "technology": "HTML5",
+      "releaseYear": 2018
+    },
+    {
+      "title": "Sudoku",
+      "url": "https://tatuarvela.github.io/Sudoku",
+      "players": 1,
+      "controls": ["mouse", "keyboard"],
+      "image": "img/sudoku.png",
+      "technology": "JS",
+      "releaseYear": 2018
+    },
+    {
+      "title": "Super Mathgame",
+      "url": "https://tatuarvela.github.io/Super-Mathgame",
+      "players": 1,
+      "controls": ["mouse", "touch"],
+      "image": "img/super-mathgame.png",
+      "technology": "JS",
+      "releaseYear": 2017
     },
     {
       "title": "New Life Game",
       "url": "games/new-life-game",
       "players": 1,
-      "controls": [
-        "mouse"
-      ],
+      "controls": ["mouse"],
       "image": "img/new-life-game.png",
-      "isIncomplete": true
+      "isIncomplete": true,
+      "technology": "HTML5"
     },
     {
       "title": "Jackpot",
       "url": "games/jackpot",
       "players": 1,
-      "controls": [
-        "mouse"
-      ],
-      "isIncomplete": true
+      "controls": ["mouse"],
+      "isIncomplete": true,
+      "technology": "HTML5"
     }
   ]
 }

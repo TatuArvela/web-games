@@ -40,9 +40,15 @@
           },
           "isIncomplete": {
             "type": "boolean"
+          },
+          "releaseYear": {
+            "type": "integer"
+          },
+          "technology": {
+            "type": "string"
           }
         },
-        "required": ["title", "url", "players", "controls"]
+        "required": ["title", "url", "players", "controls", "technology"]
       }
     }
   },

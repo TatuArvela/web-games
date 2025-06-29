@@ -120,6 +120,38 @@ img {
   opacity: 1;
 }
 
+.game-count-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.game-count {
+  background: rgba(83, 83, 83, 0.5);
+  border-radius: 12px;
+  border: 2px solid black;
+  box-shadow: inset -2px -2px 0 0 white,
+  inset 2px -2px 0 0 white,
+  inset -2px 2px 0 0 white,
+  inset 2px 2px 0 0 white;
+  color: white;
+  font-family: "Press Start 2P", monospace;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 270px;
+  padding: 8px;
+  text-align: center;
+  text-transform: uppercase;
+  width: 400px;
+}
+
 .games {
   align-items: center;
   display: flex;
@@ -241,7 +273,15 @@ img {
   height: 18px;
 }
 
-.game-players {
+.game-technology {
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  color: #727272;
+  font-size: 12px;
+}
+
+.game-players, .game-release-year {
   color: white;
   background: #727272;
   border-radius: 6px;
@@ -250,7 +290,7 @@ img {
   height: 22px;
   top: 4px;
   right: 4px;
-  padding: 4px 6px 2px 6px;
+  padding: 2px 4px 2px 6px;
 }
 
 .move-previous,
