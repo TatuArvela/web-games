@@ -2,15 +2,15 @@ let games = [];
 const IDLE_TIME = 60000;
 const GAME_RENDER_LIMIT = 11;
 
-const launcherElement = document.getElementById('launcher');
-const gamesElement = document.getElementById('games');
-const titleElement = document.getElementById('title');
+const launcherElement = document.getElementById("launcher");
+const gamesElement = document.getElementById("games");
+const titleElement = document.getElementById("title");
 let screensaverElement;
 
 const moveDuration = parseInt(
   getComputedStyle(document.documentElement)
-    .getPropertyValue('--move-duration')
-    .replace('ms', '')
+    .getPropertyValue("--move-duration")
+    .replace("ms", "")
 );
 
 let selectedIndex = 0;
@@ -19,47 +19,38 @@ let moveTimeout = null;
 let screensaverTimeout;
 
 function getGamesToRender() {
-  let renderedGames = [];
-
+  const renderedGames = [];
   const renderedPerSide = (GAME_RENDER_LIMIT - 1) / 2;
 
-  for (let i = renderedPerSide; i > 0; i--) {
-    const gameIndex = selectedIndex - i;
-    renderedGames.push(gameIndex < 0
-      ? games[gameIndex + games.length]
-      : games[gameIndex]
-    );
-  }
-
-  renderedGames.push(games[selectedIndex]);
-
-  for (let i = 1; i <= renderedPerSide; i++) {
-    const gameIndex = selectedIndex + i;
-    renderedGames.push(gameIndex > games.length - 1
-      ? games[gameIndex - games.length]
-      : games[gameIndex]
-    );
+  for (let offset = -renderedPerSide; offset <= renderedPerSide; offset++) {
+    let gameIndex = (selectedIndex + offset + games.length) % games.length;
+    renderedGames.push(games[gameIndex]);
   }
 
   return renderedGames;
 }
 
 function renderGames() {
-  gamesElement.innerHTML = '';
+  const fragment = document.createDocumentFragment();
+  const selectedGame = games[selectedIndex];
+
   getGamesToRender().forEach((game) => {
-    const isSelected = games[selectedIndex].title === game.title;
+    const isSelected = selectedGame.title === game.title;
     const gameElement = document.createElement("div");
     gameElement.className = [
       "game",
       animation,
-      game.isIncomplete && 'incomplete',
-    ].filter(Boolean).join(" ");
+      game.isIncomplete && "incomplete",
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     if (isSelected) {
       gameElement.id = "selected";
       gameElement.onclick = () => play(game);
     }
 
+    // Image
     const imageContainer = document.createElement("div");
     imageContainer.className = "game-image";
     let imageElement;
@@ -73,18 +64,21 @@ function renderGames() {
     }
     imageContainer.appendChild(imageElement);
 
+    // Details
     const details = document.createElement("div");
     details.className = "game-details";
 
+    // Controls
     const controls = document.createElement("div");
     controls.className = "game-controls";
     game.controls.forEach((control) => {
-      const controlIcon = document.createElement('img');
+      const controlIcon = document.createElement("img");
       controlIcon.src = `img/${control}.png`;
       controls.appendChild(controlIcon);
     });
     details.appendChild(controls);
 
+    // Players
     const players = document.createElement("div");
     players.className = "game-players";
     players.innerText = `${game.players}P`;
@@ -92,9 +86,15 @@ function renderGames() {
 
     gameElement.appendChild(imageContainer);
     gameElement.appendChild(details);
-    gamesElement.appendChild(gameElement);
+    fragment.appendChild(gameElement);
   });
-  titleElement.innerText = games[selectedIndex].title;
+
+  gamesElement.innerHTML = "";
+  gamesElement.appendChild(fragment);
+
+  if (titleElement.innerText !== selectedGame.title) {
+    titleElement.innerText = selectedGame.title;
+  }
 }
 
 function debounce(func, delay = 0) {
@@ -106,7 +106,7 @@ function debounce(func, delay = 0) {
 
   moveTimeout = setTimeout(() => {
     moveTimeout = null;
-  }, delay)
+  }, delay);
 }
 
 function previousGame() {
@@ -172,7 +172,7 @@ function screensaver() {
 }
 
 async function launcher() {
-  games = await fetch('./games.json')
+  games = await fetch("./games.json")
     .then((response) => response.json())
     .then((data) => data.games);
 

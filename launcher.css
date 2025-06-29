@@ -17,7 +17,6 @@ body {
   margin: 0;
   width: 100vw;
   overflow: hidden;
-
 }
 
 * {
@@ -158,6 +157,8 @@ img {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  contain: layout paint;
+  transform: translateZ(0);
 }
 
 .game#selected {
@@ -252,33 +253,38 @@ img {
   padding: 4px 6px 2px 6px;
 }
 
-.move-previous {
-  animation-name: move-previous;
+.move-previous,
+.move-next {
+  will-change: transform;
   animation-duration: var(--move-duration);
   animation-timing-function: ease-in;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.move-previous {
+  animation-name: move-previous;
 }
 
 @keyframes move-previous {
   from {
-    transform: translateX(-180px)
+    transform: translate3d(-180px, 0, 0);
   }
   to {
-    transform: translateX(0)
+    transform: translate3d(0, 0, 0);
   }
 }
 
 .move-next {
   animation-name: move-next;
-  animation-duration: var(--move-duration);
-  animation-timing-function: ease-in;
 }
 
 @keyframes move-next {
   from {
-    transform: translateX(180px)
+    transform: translate3d(180px, 0, 0);
   }
   to {
-    transform: translateX(0)
+    transform: translate3d(0, 0, 0);
   }
 }
 
