@@ -31,7 +31,7 @@ const drumsHorizontalMargin = 140;
 const drumsVerticalMargin = 25;
 const drumsWidth = frameWidth - drumsHorizontalMargin * 2;
 const drumsHeight = frameHeight - drumsVerticalMargin * 2;
-const drums = Array.from({ length: 3 }, (_, i) => new Drum(i));
+const drums = REEL_STRIPS.map((strip) => new Drum(strip));
 
 // ── Game logic ───────────────────────────────────────────
 function pullLever() {
@@ -267,35 +267,4 @@ function update() {
   }
 }
 
-// ── Main draw ────────────────────────────────────────────
-function draw() {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-
-  drawSignBase();
-  drawSignLights();
-  drawLogo();
-
-  drawTop();
-  drawWins();
-  drawWinsText();
-
-  drawBottom();
-  drawPrizeSlot();
-
-  drawArmBase();
-  drawArm();
-  drawArmBall();
-
-  drawDrums();
-  drawFrame();
-
-  drawCoinTray();
-  drawCoins();
-  drawCoinSlot();
-  drawWinOverlay();
-
-  requestAnimationFrame(draw);
-}
-
 setInterval(() => update(), updateIntervalMs);
-requestAnimationFrame(draw);

@@ -89,40 +89,15 @@ function drawTripleBar(cx, cy, w, h) {
 }
 
 function drawRoundedRect(x, y, width, height, radius) {
-  const offset = context.lineWidth / 2;
-  const adjustedRadius = radius - offset;
-
+  const o = context.lineWidth / 2;
   context.beginPath();
-  context.moveTo(x + adjustedRadius + offset, y + offset);
-  context.arcTo(
-    x + width - offset,
-    y + offset,
-    x + width - offset,
-    y + height - offset,
-    adjustedRadius,
+  context.roundRect(
+    x + o,
+    y + o,
+    width - o * 2,
+    height - o * 2,
+    Math.max(0, radius - o),
   );
-  context.arcTo(
-    x + width - offset,
-    y + height - offset,
-    x + offset,
-    y + height - offset,
-    adjustedRadius,
-  );
-  context.arcTo(
-    x + offset,
-    y + height - offset,
-    x + offset,
-    y + offset,
-    adjustedRadius,
-  );
-  context.arcTo(
-    x + offset,
-    y + offset,
-    x + width - offset,
-    y + offset,
-    adjustedRadius,
-  );
-  context.closePath();
 }
 
 // ── Sign / logo ──────────────────────────────────────────
@@ -134,10 +109,7 @@ function drawSignBase() {
   gradient.addColorStop(1, "rgb(8,10,38)");
 
   context.fillStyle = gradient;
-  context.beginPath();
   context.fillRect(20, 10, frameWidth - 40, 180);
-  context.closePath();
-  context.stroke();
 
   context.lineWidth = 20;
   context.strokeStyle = gradient;
@@ -166,54 +138,45 @@ function drawSignLights() {
   const speed = winning ? 80 : 200;
   const time = Date.now() / speed;
   const bulbCount = 17;
+  const bulbRows = [
+    {
+      y: 12,
+      bright: "rgb(255,255,180)",
+      glow: "rgba(255,255,100,0.9)",
+      on: "rgb(255,255,100)",
+      off: "rgb(80,80,40)",
+    },
+    {
+      y: 188,
+      bright: "rgb(255,160,160)",
+      glow: "rgba(255,100,100,0.9)",
+      on: "rgb(255,100,100)",
+      off: "rgb(80,40,40)",
+    },
+  ];
   for (let i = 0; i < bulbCount; i++) {
-    const t = i / (bulbCount - 1);
-    const x = 40 + t * (frameWidth - 80);
+    const x = 40 + (i / (bulbCount - 1)) * (frameWidth - 80);
+    const topOn =
+      !broke &&
+      (winning ? Math.sin(time * 3) > 0 : Math.sin(time + i * 0.8) > 0);
+    const onStates = [topOn, !broke && (winning ? topOn : !topOn)];
 
-    let topOn, botOn;
-    if (broke) {
-      // All lights off when no credits
-      topOn = false;
-      botOn = false;
-    } else if (winning) {
-      // All bulbs pulse on/off together
-      const allOn = Math.sin(time * 3) > 0;
-      topOn = allOn;
-      botOn = allOn;
-    } else {
-      topOn = Math.sin(time + i * 0.8) > 0;
-      botOn = !topOn;
-    }
-
-    // Top row
-    context.beginPath();
-    context.arc(x, 12, 5, 0, Math.PI * 2);
-    if (winning && topOn) {
-      context.fillStyle = "rgb(255,255,180)";
-      context.shadowColor = "rgba(255,255,100,0.9)";
-      context.shadowBlur = 16;
-    } else {
-      context.fillStyle = topOn ? "rgb(255,255,100)" : "rgb(80,80,40)";
-      context.shadowColor = "transparent";
+    for (let r = 0; r < 2; r++) {
+      const { y, bright, glow, on, off } = bulbRows[r];
+      const isOn = onStates[r];
+      context.beginPath();
+      context.arc(x, y, 5, 0, Math.PI * 2);
+      context.shadowBlur = 0;
+      if (winning && isOn) {
+        context.fillStyle = bright;
+        context.shadowColor = glow;
+        context.shadowBlur = 16;
+      } else {
+        context.fillStyle = isOn ? on : off;
+      }
+      context.fill();
       context.shadowBlur = 0;
     }
-    context.fill();
-    context.shadowBlur = 0;
-
-    // Bottom row
-    context.beginPath();
-    context.arc(x, 188, 5, 0, Math.PI * 2);
-    if (winning && botOn) {
-      context.fillStyle = "rgb(255,160,160)";
-      context.shadowColor = "rgba(255,100,100,0.9)";
-      context.shadowBlur = 16;
-    } else {
-      context.fillStyle = botOn ? "rgb(255,100,100)" : "rgb(80,40,40)";
-      context.shadowColor = "transparent";
-      context.shadowBlur = 0;
-    }
-    context.fill();
-    context.shadowBlur = 0;
   }
 }
 
@@ -243,10 +206,7 @@ function drawTop() {
   gradient.addColorStop(1, "rgb(160,160,175)");
 
   context.fillStyle = gradient;
-  context.beginPath();
   context.fillRect(20, 120, frameWidth - 40, 130);
-  context.closePath();
-  context.stroke();
 
   context.lineWidth = 20;
   context.strokeStyle = gradient;
@@ -330,10 +290,16 @@ function drawWins() {
   const row2 = 152; // middle
   const row3 = 176; // bottom
 
+  const symSize = 22;
+  const barW = 37;
+  const barH = 17;
+  const spacing = 30;
+  const centerX = cardX + cardW / 2;
+
   // Helper: draw "7" symbol
-  function draw7(x, y, size) {
+  function draw7(x, y) {
     context.save();
-    context.font = "bold " + size + "px Ultra";
+    context.font = "bold " + symSize + "px Ultra";
     context.fillStyle = "#b00";
     context.textAlign = "center";
     context.textBaseline = "middle";
@@ -341,54 +307,24 @@ function drawWins() {
     context.restore();
   }
 
-  // Helper: draw classic triple-BAR at a position
-  function drawBarSym(x, y, w, h) {
-    context.save();
-    drawTripleBar(x, y, w, h);
-    context.restore();
-  }
-
-  const symSize = 22;
-  const barW = 37;
-  const barH = 17;
-  const spacing = 30;
-  const centerX = cardX + cardW / 2;
-
-  // Left side combos (7-leading)
+  // Side combos: all mixes of 7s and BARs
   const leftX = cardX + 42;
-
-  // 7 BAR BAR
-  draw7(leftX - spacing, row1, symSize);
-  drawBarSym(leftX, row1, barW, barH);
-  drawBarSym(leftX + spacing, row1, barW, barH);
-
-  // 7 7 BAR
-  draw7(leftX - spacing, row2, symSize);
-  draw7(leftX, row2, symSize);
-  drawBarSym(leftX + spacing, row2, barW, barH);
-
-  // 7 BAR 7
-  draw7(leftX - spacing, row3, symSize);
-  drawBarSym(leftX, row3, barW, barH);
-  draw7(leftX + spacing, row3, symSize);
-
-  // Right side combos (BAR-leading)
   const rightX = cardX + cardW - 42;
-
-  // BAR BAR 7
-  drawBarSym(rightX - spacing, row1, barW, barH);
-  drawBarSym(rightX, row1, barW, barH);
-  draw7(rightX + spacing, row1, symSize);
-
-  // BAR 7 7
-  drawBarSym(rightX - spacing, row2, barW, barH);
-  draw7(rightX, row2, symSize);
-  draw7(rightX + spacing, row2, symSize);
-
-  // BAR 7 BAR
-  drawBarSym(rightX - spacing, row3, barW, barH);
-  draw7(rightX, row3, symSize);
-  drawBarSym(rightX + spacing, row3, barW, barH);
+  const combos = [
+    [leftX, row1, "7BB"],
+    [rightX, row1, "BB7"],
+    [leftX, row2, "77B"],
+    [rightX, row2, "B77"],
+    [leftX, row3, "7B7"],
+    [rightX, row3, "B7B"],
+  ];
+  for (const [cx, ry, pattern] of combos) {
+    for (let j = 0; j < 3; j++) {
+      const x = cx + (j - 1) * spacing;
+      if (pattern[j] === "7") draw7(x, ry);
+      else drawTripleBar(x, ry, barW, barH);
+    }
+  }
 
   // Center boxes - 3 tall boxes spanning row2 and row3, with 7 on top and BAR on bottom
   const boxW = 40;
@@ -435,7 +371,12 @@ function drawWins() {
 
   // BAR labels in bottom half
   for (let i = 0; i < 3; i++) {
-    drawBarSym(centerStartX + boxW / 2 + i * (boxW + boxGap), row3, barW, barH);
+    drawTripleBar(
+      centerStartX + boxW / 2 + i * (boxW + boxGap),
+      row3,
+      barW,
+      barH,
+    );
   }
 }
 
@@ -646,15 +587,12 @@ function drawBottom() {
   gradient.addColorStop(0.7, "rgb(240,240,252)");
 
   context.fillStyle = gradient;
-  context.beginPath();
   context.fillRect(
     20,
     topMargin + frameHeight - 20,
     frameWidth - 40,
     bottomMargin,
   );
-  context.closePath();
-  context.stroke();
 
   context.lineWidth = 20;
   context.strokeStyle = gradient;
@@ -679,10 +617,6 @@ function drawBottom() {
   context.stroke();
 }
 
-function drawPrizeSlot() {
-  // Now drawn as part of the coin tray
-}
-
 // ── Arm (with pull animation) ────────────────────────────
 function drawArmBase() {
   context.save();
@@ -696,17 +630,11 @@ function drawArmBase() {
   gradient.addColorStop(0.8, "rgb(100,100,100)");
   context.fillStyle = gradient;
 
-  const arm = [
-    [0, 0],
-    [40, 20],
-    [40, 100],
-    [0, 120],
-  ];
   context.beginPath();
-  context.moveTo(arm[0], arm[1]);
-  for (let item = 0; item < arm.length; item += 1) {
-    context.lineTo(arm[item][0], arm[item][1]);
-  }
+  context.moveTo(0, 0);
+  context.lineTo(40, 20);
+  context.lineTo(40, 100);
+  context.lineTo(0, 120);
   context.closePath();
   context.stroke();
   context.fill();
@@ -730,17 +658,11 @@ function drawArm() {
   context.fillStyle = gradient;
 
   const armLength = 200 - armPullOffset * 0.6;
-  const base = [
-    [55, 0],
-    [75, 0],
-    [20, armLength],
-    [5, armLength - 5],
-  ];
   context.beginPath();
-  context.moveTo(base[0][0], base[0][1]);
-  for (let item = 0; item < base.length; item += 1) {
-    context.lineTo(base[item][0], base[item][1]);
-  }
+  context.moveTo(55, 0);
+  context.lineTo(75, 0);
+  context.lineTo(20, armLength);
+  context.lineTo(5, armLength - 5);
   context.closePath();
   context.stroke();
   context.fill();
@@ -753,7 +675,8 @@ function drawArmBall() {
   context.translate(canvas.width - 40, canvas.height / 2 - 200 + armPullOffset);
 
   context.beginPath();
-  context.arc(0, 0, 40, 0, Math.PI * 2, false);
+  context.arc(0, 0, 40, 0, Math.PI * 2);
+
   context.fillStyle = "rgb(152,0,0)";
   context.fill();
 
@@ -766,10 +689,8 @@ function drawArmBall() {
     50,
   );
   reflectionGradient1.addColorStop(0, "rgba(255,62,62,0.8)");
-  reflectionGradient1.addColorStop(1, "rgba(255, 255, 255, 0)");
+  reflectionGradient1.addColorStop(1, "rgba(255,255,255,0)");
   context.fillStyle = reflectionGradient1;
-  context.beginPath();
-  context.arc(0, 0, 40, 0, Math.PI * 2, false);
   context.fill();
 
   const reflectionGradient2 = context.createRadialGradient(
@@ -781,18 +702,11 @@ function drawArmBall() {
     20,
   );
   reflectionGradient2.addColorStop(0, "rgba(255,255,255,0.9)");
-  reflectionGradient2.addColorStop(1, "rgba(255, 255, 255, 0)");
+  reflectionGradient2.addColorStop(1, "rgba(255,255,255,0)");
   context.fillStyle = reflectionGradient2;
-  context.beginPath();
-  context.arc(0, 0, 40, 0, Math.PI * 2, false);
   context.fill();
 
   context.restore();
-}
-
-// ── Win overlay (now handled by sign lights) ────────────
-function drawWinOverlay() {
-  // Win signaling moved to drawSignLights
 }
 
 // ── Coin tray & coins ────────────────────────────────────
@@ -962,3 +876,33 @@ function drawCoins() {
     drawCoin(fc.x, fc.y, true);
   });
 }
+
+// ── Main draw ────────────────────────────────────────────
+function draw() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawSignBase();
+  drawSignLights();
+  drawLogo();
+
+  drawTop();
+  drawWins();
+  drawWinsText();
+
+  drawBottom();
+
+  drawArmBase();
+  drawArm();
+  drawArmBall();
+
+  drawDrums();
+  drawFrame();
+
+  drawCoinTray();
+  drawCoins();
+  drawCoinSlot();
+
+  requestAnimationFrame(draw);
+}
+
+requestAnimationFrame(draw);
