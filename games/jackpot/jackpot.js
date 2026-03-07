@@ -6,13 +6,15 @@ context.imageSmoothingEnabled = false;
 const updateIntervalMs = 10;
 
 // ── Game state ───────────────────────────────────────────
-let credits = 5;
+let credits = 20;
 let lastWin = 0;
 let state = "idle"; // idle | spinning | stopping | showing-win
 let winFlashTimer = 0;
 let pendingPayout = 0; // coins yet to be paid out
 let payoutTimer = 0; // ms since last coin dropped
-let fallingCoins = []; // animated coins dropping from slot
+let nextCoinDelay = 120; // ms until next coin drops (randomized each time)
+let coins = []; // tray coins with physics: {x, y, vx, vy, settled}
+const COIN_R = 13; // collision radius
 
 // Arm animation
 let armPullOffset = 0; // 0 = resting, positive = pulled down
@@ -34,6 +36,30 @@ const drumsHeight = frameHeight - drumsVerticalMargin * 2;
 const drums = REEL_STRIPS.map((strip) => new Drum(strip));
 
 // ── Game logic ───────────────────────────────────────────
+function initTrayCoins() {
+  coins = [];
+  const count = Math.min(credits, 50);
+  audioCtx.resume().then(() => {
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const slotCenterX = trayX + trayW / 2 + (Math.random() - 0.5) * 30;
+        coins.push({ x: slotCenterX, y: trayY - 5, vx: (Math.random() - 0.5) * 3, vy: 1, settled: false });
+        playInsertCoinSound();
+      }, i * 50);
+    }
+  });
+}
+
+// Trigger coin dispensing on first user interaction (required for Web Audio autoplay policy)
+let _trayInitialized = false;
+["click", "touchstart", "keydown"].forEach((evt) =>
+  document.addEventListener(evt, () => {
+    if (_trayInitialized) return;
+    _trayInitialized = true;
+    initTrayCoins();
+  }, { once: true })
+);
+
 function pullLever() {
   if (state !== "idle") return;
   if (credits < 1) {
@@ -41,6 +67,11 @@ function pullLever() {
   }
   audioCtx.resume();
   credits -= 1;
+  // Remove one coin from the tray
+  for (let i = coins.length - 1; i >= 0; i--) {
+    if (coins[i].settled) { coins.splice(i, 1); break; }
+  }
+  playInsertCoinSound();
   lastWin = 0;
   state = "spinning";
 
@@ -60,23 +91,18 @@ function pullLever() {
     return idx;
   });
 
-  // Stagger the stops
+  // Stagger the stops — vary when the sequence starts, keep intervals constant
+  const spinDelay = 1200 + Math.random() * 400;
   drums.forEach((d, i) => {
-    setTimeout(
-      () => {
-        d.beginStop(results[i]);
-      },
-      1200 + i * 600,
-    );
+    setTimeout(() => {
+      d.beginStop(results[i]);
+    }, spinDelay + i * 600);
   });
 
   // After all stopped, evaluate
-  setTimeout(
-    () => {
-      evaluateResult();
-    },
-    1200 + 3 * 600 + 500,
-  );
+  setTimeout(() => {
+    evaluateResult();
+  }, spinDelay + drums.length * 600 + 500);
 }
 
 function evaluateResult() {
@@ -110,10 +136,10 @@ function evaluateResult() {
   if (winAmount > 0) {
     lastWin = winAmount;
     pendingPayout = winAmount;
-    payoutTimer = 0;
+    payoutTimer = -700; // delay before first coin drops
     state = "showing-win";
     winFlashTimer = 0;
-    playWinSound();
+    playWinSound(winAmount);
   } else {
     lastWin = 0;
     state = "idle";
@@ -218,21 +244,23 @@ function update() {
   // Payout animation: drop coins one at a time
   if (state === "showing-win" && pendingPayout > 0) {
     payoutTimer += updateIntervalMs;
-    if (payoutTimer >= 120) {
-      // one coin every 120ms
+    if (payoutTimer >= nextCoinDelay) {
       payoutTimer = 0;
+      nextCoinDelay = 80 + Math.random() * 120; // 80–200ms per coin
       credits += 1;
       pendingPayout -= 1;
       playInsertCoinSound();
       // Spawn a falling coin from the payout slot
-      const slotCenterX = trayX + trayW / 2 + (Math.random() - 0.5) * 80;
-      fallingCoins.push({
-        x: slotCenterX,
-        y: trayY - 2,
-        vy: 0,
-        targetY: trayY + trayH - 10 - Math.random() * 8,
-        done: false,
-      });
+      if (coins.length < 50) {
+        const slotCenterX = trayX + trayW / 2 + (Math.random() - 0.5) * 30;
+        coins.push({
+          x: slotCenterX,
+          y: trayY - 5,
+          vx: (Math.random() - 0.5) * 2,
+          vy: 1,
+          settled: false,
+        });
+      }
       if (pendingPayout <= 0) {
         // All coins paid, linger briefly then go idle
         setTimeout(() => {
@@ -242,19 +270,61 @@ function update() {
     }
   }
 
-  // Update falling coins
-  for (const fc of fallingCoins) {
-    if (fc.done) continue;
-    fc.vy += 0.6; // gravity
-    fc.y += fc.vy;
-    if (fc.y >= fc.targetY) {
-      fc.y = fc.targetY;
-      fc.vy *= -0.3; // small bounce
-      if (Math.abs(fc.vy) < 0.5) fc.done = true;
+  // Update coin physics
+  const floorY = trayY + trayH - 10;
+  const leftX = trayX + 18;
+  const rightX = trayX + trayW - 18;
+  for (const coin of coins) {
+    if (coin.settled) continue;
+    coin.vy += 0.7;
+    coin.x += coin.vx;
+    coin.y += coin.vy;
+    // Walls
+    if (coin.x < leftX) { coin.x = leftX; coin.vx = Math.abs(coin.vx) * 0.4; }
+    if (coin.x > rightX) { coin.x = rightX; coin.vx = -Math.abs(coin.vx) * 0.4; }
+    // Coin-coin collisions — 2D detection, push mostly horizontal
+    for (const other of coins) {
+      if (other === coin) continue;
+      const dx = coin.x - other.x;
+      const dy = coin.y - other.y;
+      const distSq = dx * dx + dy * dy;
+      const minDist = COIN_R * 2;
+      if (distSq < minDist * minDist && distSq > 0.01) {
+        const dist = Math.sqrt(distSq);
+        const overlap = minDist - dist;
+        const nx = dx / dist;
+        const ny = dy / dist;
+        if (other.settled) {
+          coin.x += nx * overlap;
+          coin.y += ny * overlap * 0.15; // tiny vertical nudge for piling
+          const dot = coin.vx * nx;
+          if (dot < 0) { coin.vx -= dot * nx * 1.3; coin.vx *= 0.6; }
+        } else {
+          coin.x += nx * overlap * 0.5;
+          coin.y += ny * overlap * 0.15;
+          other.x -= nx * overlap * 0.5;
+          other.y -= ny * overlap * 0.15;
+        }
+      }
+    }
+    // Floor
+    if (coin.y > floorY) {
+      coin.y = floorY;
+      coin.vy *= -0.35;
+      coin.vx *= 0.75;
+    }
+    // Continuous floor friction when sliding on the floor
+    if (coin.y >= floorY - 2) {
+      coin.vx *= 0.88;
+      coin.vy *= 0.88;
+    }
+    // Settle when slow (at floor level or resting on piled coins)
+    if (Math.abs(coin.vy) < 0.4 && Math.abs(coin.vx) < 0.3 && coin.y >= floorY - COIN_R * 2) {
+      coin.settled = true;
+      coin.vx = 0;
+      coin.vy = 0;
     }
   }
-  // Remove settled falling coins (they become tray coins via updateCoinPositions)
-  fallingCoins = fallingCoins.filter((fc) => !fc.done);
 
   // Spin tick sounds
   if (state === "spinning" || drums.some((d) => d.spinning)) {
