@@ -62,8 +62,14 @@ function placeTrayCoinsImmediate() {
       coin.vy += 0.7;
       coin.x += coin.vx;
       coin.y += coin.vy;
-      if (coin.x < leftX) { coin.x = leftX; coin.vx = Math.abs(coin.vx) * 0.4; }
-      if (coin.x > rightX) { coin.x = rightX; coin.vx = -Math.abs(coin.vx) * 0.4; }
+      if (coin.x < leftX) {
+        coin.x = leftX;
+        coin.vx = Math.abs(coin.vx) * 0.4;
+      }
+      if (coin.x > rightX) {
+        coin.x = rightX;
+        coin.vx = -Math.abs(coin.vx) * 0.4;
+      }
       for (const other of coins) {
         if (other === coin) continue;
         const dx = coin.x - other.x;
@@ -79,7 +85,10 @@ function placeTrayCoinsImmediate() {
             coin.x += nx * overlap;
             coin.y += ny * overlap * 0.15;
             const dot = coin.vx * nx;
-            if (dot < 0) { coin.vx -= dot * nx * 1.3; coin.vx *= 0.6; }
+            if (dot < 0) {
+              coin.vx -= dot * nx * 1.3;
+              coin.vx *= 0.6;
+            }
           } else {
             coin.x += nx * overlap * 0.5;
             coin.y += ny * overlap * 0.15;
@@ -97,7 +106,11 @@ function placeTrayCoinsImmediate() {
         coin.vx *= 0.88;
         coin.vy *= 0.88;
       }
-      if (Math.abs(coin.vy) < 0.4 && Math.abs(coin.vx) < 0.3 && coin.y >= floorY - COIN_R * 2) {
+      if (
+        Math.abs(coin.vy) < 0.4 &&
+        Math.abs(coin.vx) < 0.3 &&
+        coin.y >= floorY - COIN_R * 2
+      ) {
         coin.settled = true;
         coin.vx = 0;
         coin.vy = 0;
@@ -106,7 +119,11 @@ function placeTrayCoinsImmediate() {
     if (coins.every((c) => c.settled)) break;
   }
   // Force-settle any stragglers
-  for (const coin of coins) { coin.settled = true; coin.vx = 0; coin.vy = 0; }
+  for (const coin of coins) {
+    coin.settled = true;
+    coin.vx = 0;
+    coin.vy = 0;
+  }
 }
 
 window.addEventListener("load", placeTrayCoinsImmediate);
@@ -120,7 +137,10 @@ function pullLever() {
   credits -= 1;
   // Remove one coin from the tray
   for (let i = coins.length - 1; i >= 0; i--) {
-    if (coins[i].settled) { coins.splice(i, 1); break; }
+    if (coins[i].settled) {
+      coins.splice(i, 1);
+      break;
+    }
   }
   playInsertCoinSound();
   lastWin = 0;
@@ -145,15 +165,21 @@ function pullLever() {
   // Stagger the stops — vary when the sequence starts, keep intervals constant
   const spinDelay = 1200 + Math.random() * 400;
   drums.forEach((d, i) => {
-    setTimeout(() => {
-      d.beginStop(results[i]);
-    }, spinDelay + i * 600);
+    setTimeout(
+      () => {
+        d.beginStop(results[i]);
+      },
+      spinDelay + i * 600,
+    );
   });
 
   // After all stopped, evaluate
-  setTimeout(() => {
-    evaluateResult();
-  }, spinDelay + drums.length * 600 + 500);
+  setTimeout(
+    () => {
+      evaluateResult();
+    },
+    spinDelay + drums.length * 600 + 500,
+  );
 }
 
 function evaluateResult() {
@@ -194,10 +220,9 @@ function evaluateResult() {
   } else {
     lastWin = 0;
     state = "idle";
-    playLoseSound();
 
     if (credits <= 0) {
-      // No auto-refill — machine stays dark
+      playLoseSound();
     }
   }
 }
@@ -331,8 +356,14 @@ function update() {
     coin.x += coin.vx;
     coin.y += coin.vy;
     // Walls
-    if (coin.x < leftX) { coin.x = leftX; coin.vx = Math.abs(coin.vx) * 0.4; }
-    if (coin.x > rightX) { coin.x = rightX; coin.vx = -Math.abs(coin.vx) * 0.4; }
+    if (coin.x < leftX) {
+      coin.x = leftX;
+      coin.vx = Math.abs(coin.vx) * 0.4;
+    }
+    if (coin.x > rightX) {
+      coin.x = rightX;
+      coin.vx = -Math.abs(coin.vx) * 0.4;
+    }
     // Coin-coin collisions — 2D detection, push mostly horizontal
     for (const other of coins) {
       if (other === coin) continue;
@@ -349,7 +380,10 @@ function update() {
           coin.x += nx * overlap;
           coin.y += ny * overlap * 0.15; // tiny vertical nudge for piling
           const dot = coin.vx * nx;
-          if (dot < 0) { coin.vx -= dot * nx * 1.3; coin.vx *= 0.6; }
+          if (dot < 0) {
+            coin.vx -= dot * nx * 1.3;
+            coin.vx *= 0.6;
+          }
         } else {
           coin.x += nx * overlap * 0.5;
           coin.y += ny * overlap * 0.15;
@@ -370,7 +404,11 @@ function update() {
       coin.vy *= 0.88;
     }
     // Settle when slow (at floor level or resting on piled coins)
-    if (Math.abs(coin.vy) < 0.4 && Math.abs(coin.vx) < 0.3 && coin.y >= floorY - COIN_R * 2) {
+    if (
+      Math.abs(coin.vy) < 0.4 &&
+      Math.abs(coin.vx) < 0.3 &&
+      coin.y >= floorY - COIN_R * 2
+    ) {
       coin.settled = true;
       coin.vx = 0;
       coin.vy = 0;

@@ -229,30 +229,12 @@ function drawTop() {
   context.stroke();
 }
 
-function drawWinsText() {
-  context.font = "28px Ultra";
-  context.textAlign = "center";
-  context.textBaseline = "top";
-
-  context.lineJoin = "round";
-  context.lineWidth = 4;
-  context.strokeStyle = "rgb(27,29,30)";
-  context.strokeText("WINS", 340, 113);
-
-  const gradient = context.createLinearGradient(0, 113, 0, 143);
-  gradient.addColorStop(0, "rgb(236,189,93)");
-  gradient.addColorStop(0.499, "rgb(236,189,93)");
-  gradient.addColorStop(0.5, "rgb(210,116,58)");
-  gradient.addColorStop(1, "rgb(210,116,58)");
-  context.fillStyle = gradient;
-  context.fillText("WINS", 340, 113);
-}
-
 function drawWins() {
   const cardX = 25;
   const cardW = frameWidth - 50;
-  const cardY = 115;
-  const cardH = 74;
+  const cardY = 113;
+  const cardH = 82;
+  const colW = cardW / 5;
 
   const darkGradient = context.createLinearGradient(0, 90, 0, 90 + 80);
   darkGradient.addColorStop(0, "rgb(33,31,47)");
@@ -267,12 +249,7 @@ function drawWins() {
   drawRoundedRect(cardX - 4, cardY - 4, cardW + 8, cardH + 8, 10);
   context.stroke();
 
-  const lightGradient = context.createLinearGradient(
-    0,
-    cardY,
-    0,
-    cardY + cardH,
-  );
+  const lightGradient = context.createLinearGradient(0, cardY, 0, cardY + cardH);
   lightGradient.addColorStop(0, "rgb(215, 222, 235)");
   lightGradient.addColorStop(1, "rgb(238, 243, 252)");
 
@@ -280,113 +257,95 @@ function drawWins() {
   drawRoundedRect(cardX, cardY, cardW, cardH, 6);
   context.fill();
 
-  // Horizontal dividers
-  const lineX1 = cardX + 1;
-  const lineX2 = cardX + cardW - 1;
   context.strokeStyle = "rgb(117,117,117)";
   context.lineWidth = 1;
+
+  // Horizontal divider between the two rows
+  const dividerY = cardY + cardH / 2;
   context.beginPath();
-  context.moveTo(lineX1, 139);
-  context.lineTo(lineX2, 139);
+  context.moveTo(cardX + 1, dividerY);
+  context.lineTo(cardX + cardW - 1, dividerY);
   context.stroke();
 
-  context.beginPath();
-  context.moveTo(lineX1, 164);
-  context.lineTo(lineX2, 164);
-  context.stroke();
-
-  // Row centers
-  const row1 = 128; // top
-  const row2 = 152; // middle
-  const row3 = 176; // bottom
-
-  const symSize = 22;
-  const barW = 37;
-  const barH = 17;
-  const spacing = 30;
-  const centerX = cardX + cardW / 2;
-
-  // Helper: draw "7" symbol
-  function draw7(x, y) {
-    context.save();
-    context.font = "bold " + symSize + "px Ultra";
-    context.fillStyle = "#b00";
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillText("7", x, y);
-    context.restore();
+  // Vertical dividers between the five columns
+  for (let i = 1; i < 5; i++) {
+    const dx = cardX + i * colW;
+    context.beginPath();
+    context.moveTo(dx, cardY + 1);
+    context.lineTo(dx, cardY + cardH - 1);
+    context.stroke();
   }
 
-  // Side combos: all mixes of 7s and BARs
-  const leftX = cardX + 42;
-  const rightX = cardX + cardW - 42;
-  const combos = [
-    [leftX, row1, "7BB"],
-    [rightX, row1, "BB7"],
-    [leftX, row2, "77B"],
-    [rightX, row2, "B77"],
-    [leftX, row3, "7B7"],
-    [rightX, row3, "B7B"],
+  // Row centers (2 rows)
+  const rowCenters = [cardY + cardH * 0.25, cardY + cardH * 0.75];
+
+  // Combo entries: [row, col, sym1, sym2, sym3, payout]
+  // sym values: emoji string | '7' | 'bar' | null (any/wildcard)
+  // 2 rows × 5 cols, lesser wins on left → bigger wins on right
+  const entries = [
+    // Top row: cherry combos, then 7/bar mix, then bell
+    [0, 0, "🍒", null, null, 2],
+    [0, 1, "🍒", "🍒", null, 5],
+    [0, 2, "🍒", "🍒", "🍒", 10],
+    [0, 3, "7", "bar", "7", 15],
+    [0, 4, "🔔", "🔔", "🔔", 20],
+    // Bottom row: fruit combos, then BAR×3, then 7×7×7
+    [1, 0, "🍋", "🍋", "🍋", 5],
+    [1, 1, "🍇", "🍇", "🍇", 8],
+    [1, 2, "🍊", "🍊", "🍊", 10],
+    [1, 3, "bar", "bar", "bar", 50],
+    [1, 4, "7", "7", "7", 200],
   ];
-  for (const [cx, ry, pattern] of combos) {
-    for (let j = 0; j < 3; j++) {
-      const x = cx + (j - 1) * spacing;
-      if (pattern[j] === "7") draw7(x, ry);
-      else drawTripleBar(x, ry, barW, barH);
+
+  function drawSym(sym, x, y) {
+    if (sym === null) {
+      context.beginPath();
+      context.arc(x, y, 4, 0, Math.PI * 2);
+      context.fillStyle = "rgba(100,100,110,0.45)";
+      context.fill();
+    } else if (sym === "7") {
+      context.save();
+      context.globalAlpha = 1;
+      context.font = "bold 24px Ultra";
+      context.fillStyle = "#b00";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText("7", x, y + 2);
+      context.restore();
+    } else if (sym === "bar") {
+      drawTripleBar(x, y, 31, 23);
+    } else {
+      context.save();
+      context.globalAlpha = 1;
+      context.font = "20px sans-serif";
+      context.fillStyle = "#000";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(sym, x, y);
+      context.restore();
     }
   }
 
-  // Center boxes - 3 tall boxes spanning row2 and row3, with 7 on top and BAR on bottom
-  const boxW = 40;
-  const boxGap = 4;
-  const centerGroupW = boxW * 3 + boxGap * 2;
-  const centerStartX = centerX - centerGroupW / 2;
-  const boxTop = row2 - 10 - 2;
-  const boxBottom = row3 + 10 + 2;
-  const boxFullH = boxBottom - boxTop;
+  for (const [row, col, s1, s2, s3, payout] of entries) {
+    const cy = rowCenters[row];
+    const colLeft = cardX + col * colW;
+    const symSpacing = 26;
+    const sym1X = colLeft + 20;
+    const sym2X = sym1X + symSpacing;
+    const sym3X = sym2X + symSpacing;
 
-  context.fillStyle = "rgb(73,73,73)";
-  context.fillRect(
-    centerStartX - 2,
-    boxTop - 1,
-    centerGroupW + 4,
-    boxFullH + 2,
-  );
+    drawSym(s1, sym1X, cy);
+    drawSym(s2, sym2X, cy);
+    drawSym(s3, sym3X, cy);
 
-  const emphasisGradient = context.createLinearGradient(
-    0,
-    boxTop,
-    0,
-    boxBottom,
-  );
-  emphasisGradient.addColorStop(0, "rgb(215, 222, 235)");
-  emphasisGradient.addColorStop(0.5, "rgb(238, 243, 252)");
-  emphasisGradient.addColorStop(1, "rgb(215, 222, 235)");
-
-  for (let i = 0; i < 3; i++) {
-    const bx = centerStartX + i * (boxW + boxGap);
-    context.fillStyle = emphasisGradient;
-    drawRoundedRect(bx, boxTop, boxW, boxFullH, 2);
-    context.fill();
-  }
-
-  // 7s in top half (same size as side 7s)
-  context.font = "bold " + symSize + "px Ultra";
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillStyle = "#b00";
-  for (let i = 0; i < 3; i++) {
-    context.fillText("7", centerStartX + boxW / 2 + i * (boxW + boxGap), row2);
-  }
-
-  // BAR labels in bottom half
-  for (let i = 0; i < 3; i++) {
-    drawTripleBar(
-      centerStartX + boxW / 2 + i * (boxW + boxGap),
-      row3,
-      barW,
-      barH,
-    );
+    context.save();
+    context.globalAlpha = 1;
+    context.font = "600 16px Oswald";
+    context.fillStyle = "#111";
+    context.textAlign = "left";
+    context.textBaseline = "middle";
+    context.fillText(String(payout), sym3X + 16, cy + 1);
+    context.restore();
   }
 }
 
@@ -1067,7 +1026,6 @@ function draw() {
 
   drawTop();
   drawWins();
-  drawWinsText();
 
   drawBottom();
 

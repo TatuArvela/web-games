@@ -186,4 +186,35 @@ function playInsertCoinSound() {
   microBurst(24, 0.02 * v, 3500 * p);
 }
 
-function playLoseSound() {}
+function playLoseSound() {
+  // 4-tone descending jingle: G3 → F3 → Eb3 → C3 (C minor descent), last note sustained
+  function loseNote(freq, startMs, dur, droop = 1.0) {
+    setTimeout(() => {
+      const now = audioCtx.currentTime;
+      [1, 2, 3].forEach((h, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq * h, now);
+        if (droop < 1.0) {
+          osc.frequency.setValueAtTime(freq * h, now + dur - 0.25);
+          osc.frequency.exponentialRampToValueAtTime(freq * h * droop, now + dur);
+        }
+        const vol = 0.11 / (i + 1);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(vol, now + 0.07);
+        gain.gain.setValueAtTime(vol, now + dur - 0.18);
+        gain.gain.linearRampToValueAtTime(0.0001, now + dur);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + dur);
+      });
+    }, startMs);
+  }
+
+  loseNote(554, 0,    0.38);        // C#5
+  loseNote(523, 420,  0.38);        // C5
+  loseNote(494, 840,  0.38);        // B4
+  loseNote(466, 1260, 1.40, 0.97);  // A#4 — sustained, very subtle droop
+}
