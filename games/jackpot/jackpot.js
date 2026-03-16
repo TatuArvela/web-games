@@ -36,29 +36,80 @@ const drumsHeight = frameHeight - drumsVerticalMargin * 2;
 const drums = REEL_STRIPS.map((strip) => new Drum(strip));
 
 // ── Game logic ───────────────────────────────────────────
-function initTrayCoins() {
+function placeTrayCoinsImmediate() {
   coins = [];
   const count = Math.min(credits, 50);
-  audioCtx.resume().then(() => {
-    for (let i = 0; i < count; i++) {
-      setTimeout(() => {
-        const slotCenterX = trayX + trayW / 2 + (Math.random() - 0.5) * 30;
-        coins.push({ x: slotCenterX, y: trayY - 5, vx: (Math.random() - 0.5) * 3, vy: 1, settled: false });
-        playInsertCoinSound();
-      }, i * 50);
+  const slotCenterX = trayX + trayW / 2;
+  const floorY = trayY + trayH - 10;
+  const leftX = trayX + 18;
+  const rightX = trayX + trayW - 18;
+
+  // Spawn coins staggered above the slot so they don't all overlap
+  for (let i = 0; i < count; i++) {
+    coins.push({
+      x: slotCenterX + (Math.random() - 0.5) * 30,
+      y: trayY - 5 - i * COIN_R * 2.5,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 1,
+      settled: false,
+    });
+  }
+
+  // Run the same physics as update() silently until all coins settle
+  for (let tick = 0; tick < 5000; tick++) {
+    for (const coin of coins) {
+      if (coin.settled) continue;
+      coin.vy += 0.7;
+      coin.x += coin.vx;
+      coin.y += coin.vy;
+      if (coin.x < leftX) { coin.x = leftX; coin.vx = Math.abs(coin.vx) * 0.4; }
+      if (coin.x > rightX) { coin.x = rightX; coin.vx = -Math.abs(coin.vx) * 0.4; }
+      for (const other of coins) {
+        if (other === coin) continue;
+        const dx = coin.x - other.x;
+        const dy = coin.y - other.y;
+        const distSq = dx * dx + dy * dy;
+        const minDist = COIN_R * 2;
+        if (distSq < minDist * minDist && distSq > 0.01) {
+          const dist = Math.sqrt(distSq);
+          const overlap = minDist - dist;
+          const nx = dx / dist;
+          const ny = dy / dist;
+          if (other.settled) {
+            coin.x += nx * overlap;
+            coin.y += ny * overlap * 0.15;
+            const dot = coin.vx * nx;
+            if (dot < 0) { coin.vx -= dot * nx * 1.3; coin.vx *= 0.6; }
+          } else {
+            coin.x += nx * overlap * 0.5;
+            coin.y += ny * overlap * 0.15;
+            other.x -= nx * overlap * 0.5;
+            other.y -= ny * overlap * 0.15;
+          }
+        }
+      }
+      if (coin.y > floorY) {
+        coin.y = floorY;
+        coin.vy *= -0.35;
+        coin.vx *= 0.75;
+      }
+      if (coin.y >= floorY - 2) {
+        coin.vx *= 0.88;
+        coin.vy *= 0.88;
+      }
+      if (Math.abs(coin.vy) < 0.4 && Math.abs(coin.vx) < 0.3 && coin.y >= floorY - COIN_R * 2) {
+        coin.settled = true;
+        coin.vx = 0;
+        coin.vy = 0;
+      }
     }
-  });
+    if (coins.every((c) => c.settled)) break;
+  }
+  // Force-settle any stragglers
+  for (const coin of coins) { coin.settled = true; coin.vx = 0; coin.vy = 0; }
 }
 
-// Trigger coin dispensing on first user interaction (required for Web Audio autoplay policy)
-let _trayInitialized = false;
-["click", "touchstart", "keydown"].forEach((evt) =>
-  document.addEventListener(evt, () => {
-    if (_trayInitialized) return;
-    _trayInitialized = true;
-    initTrayCoins();
-  }, { once: true })
-);
+window.addEventListener("load", placeTrayCoinsImmediate);
 
 function pullLever() {
   if (state !== "idle") return;
