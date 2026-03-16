@@ -218,10 +218,10 @@ function drawTop() {
   context.stroke();
 
   const topEdgeGrad = context.createLinearGradient(0, 100, 0, 250);
-  topEdgeGrad.addColorStop(0.00, "rgb(55, 57, 72)");
-  topEdgeGrad.addColorStop(0.40, "rgb(100, 102, 118)");
-  topEdgeGrad.addColorStop(0.70, "rgb(85, 87, 102)");
-  topEdgeGrad.addColorStop(1.00, "rgb(50, 52, 66)");
+  topEdgeGrad.addColorStop(0.0, "rgb(55, 57, 72)");
+  topEdgeGrad.addColorStop(0.4, "rgb(100, 102, 118)");
+  topEdgeGrad.addColorStop(0.7, "rgb(85, 87, 102)");
+  topEdgeGrad.addColorStop(1.0, "rgb(50, 52, 66)");
 
   context.lineWidth = 3;
   context.strokeStyle = topEdgeGrad;
@@ -249,7 +249,12 @@ function drawWins() {
   drawRoundedRect(cardX - 4, cardY - 4, cardW + 8, cardH + 8, 10);
   context.stroke();
 
-  const lightGradient = context.createLinearGradient(0, cardY, 0, cardY + cardH);
+  const lightGradient = context.createLinearGradient(
+    0,
+    cardY,
+    0,
+    cardY + cardH,
+  );
   lightGradient.addColorStop(0, "rgb(215, 222, 235)");
   lightGradient.addColorStop(1, "rgb(238, 243, 252)");
 
@@ -351,148 +356,133 @@ function drawWins() {
 
 function drawCoinSlot() {
   const x = trayX + trayW + 68;
-  const y = trayY + trayH / 2 - 16;
+  const y = trayY + trayH / 2 - 12;
 
-  // Dimensions of the extruded slot housing
-  const slotW = 60; // width of the opening at top
-  const slotH = 24; // total height of the housing
-  const baseW = 50; // narrower at the bottom
-  const lipH = 5; // thickness of the top rim
-  const funnelDepth = 8; // how deep the funnel walls look
+  const slotW = 58; // top opening width
+  const slotH = 32; // taller housing
+  const baseW = 44; // narrower at the bottom
+  const lipH = 7; // top rim thickness
+  const funnelDepth = 9; // side wall depth
 
-  // Back plate — dark recessed area behind the slot
-  const backGrad = context.createLinearGradient(
-    0,
-    y - slotH / 2,
-    0,
-    y + slotH / 2,
-  );
-  backGrad.addColorStop(0, "rgb(55,55,68)");
-  backGrad.addColorStop(1, "rgb(40,40,52)");
-  context.fillStyle = backGrad;
-  context.beginPath();
-  context.roundRect(
-    x - slotW / 2 - 6,
-    y - slotH / 2 - 4,
-    slotW + 12,
-    slotH + 8,
-    5,
-  );
-  context.fill();
+  const top = y - slotH / 2;
+  const bot = y + slotH / 2;
 
-  // Left wall — angled trapezoid side
+  // Left side wall
   const leftWallGrad = context.createLinearGradient(
+    x - slotW / 2 - funnelDepth,
+    0,
     x - slotW / 2,
     0,
-    x - baseW / 2,
-    0,
   );
-  leftWallGrad.addColorStop(0, "rgb(200,202,218)");
-  leftWallGrad.addColorStop(1, "rgb(140,142,160)");
+  leftWallGrad.addColorStop(0, "rgb(155,157,175)");
+  leftWallGrad.addColorStop(1, "rgb(210,212,228)");
   context.fillStyle = leftWallGrad;
   context.beginPath();
-  context.moveTo(x - slotW / 2, y - slotH / 2);
-  context.lineTo(x - baseW / 2, y + slotH / 2);
-  context.lineTo(x - baseW / 2 - funnelDepth, y + slotH / 2);
-  context.lineTo(x - slotW / 2 - funnelDepth, y - slotH / 2);
+  context.moveTo(x - slotW / 2, top);
+  context.lineTo(x - baseW / 2, bot);
+  context.lineTo(x - baseW / 2 - funnelDepth, bot);
+  context.lineTo(x - slotW / 2 - funnelDepth, top);
   context.closePath();
   context.fill();
 
-  // Right wall — angled trapezoid side
+  // Right side wall
   const rightWallGrad = context.createLinearGradient(
-    x + baseW / 2,
-    0,
     x + slotW / 2,
     0,
+    x + slotW / 2 + funnelDepth,
+    0,
   );
-  rightWallGrad.addColorStop(0, "rgb(130,132,150)");
-  rightWallGrad.addColorStop(1, "rgb(185,188,205)");
+  rightWallGrad.addColorStop(0, "rgb(120,122,140)");
+  rightWallGrad.addColorStop(1, "rgb(172,174,192)");
   context.fillStyle = rightWallGrad;
   context.beginPath();
-  context.moveTo(x + slotW / 2, y - slotH / 2);
-  context.lineTo(x + baseW / 2, y + slotH / 2);
-  context.lineTo(x + baseW / 2 + funnelDepth, y + slotH / 2);
-  context.lineTo(x + slotW / 2 + funnelDepth, y - slotH / 2);
+  context.moveTo(x + slotW / 2, top);
+  context.lineTo(x + baseW / 2, bot);
+  context.lineTo(x + baseW / 2 + funnelDepth, bot);
+  context.lineTo(x + slotW / 2 + funnelDepth, top);
   context.closePath();
   context.fill();
 
-  // Inner face — the funnel surface between top opening and slit
-  const innerGrad = context.createLinearGradient(
-    0,
-    y - slotH / 2,
-    0,
-    y + slotH / 2,
-  );
-  innerGrad.addColorStop(0, "rgb(170,172,190)");
-  innerGrad.addColorStop(0.5, "rgb(135,138,158)");
-  innerGrad.addColorStop(1, "rgb(100,102,120)");
+  // Inner funnel face
+  const innerGrad = context.createLinearGradient(0, top, 0, bot);
+  innerGrad.addColorStop(0, "rgb(178,180,198)");
+  innerGrad.addColorStop(0.5, "rgb(138,140,158)");
+  innerGrad.addColorStop(1, "rgb(95,97,115)");
   context.fillStyle = innerGrad;
   context.beginPath();
-  context.moveTo(x - slotW / 2, y - slotH / 2);
-  context.lineTo(x + slotW / 2, y - slotH / 2);
-  context.lineTo(x + baseW / 2, y + slotH / 2);
-  context.lineTo(x - baseW / 2, y + slotH / 2);
+  context.moveTo(x - slotW / 2, top);
+  context.lineTo(x + slotW / 2, top);
+  context.lineTo(x + baseW / 2, bot);
+  context.lineTo(x - baseW / 2, bot);
   context.closePath();
   context.fill();
 
-  // Top rim — bright lip catching light
-  const rimGrad = context.createLinearGradient(
-    0,
-    y - slotH / 2 - lipH,
-    0,
-    y - slotH / 2 + 1,
-  );
-  rimGrad.addColorStop(0, "rgb(240,242,252)");
-  rimGrad.addColorStop(0.5, "rgb(215,218,235)");
-  rimGrad.addColorStop(1, "rgb(170,172,192)");
+  // Coin slit — prominent dark opening at the bottom
+  const slitW = baseW - 6;
+  const slitH = 6;
+  const slitY = bot - slitH - 2;
+  context.fillStyle = "rgb(30,30,42)";
+  context.beginPath();
+  context.roundRect(x - slitW / 2 - 1, slitY - 1, slitW + 2, slitH + 2, 4);
+  context.fill();
+  context.fillStyle = "rgb(42,42,58)";
+  context.beginPath();
+  context.roundRect(x - slitW / 2, slitY, slitW, slitH, 3);
+  context.fill();
+  // Slit highlight
+  context.strokeStyle = "rgba(200,202,220,0.5)";
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(x - slitW / 2 + 4, slitY);
+  context.lineTo(x + slitW / 2 - 4, slitY);
+  context.stroke();
+
+  // Top chrome rim
+  const rimGrad = context.createLinearGradient(0, top - lipH, 0, top + 1);
+  rimGrad.addColorStop(0, "rgb(225,227,243)");
+  rimGrad.addColorStop(0.38, "rgb(255,255,255)");
+  rimGrad.addColorStop(0.65, "rgb(210,212,228)");
+  rimGrad.addColorStop(1, "rgb(155,157,175)");
   context.fillStyle = rimGrad;
   context.beginPath();
   context.roundRect(
     x - slotW / 2 - funnelDepth - 1,
-    y - slotH / 2 - lipH,
+    top - lipH,
     slotW + funnelDepth * 2 + 2,
     lipH + 1,
-    [3, 3, 0, 0],
+    [4, 4, 0, 0],
   );
   context.fill();
 
-  // The actual coin slit at the bottom — dark opening
-  const slitW2 = baseW - 4;
-  const slitH2 = 4;
-  const slitY = y + slotH / 2 - 2;
-  context.fillStyle = "rgb(10,10,14)";
+  // Top rim highlight line
+  context.strokeStyle = "rgba(255,255,255,0.7)";
+  context.lineWidth = 1;
   context.beginPath();
-  context.roundRect(x - slitW2 / 2, slitY - slitH2 / 2, slitW2, slitH2, 2);
-  context.fill();
+  context.moveTo(x - slotW / 2 - funnelDepth + 2, top - lipH + 1);
+  context.lineTo(x + slotW / 2 + funnelDepth - 2, top - lipH + 1);
+  context.stroke();
 
-  // Edge highlights and shadows for definition
-  context.strokeStyle = "rgb(70,70,85)";
+  // Inner edge definition lines
+  context.strokeStyle = "rgba(60,62,78,0.6)";
   context.lineWidth = 0.75;
-  // Left edge
   context.beginPath();
-  context.moveTo(x - slotW / 2, y - slotH / 2);
-  context.lineTo(x - baseW / 2, y + slotH / 2);
+  context.moveTo(x - slotW / 2, top);
+  context.lineTo(x - baseW / 2, bot);
   context.stroke();
-  // Right edge
   context.beginPath();
-  context.moveTo(x + slotW / 2, y - slotH / 2);
-  context.lineTo(x + baseW / 2, y + slotH / 2);
+  context.moveTo(x + slotW / 2, top);
+  context.lineTo(x + baseW / 2, bot);
   context.stroke();
 
-  // Top edge highlight
-  context.strokeStyle = "rgba(255,255,255,0.5)";
-  context.lineWidth = 1;
+  // Dark border around the entire housing
+  context.strokeStyle = "rgb(72,74,90)";
+  context.lineWidth = 2;
   context.beginPath();
-  context.moveTo(x - slotW / 2 - funnelDepth, y - slotH / 2 - lipH);
-  context.lineTo(x + slotW / 2 + funnelDepth, y - slotH / 2 - lipH);
-  context.stroke();
-
-  // Bottom edge shadow
-  context.strokeStyle = "rgb(50,50,62)";
-  context.lineWidth = 1;
-  context.beginPath();
-  context.moveTo(x - baseW / 2 - funnelDepth, y + slotH / 2);
-  context.lineTo(x + baseW / 2 + funnelDepth, y + slotH / 2);
+  context.moveTo(x - slotW / 2 - funnelDepth, top - lipH);
+  context.lineTo(x + slotW / 2 + funnelDepth, top - lipH);
+  context.lineTo(x + baseW / 2 + funnelDepth, bot);
+  context.lineTo(x - baseW / 2 - funnelDepth, bot);
+  context.closePath();
   context.stroke();
 }
 
@@ -605,12 +595,17 @@ function drawFrameBack() {
     frameHeight - 20,
   );
 
-  const edgeGrad = context.createLinearGradient(0, topMargin, 0, topMargin + frameHeight);
-  edgeGrad.addColorStop(0.00, "rgb(55, 57, 72)");
+  const edgeGrad = context.createLinearGradient(
+    0,
+    topMargin,
+    0,
+    topMargin + frameHeight,
+  );
+  edgeGrad.addColorStop(0.0, "rgb(55, 57, 72)");
   edgeGrad.addColorStop(0.25, "rgb(100, 102, 118)");
-  edgeGrad.addColorStop(0.50, "rgb(75, 77, 92)");
+  edgeGrad.addColorStop(0.5, "rgb(75, 77, 92)");
   edgeGrad.addColorStop(0.75, "rgb(95, 97, 112)");
-  edgeGrad.addColorStop(1.00, "rgb(45, 47, 62)");
+  edgeGrad.addColorStop(1.0, "rgb(45, 47, 62)");
 
   context.lineWidth = 3;
   context.strokeStyle = edgeGrad;
@@ -729,11 +724,16 @@ function drawBottom() {
   );
   context.stroke();
 
-  const bottomEdgeGrad = context.createLinearGradient(0, topMargin + frameHeight - 40, 0, topMargin + frameHeight + bottomMargin);
-  bottomEdgeGrad.addColorStop(0.00, "rgb(55, 57, 72)");
-  bottomEdgeGrad.addColorStop(0.40, "rgb(100, 102, 118)");
-  bottomEdgeGrad.addColorStop(0.70, "rgb(85, 87, 102)");
-  bottomEdgeGrad.addColorStop(1.00, "rgb(50, 52, 66)");
+  const bottomEdgeGrad = context.createLinearGradient(
+    0,
+    topMargin + frameHeight - 40,
+    0,
+    topMargin + frameHeight + bottomMargin,
+  );
+  bottomEdgeGrad.addColorStop(0.0, "rgb(55, 57, 72)");
+  bottomEdgeGrad.addColorStop(0.4, "rgb(100, 102, 118)");
+  bottomEdgeGrad.addColorStop(0.7, "rgb(85, 87, 102)");
+  bottomEdgeGrad.addColorStop(1.0, "rgb(50, 52, 66)");
 
   context.lineWidth = 3;
   context.strokeStyle = bottomEdgeGrad;
@@ -846,116 +846,160 @@ const trayW = frameWidth - 184;
 const trayH = 55;
 
 function drawCoinTray() {
-  const wallW = 6; // side wall thickness
+  const wallW = 7;
+  const rimH = 10;
+  const lipH = 13;
+  const r = 7; // rounded bottom corners on interior
 
-  // Tray interior — dark recessed bowl
-  const interiorGrad = context.createLinearGradient(0, trayY - 5, 0, trayY + trayH);
-  interiorGrad.addColorStop(0.00, "rgb(58, 58, 70)");
-  interiorGrad.addColorStop(0.20, "rgb(68, 68, 82)");
-  interiorGrad.addColorStop(0.65, "rgb(78, 78, 92)");
-  interiorGrad.addColorStop(1.00, "rgb(65, 65, 78)");
-  context.fillStyle = interiorGrad;
-  context.fillRect(trayX, trayY - 5, trayW, trayH + 5);
+  // Outer shadow/border
+  context.fillStyle = "rgb(70,72,88)";
+  context.beginPath();
+  context.roundRect(
+    trayX - wallW - 2,
+    trayY - rimH - 2,
+    trayW + (wallW + 2) * 2,
+    trayH + rimH + lipH + 4,
+    9,
+  );
+  context.fill();
 
-  // Left side wall — gradient gives angled-wall impression
+  // Left side wall
   const leftWallGrad = context.createLinearGradient(trayX - wallW, 0, trayX, 0);
-  leftWallGrad.addColorStop(0, "rgb(148, 150, 165)");
-  leftWallGrad.addColorStop(0.5, "rgb(185, 187, 202)");
-  leftWallGrad.addColorStop(1, "rgb(118, 120, 135)");
+  leftWallGrad.addColorStop(0, "rgb(155,157,173)");
+  leftWallGrad.addColorStop(0.4, "rgb(210,212,228)");
+  leftWallGrad.addColorStop(1, "rgb(125,127,143)");
   context.fillStyle = leftWallGrad;
-  context.fillRect(trayX - wallW, trayY - 5, wallW, trayH + 5);
+  context.beginPath();
+  context.roundRect(
+    trayX - wallW,
+    trayY - rimH,
+    wallW,
+    trayH + rimH + lipH,
+    [4, 0, 0, 5],
+  );
+  context.fill();
 
   // Right side wall
-  const rightWallGrad = context.createLinearGradient(trayX + trayW, 0, trayX + trayW + wallW, 0);
-  rightWallGrad.addColorStop(0, "rgb(118, 120, 135)");
-  rightWallGrad.addColorStop(0.5, "rgb(165, 167, 182)");
-  rightWallGrad.addColorStop(1, "rgb(138, 140, 155)");
+  const rightWallGrad = context.createLinearGradient(
+    trayX + trayW,
+    0,
+    trayX + trayW + wallW,
+    0,
+  );
+  rightWallGrad.addColorStop(0, "rgb(118,120,136)");
+  rightWallGrad.addColorStop(0.6, "rgb(195,197,213)");
+  rightWallGrad.addColorStop(1, "rgb(148,150,166)");
   context.fillStyle = rightWallGrad;
-  context.fillRect(trayX + trayW, trayY - 5, wallW, trayH + 5);
-
-  // Back wall (top rim) — chrome lip catching overhead light
-  const backGrad = context.createLinearGradient(0, trayY - 8, 0, trayY + 2);
-  backGrad.addColorStop(0.00, "rgb(185, 187, 202)");
-  backGrad.addColorStop(0.35, "rgb(228, 230, 242)");
-  backGrad.addColorStop(0.60, "rgb(205, 207, 220)");
-  backGrad.addColorStop(1.00, "rgb(120, 122, 137)");
-  context.fillStyle = backGrad;
-  context.fillRect(trayX - wallW, trayY - 8, trayW + wallW * 2, 10);
-
-  // Front lip — chrome rail along the bottom edge
-  const lipGrad = context.createLinearGradient(0, trayY + trayH - 1, 0, trayY + trayH + 11);
-  lipGrad.addColorStop(0.00, "rgb(85, 87, 102)");
-  lipGrad.addColorStop(0.18, "rgb(158, 160, 175)");
-  lipGrad.addColorStop(0.40, "rgb(222, 224, 236)");
-  lipGrad.addColorStop(0.52, "rgb(242, 244, 252)");
-  lipGrad.addColorStop(0.65, "rgb(215, 217, 230)");
-  lipGrad.addColorStop(0.85, "rgb(150, 152, 167)");
-  lipGrad.addColorStop(1.00, "rgb(82, 84, 99)");
-  context.fillStyle = lipGrad;
   context.beginPath();
-  context.roundRect(trayX - wallW, trayY + trayH - 1, trayW + wallW * 2, 12, [0, 0, 5, 5]);
+  context.roundRect(
+    trayX + trayW,
+    trayY - rimH,
+    wallW,
+    trayH + rimH + lipH,
+    [0, 4, 5, 0],
+  );
   context.fill();
 
-  // Inner top shadow (cast from back wall onto tray floor)
-  const topShadow = context.createLinearGradient(0, trayY + 2, 0, trayY + 20);
-  topShadow.addColorStop(0, "rgba(0,0,0,0.35)");
+  // Top chrome rim
+  const rimGrad = context.createLinearGradient(0, trayY - rimH, 0, trayY);
+  rimGrad.addColorStop(0, "rgb(215,217,233)");
+  rimGrad.addColorStop(0.35, "rgb(252,254,255)");
+  rimGrad.addColorStop(0.65, "rgb(212,214,230)");
+  rimGrad.addColorStop(1, "rgb(138,140,156)");
+  context.fillStyle = rimGrad;
+  context.beginPath();
+  context.roundRect(
+    trayX - wallW,
+    trayY - rimH,
+    trayW + wallW * 2,
+    rimH,
+    [5, 5, 0, 0],
+  );
+  context.fill();
+
+  // Interior bowl — rounded bottom corners
+  const interiorGrad = context.createLinearGradient(0, trayY, 0, trayY + trayH);
+  interiorGrad.addColorStop(0, "rgb(48,48,62)");
+  interiorGrad.addColorStop(0.35, "rgb(64,64,78)");
+  interiorGrad.addColorStop(1, "rgb(74,74,88)");
+  context.fillStyle = interiorGrad;
+  context.beginPath();
+  context.roundRect(trayX, trayY, trayW, trayH, [0, 0, r, r]);
+  context.fill();
+
+  // Deep inner shadow from top rim
+  const topShadow = context.createLinearGradient(0, trayY, 0, trayY + 26);
+  topShadow.addColorStop(0, "rgba(0,0,0,0.55)");
   topShadow.addColorStop(1, "rgba(0,0,0,0)");
   context.fillStyle = topShadow;
-  context.fillRect(trayX, trayY + 2, trayW, 18);
+  context.beginPath();
+  context.roundRect(trayX, trayY, trayW, 26, [0, 0, 0, 0]);
+  context.fill();
 
-  // Inner left shadow
-  const leftShadow = context.createLinearGradient(trayX, 0, trayX + 16, 0);
-  leftShadow.addColorStop(0, "rgba(0,0,0,0.18)");
+  // Left inner shadow
+  const leftShadow = context.createLinearGradient(trayX, 0, trayX + 22, 0);
+  leftShadow.addColorStop(0, "rgba(0,0,0,0.25)");
   leftShadow.addColorStop(1, "rgba(0,0,0,0)");
   context.fillStyle = leftShadow;
-  context.fillRect(trayX, trayY + 2, 16, trayH - 2);
-
-  // Inner right shadow
-  const rightShadow = context.createLinearGradient(trayX + trayW - 16, 0, trayX + trayW, 0);
-  rightShadow.addColorStop(0, "rgba(0,0,0,0)");
-  rightShadow.addColorStop(1, "rgba(0,0,0,0.18)");
-  context.fillStyle = rightShadow;
-  context.fillRect(trayX + trayW - 16, trayY + 2, 16, trayH - 2);
-
-  // Gradient outline — matches the rest of the machine borders
-  const outlineGrad = context.createLinearGradient(0, trayY - 8, 0, trayY + trayH + 12);
-  outlineGrad.addColorStop(0.00, "rgb(90, 92, 108)");
-  outlineGrad.addColorStop(0.40, "rgb(128, 130, 146)");
-  outlineGrad.addColorStop(0.70, "rgb(110, 112, 128)");
-  outlineGrad.addColorStop(1.00, "rgb(80, 82, 97)");
-  context.lineWidth = 2;
-  context.strokeStyle = outlineGrad;
   context.beginPath();
-  context.roundRect(trayX - wallW, trayY - 8, trayW + wallW * 2, trayH + 21, [3, 3, 5, 5]);
-  context.stroke();
+  context.roundRect(trayX, trayY, 22, trayH, [0, 0, 0, r]);
+  context.fill();
 
-  // Payout slot — dark coin opening in the back wall
-  const slotW = 120;
+  // Right inner shadow
+  const rightShadow = context.createLinearGradient(
+    trayX + trayW - 22,
+    0,
+    trayX + trayW,
+    0,
+  );
+  rightShadow.addColorStop(0, "rgba(0,0,0,0)");
+  rightShadow.addColorStop(1, "rgba(0,0,0,0.25)");
+  context.fillStyle = rightShadow;
+  context.beginPath();
+  context.roundRect(trayX + trayW - 22, trayY, 22, trayH, [0, 0, r, 0]);
+  context.fill();
+
+  // Front chrome lip
+  const lipGrad = context.createLinearGradient(
+    0,
+    trayY + trayH,
+    0,
+    trayY + trayH + lipH,
+  );
+  lipGrad.addColorStop(0, "rgb(88,90,106)");
+  lipGrad.addColorStop(0.15, "rgb(162,164,180)");
+  lipGrad.addColorStop(0.38, "rgb(235,237,250)");
+  lipGrad.addColorStop(0.52, "rgb(255,255,255)");
+  lipGrad.addColorStop(0.68, "rgb(220,222,236)");
+  lipGrad.addColorStop(0.88, "rgb(148,150,165)");
+  lipGrad.addColorStop(1, "rgb(76,78,93)");
+  context.fillStyle = lipGrad;
+  context.beginPath();
+  context.roundRect(
+    trayX - wallW,
+    trayY + trayH,
+    trayW + wallW * 2,
+    lipH,
+    [0, 0, 7, 7],
+  );
+  context.fill();
+
+  // Payout slot in back rim — wider and more pronounced
+  const slotW = 100;
   const slotH = 9;
   const slotX = trayX + trayW / 2 - slotW / 2;
-  const slotY = trayY - 5;
+  const slotY = trayY - slotH + 3;
 
-  // Slot recess shadow
-  context.fillStyle = "rgb(6, 6, 10)";
+  context.fillStyle = "rgb(30,30,42)";
   context.beginPath();
-  context.roundRect(slotX - 1, slotY - 1, slotW + 2, slotH + 2, 4);
+  context.roundRect(slotX - 2, slotY - 2, slotW + 4, slotH + 4, 5);
   context.fill();
 
-  // Slot opening
-  context.fillStyle = "rgb(14, 14, 20)";
+  context.fillStyle = "rgb(30,30,42)";
   context.beginPath();
-  context.roundRect(slotX, slotY, slotW, slotH, 3);
+  context.roundRect(slotX, slotY, slotW, slotH, 4);
   context.fill();
-
-  // Slot rim highlight
-  context.lineWidth = 1;
-  context.strokeStyle = "rgba(190, 192, 210, 0.45)";
-  context.beginPath();
-  context.moveTo(slotX + 5, slotY - 1);
-  context.lineTo(slotX + slotW - 5, slotY - 1);
-  context.stroke();
 }
-
 
 function drawCoin(cx, cy, bright) {
   const rX = 17; // horizontal radius
