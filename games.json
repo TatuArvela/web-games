@@ -2,6 +2,15 @@
   "$schema": "./games.schema.json",
   "games": [
     {
+      "title": "Gnome Catcher",
+      "url": "https://itch.io/embed-upload/4249762?color=000000",
+      "players": 1,
+      "controls": ["mouse", "keyboard"],
+      "image": "img/gnome-catcher.png",
+      "technology": "Godot",
+      "releaseYear": 2026
+    },
+    {
       "title": "Starfire Assault",
       "url": "https://itch.io/embed-upload/13532544?color=0d0e47",
       "players": 1,
@@ -114,8 +123,9 @@
       "url": "games/jackpot",
       "players": 1,
       "controls": ["mouse"],
-      "isIncomplete": true,
-      "technology": "HTML5"
+      "image": "img/jackpot.png",
+      "technology": "HTML5",
+      "releaseYear": 2026
     }
   ]
 }
