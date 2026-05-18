@@ -1,0 +1,984 @@
+/* ── Base ─────────────────────────────────────────────── */
+html {
+  align-items: center;
+  background-color: black;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  width: 100%;
+  font-family: sans-serif;
+  overscroll-behavior: none;
+}
+
+body {
+  background-color: white;
+  margin: 0;
+  aspect-ratio: 16 / 9;
+  font-size: 16rem;
+}
+
+body * {
+  box-sizing: border-box;
+  margin: 0;
+  user-select: none !important;
+}
+
+section {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  display: none;
+}
+
+:root {
+  --red: #c90016;
+  --bright-red: rgb(219, 74, 91);
+  --gray: #aaaaaa;
+}
+
+.back-button {
+  background: #333;
+  border-radius: 50%;
+  border: none;
+  bottom: 4rem;
+  box-shadow: 2rem 2rem 2rem black;
+  color: white;
+  cursor: pointer;
+  font-size: 20rem;
+  height: 40rem;
+  left: 2rem;
+  position: absolute;
+  transition: filter 100ms;
+  width: 40rem;
+  z-index: 1000;
+}
+
+.back-button:hover {
+  filter: brightness(1.5);
+}
+
+.back-button:active {
+  left: 4rem;
+  bottom: 2rem;
+  box-shadow: 0rem 0rem 2rem black;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.common-button {
+  background: var(--red);
+  border: none;
+  border-radius: 2rem;
+  box-shadow: 2rem 2rem 2rem black;
+  color: white;
+  cursor: pointer;
+  font-size: 30rem;
+  padding: 12rem;
+  position: relative;
+  transition: filter 100ms;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.common-button:hover {
+  filter: brightness(1.5);
+}
+
+.common-button:active {
+  left: 2rem;
+  top: 2rem;
+  box-shadow: 0rem 0rem 2rem black;
+}
+
+/* ── Menu screen ──────────────────────────────────────── */
+#screen-menu .title {
+  animation: 4s menu-title linear;
+  color: white;
+  display: inline-block;
+  font-size: 64rem;
+  font-weight: 400;
+  position: absolute;
+  -webkit-text-stroke: 2rem var(--red);
+  transform-origin: center;
+  transform: rotate(-720deg) scale(1);
+  top: 45%;
+  left: 60rem;
+  font-weight: bold;
+  text-shadow: 4rem 4rem 0 var(--red);
+  text-transform: uppercase;
+}
+
+@keyframes menu-title {
+  from {
+    opacity: 0;
+    transform: rotate(0deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-720deg) scale(1);
+  }
+}
+
+#screen-menu .title .new {
+  background: white;
+  border: 2rem solid var(--red);
+  box-shadow: 4rem 4rem 0 var(--red);
+  color: var(--red);
+  display: inline-block;
+  font-size: 40rem;
+  font-weight: normal;
+  height: 50rem;
+  line-height: 50rem;
+  position: relative;
+  right: -8rem;
+  text-align: center;
+  text-shadow: none;
+  text-transform: none;
+  top: -30rem;
+  transform: skewX(-20deg) rotate(-10deg);
+  width: 100rem;
+}
+
+#screen-menu .line {
+  animation: 0.5s menu-line linear;
+  width: 900rem;
+  height: 300rem;
+  position: absolute;
+  transform: rotate(-22.5deg);
+  background: var(--red);
+  opacity: 0.2;
+}
+
+#screen-menu .line-1 {
+  top: -250rem;
+  left: -120rem;
+}
+
+#screen-menu .line-2 {
+  top: -300rem;
+  left: -120rem;
+}
+
+#screen-menu .line-3 {
+  top: -350rem;
+  left: -120rem;
+}
+
+@keyframes menu-line {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.2;
+  }
+}
+
+#screen-menu .version,
+#screen-menu .subtitle {
+  position: absolute;
+  color: var(--red);
+  font-size: 14rem;
+  font-weight: 500;
+}
+
+#screen-menu .version {
+  bottom: 5rem;
+  left: 10rem;
+}
+
+#screen-menu .subtitle {
+  bottom: 5rem;
+  right: 10rem;
+}
+
+#screen-menu .button {
+  border: none;
+  position: relative;
+  background: var(--red);
+  color: white;
+  font-weight: bold;
+  width: 300rem;
+  height: 60rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18rem;
+  box-shadow: 2rem 2rem 2rem black;
+  cursor: pointer;
+  transition: box-shadow 50ms ease-out, top 50ms ease-out,
+    left 50ms ease-out, background-color 50ms ease-out;
+}
+
+#screen-menu .button:active {
+  top: 2rem;
+  left: 2rem;
+  box-shadow: 0 0 2rem black;
+}
+
+#screen-menu .button:hover {
+  background: var(--bright-red);
+}
+
+#screen-menu .button[disabled] {
+  background: var(--gray);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+#screen-menu .start {
+  position: absolute;
+  right: 120rem;
+  top: 180rem;
+}
+
+#screen-menu .help {
+  position: absolute;
+  transform: rotate(1deg);
+  right: 130rem;
+  top: 250rem;
+}
+
+#screen-menu .scenes {
+  position: absolute;
+  right: 125rem;
+  top: 320rem;
+}
+
+#screen-menu .extras {
+  position: absolute;
+  transform: rotate(-2deg);
+  right: 120rem;
+  top: 390rem;
+}
+
+#screen-menu .true-ending {
+  position: absolute;
+  transform: rotate(1.5deg);
+  right: 125rem;
+  top: 110rem;
+  display: none; /* hidden until unlocked */
+}
+
+#screen-menu .true-ending.unlocked {
+  display: block;
+}
+
+#screen-menu .true-ending button {
+  background: linear-gradient(135deg, #ffd700, #c90016);
+  text-shadow: 1rem 1rem 0 rgba(0, 0, 0, 0.6);
+  animation: true-ending-pulse 2s ease-in-out infinite;
+}
+
+@keyframes true-ending-pulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.25); }
+}
+
+#screen-menu .lock-icon {
+  font-size: 40rem;
+  margin-right: 10rem;
+}
+
+#screen-menu .locked {
+  align-items: center;
+  background: var(--gray);
+  box-shadow: 0 0 2rem black;
+  color: white;
+  display: flex;
+  font-size: 20rem;
+  font-weight: bold;
+  height: 145rem;
+  justify-content: center;
+  opacity: 0.95;
+  position: absolute;
+  right: 110rem;
+  text-align: center;
+  text-shadow: 1rem 1rem black;
+  top: 318rem;
+  width: 320rem;
+}
+
+#screen-menu .locked.hidden {
+  display: none;
+}
+
+/* ── Help screen ──────────────────────────────────────── */
+#screen-help h1 {
+  position: absolute;
+  text-align: center;
+  left: 0;
+  right: 0;
+  top: 50rem;
+  font-size: 50rem;
+  color: var(--red);
+}
+
+#screen-help .icon-left {
+  font-size: 200rem;
+  position: absolute;
+  top: -30rem;
+  left: 10rem;
+  transform: rotate(10deg);
+}
+
+#screen-help .icon-right {
+  font-size: 200rem;
+  position: absolute;
+  top: -30rem;
+  right: 10rem;
+  transform: rotate(-10deg);
+}
+
+#screen-help ul {
+  position: absolute;
+  list-style: none;
+  color: var(--red);
+  top: 160rem;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 700rem;
+  font-size: 20rem;
+}
+
+#screen-help ul li {
+  margin: 20rem 0;
+}
+
+#screen-help .error {
+  align-items: center;
+  animation: 0.2s ease-out 0.5s forwards fade-in;
+  background: black;
+  bottom: 0;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  font-size: 20rem;
+  justify-content: center;
+  left: 0;
+  line-height: 30rem;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0;
+  opacity: 0;
+  z-index: 1000;
+}
+
+#screen-help .close-button {
+  height: 50rem;
+  width: 200rem;
+  font-size: 20rem;
+  background: var(--gray);
+  border-top: 2rem solid white;
+  border-left: 2rem solid white;
+  border-right: 2rem solid #333;
+  border-bottom: 2rem solid #333;
+  cursor: pointer;
+}
+
+#screen-help .close-button:active {
+  border-top: 2rem solid #333;
+  border-left: 2rem solid #333;
+  border-right: 2rem solid white;
+  border-bottom: 2rem solid white;
+}
+
+#screen-help .close-button:active span {
+  position: relative;
+  left: 2rem;
+  top: 2rem;
+}
+
+/* ── Character selection screen ───────────────────────── */
+#screen-select-character .instructions {
+  width: 40%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  background: var(--red);
+  color: white;
+  position: absolute;
+  padding: 12rem 24rem;
+  box-shadow: 1rem 0 2rem black;
+}
+
+#screen-select-character h1 {
+  text-align: center;
+  font-size: 40rem;
+  padding: 12rem 0 36rem 0;
+}
+
+#screen-select-character .instructions p {
+  font-size: 18rem;
+  line-height: 24rem;
+}
+
+#screen-select-character .characters {
+  width: 60%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  position: absolute;
+  padding: 12rem;
+  font-size: 20rem;
+  flex-direction: column;
+  gap: 20rem;
+}
+
+#screen-select-character .character {
+  border-radius: 0;
+  border: none;
+  font-size: 20rem;
+  text-align: left;
+  box-shadow: 1rem 1rem 2rem black;
+  height: 160rem;
+  width: 90%;
+  position: relative;
+  padding: 20rem;
+  cursor: pointer;
+  transition: box-shadow 50ms ease-out, margin 20ms ease-out,
+    background-color 50ms ease-out;
+}
+
+#screen-select-character .character:active {
+  top: 2rem;
+  left: 2rem;
+  box-shadow: 0 0 2rem black;
+}
+
+#screen-select-character .character:hover {
+  background: linear-gradient(#fff, #eee);
+}
+
+#screen-select-character .stats {
+  display: flex;
+  gap: 20rem;
+  position: absolute;
+  right: 20rem;
+  top: 15rem;
+}
+
+#screen-select-character .stats div {
+  background: radial-gradient(#333, #000);
+  height: 60rem;
+  width: 60rem;
+  font-size: 60rem;
+  border-radius: 50%;
+  text-align: center;
+}
+
+#screen-select-character .stat-values {
+  display: flex;
+  position: absolute;
+  right: 10rem;
+  bottom: 10rem;
+}
+
+#screen-select-character .stat-values .minus {
+  height: 80rem;
+  width: 80rem;
+  font-size: 80rem;
+  line-height: 80rem;
+  text-align: center;
+  color: var(--bright-red);
+  font-weight: 700;
+  -webkit-text-stroke: 4rem var(--red);
+}
+
+#screen-select-character .stat-values .plus {
+  height: 80rem;
+  width: 80rem;
+  font-size: 80rem;
+  line-height: 80rem;
+  font-weight: 700;
+  text-align: center;
+  color: #00ee00;
+  -webkit-text-stroke: 4rem #00aa00;
+}
+
+/* ── Confirm screens (shared) ─────────────────────────── */
+.confirm-screen .details {
+  width: 40%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  background: var(--red);
+  color: white;
+  position: absolute;
+  padding: 12rem 24rem;
+  box-shadow: 1rem 0 2rem black;
+}
+
+.confirm-screen .details h1 {
+  text-align: center;
+  font-size: 36rem;
+  padding: 12rem 0 36rem 0;
+  text-transform: uppercase;
+}
+
+.confirm-screen .details h1 .name {
+  display: block;
+  font-size: 60rem;
+  margin-top: 10rem;
+  font-weight: 700;
+  text-shadow: 0 0 5rem white;
+}
+
+.confirm-screen .details ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.confirm-screen .details ul li {
+  font-size: 20rem;
+  margin-bottom: 16rem;
+}
+
+.confirm-screen .portrait {
+  position: absolute;
+  right: 40rem;
+  top: 40rem;
+  height: 360rem;
+  width: auto;
+  filter: drop-shadow(2rem 2rem 4rem rgba(0, 0, 0, 0.6));
+}
+
+.confirm-screen .confirm-button-container {
+  position: absolute;
+  bottom: 20rem;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30rem;
+  width: 60%;
+}
+
+.confirm-screen .common-button.secondary {
+  background: #555;
+}
+
+/* ── Story screen (data-driven scenes) ────────────────── */
+#screen-story .bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#screen-story .bg-emoji {
+  font-size: 360rem;
+  opacity: 0.85;
+  filter: drop-shadow(4rem 4rem 0 rgba(0, 0, 0, 0.25));
+  animation: 0.4s ease-out fade-in;
+}
+
+#screen-story .portrait {
+  position: absolute;
+  bottom: 0;
+  left: 20rem;
+  height: 60%;
+  width: auto;
+  filter: drop-shadow(2rem 2rem 4rem rgba(0, 0, 0, 0.6));
+  animation: 0.4s ease-out fade-in;
+}
+
+/* Narration banner — used when there is no speaker. Subdued, no tail. */
+#screen-story .narration {
+  position: absolute;
+  top: 60rem;
+  left: 100rem;
+  right: 100rem;
+  padding: 14rem 24rem;
+  background: rgba(0, 0, 0, 0.72);
+  color: white;
+  font-size: 20rem;
+  line-height: 28rem;
+  font-style: italic;
+  text-align: center;
+  border-radius: 4rem;
+  box-shadow: 2rem 2rem 0 rgba(0, 0, 0, 0.3);
+  animation: 0.3s ease-out fade-in;
+  z-index: 5;
+}
+
+/* Speech bubble — used when the scene has a `speaker`. */
+#screen-story .speech-bubble {
+  position: absolute;
+  top: 60rem;
+  left: 50rem;
+  right: 50rem;
+  min-height: 90rem;
+  padding: 22rem 30rem;
+  background: white;
+  color: #111;
+  font-size: 22rem;
+  line-height: 30rem;
+  border: 3rem solid #111;
+  border-radius: 36rem;
+  box-shadow: 4rem 4rem 0 rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  animation: 0.3s ease-out fade-in;
+  z-index: 5;
+}
+
+/* Tail pointing down toward the portrait. */
+#screen-story .speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -38rem;
+  left: 100rem;
+  width: 0;
+  height: 0;
+  border-left: 22rem solid transparent;
+  border-right: 22rem solid transparent;
+  border-top: 40rem solid white;
+  z-index: 2;
+}
+
+#screen-story .speech-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -46rem;
+  left: 95rem;
+  width: 0;
+  height: 0;
+  border-left: 27rem solid transparent;
+  border-right: 27rem solid transparent;
+  border-top: 46rem solid #111;
+  z-index: 1;
+}
+
+/* Choice bar — bottom-right column of big wide buttons. */
+#screen-story .choice-bar {
+  position: absolute;
+  bottom: 40rem;
+  right: 40rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12rem;
+  width: 460rem;
+  z-index: 5;
+}
+
+#screen-story .choice {
+  background: var(--red);
+  border: 3rem solid white;
+  border-radius: 4rem;
+  box-shadow: 3rem 3rem 0 rgba(0, 0, 0, 0.4);
+  color: white;
+  cursor: pointer;
+  font-size: 22rem;
+  font-weight: bold;
+  padding: 14rem 16rem;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 1rem 1rem 0 rgba(0, 0, 0, 0.6);
+  transition: filter 100ms, transform 50ms;
+}
+
+#screen-story .choice:hover {
+  filter: brightness(1.25);
+}
+
+#screen-story .choice:active {
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.4);
+  transform: translate(2rem, 2rem);
+}
+
+/* Road sign — used by template: "road-sign" scenes (loading screens). */
+#screen-story .road-sign {
+  position: absolute;
+  bottom: 30rem;
+  left: 55%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  animation: 0.3s ease-out fade-in;
+}
+
+/* Ground strip — the gray bar along the bottom on road-sign scenes. */
+#screen-story .ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50rem;
+  background: linear-gradient(to bottom, #909090, #6a6a6a);
+  border-top: 2rem solid #555;
+  z-index: 1;
+}
+
+/* Walking portrait — slides from --walk-from to --walk-to over --walk-duration.
+   Used by road-sign scenes; static portrait simply gets the default `left`. */
+#screen-story .portrait {
+  z-index: 3;
+}
+
+#screen-story .portrait.right {
+  left: auto;
+  right: 20rem;
+  transform: scaleX(-1); /* mirror so the character faces the other one */
+}
+
+#screen-story .portrait.walking {
+  left: var(--walk-from, 0%);
+  animation: walk var(--walk-duration, 3s) linear forwards;
+}
+
+@keyframes walk {
+  from { left: var(--walk-from, 0%); }
+  to { left: var(--walk-to, 100%); }
+}
+
+#screen-story .road-sign .sign-board {
+  position: relative;
+  width: 420rem;
+  height: 100rem;
+  filter: drop-shadow(3rem 3rem 0 rgba(0, 0, 0, 0.3));
+}
+
+#screen-story .road-sign .sign-shape {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Text and button are constrained to the rectangular part of the sign
+   (the polygon's rectangle spans 0–340 of a 420-wide viewBox ≈ 81%). */
+#screen-story .road-sign .sign-text {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 81%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rem;
+  font-style: italic;
+  font-weight: bold;
+  color: #555;
+  text-shadow: 1rem 1rem 0 rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+
+#screen-story .road-sign .sign-button {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 81%;
+  transform: translateY(-50%);
+  font-size: 22rem;
+  padding: 12rem 16rem;
+  letter-spacing: 1rem;
+  transition: opacity 0.5s ease-out;
+}
+
+#screen-story .road-sign .sign-button.pending {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#screen-story .road-sign .posts {
+  display: flex;
+  gap: 130rem;
+  margin-top: -3rem;
+  /* Shift posts under the rectangle (left side) so they don't appear under the arrow. */
+  margin-right: 76rem;
+}
+
+#screen-story .road-sign .posts div {
+  width: 14rem;
+  height: 140rem;
+  background: linear-gradient(#cfcfcf, #909090);
+  border: 2rem solid #333;
+}
+
+#screen-story .hotspot {
+  position: absolute;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rem;
+  line-height: 1;
+  color: white;
+  opacity: 0.55;
+  filter: drop-shadow(2rem 2rem 0 rgba(0, 0, 0, 0.4));
+  animation: hotspot-pulse 2.6s ease-in-out infinite;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+#screen-story .hotspot:hover {
+  opacity: 1;
+  transform: scale(1.18);
+  animation: none;
+}
+
+@keyframes hotspot-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.75; }
+}
+
+#screen-story .label {
+  position: absolute;
+  top: 20rem;
+  left: 20rem;
+  color: white;
+  font-size: 14rem;
+  font-weight: bold;
+  text-shadow: 1rem 1rem 0 black;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6rem 10rem;
+  border-radius: 4rem;
+}
+
+/* ── Scene Selection screen ───────────────────────────── */
+#screen-scenes h1 {
+  position: absolute;
+  text-align: center;
+  left: 0;
+  right: 0;
+  top: 30rem;
+  font-size: 40rem;
+  color: var(--red);
+}
+
+#screen-scenes .lists {
+  position: absolute;
+  top: 110rem;
+  left: 40rem;
+  right: 40rem;
+  bottom: 40rem;
+  display: flex;
+  gap: 24rem;
+  overflow: hidden;
+}
+
+#screen-scenes .col {
+  flex: 1;
+  background: #f5f5f5;
+  border: 2rem solid var(--red);
+  border-radius: 4rem;
+  padding: 16rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8rem;
+  overflow-y: auto;
+}
+
+#screen-scenes .col h2 {
+  color: var(--red);
+  font-size: 22rem;
+  margin-bottom: 6rem;
+  text-transform: uppercase;
+}
+
+#screen-scenes .scene-entry {
+  background: white;
+  border: 1rem solid var(--gray);
+  border-radius: 3rem;
+  padding: 8rem 12rem;
+  font-size: 14rem;
+  cursor: pointer;
+  text-align: left;
+  color: #333;
+  transition: background 80ms;
+}
+
+#screen-scenes .scene-entry:hover {
+  background: var(--bright-red);
+  color: white;
+}
+
+#screen-scenes .scene-entry.unvisited {
+  background: #ececec;
+  border-color: #d0d0d0;
+  color: #a0a0a0;
+  cursor: default;
+  pointer-events: none;
+  font-style: italic;
+  letter-spacing: 2rem;
+}
+
+#screen-scenes .empty {
+  color: var(--gray);
+  font-size: 14rem;
+  font-style: italic;
+}
+
+/* ── Extras menu screen ───────────────────────────────── */
+#screen-extras h1 {
+  position: absolute;
+  text-align: center;
+  left: 0;
+  right: 0;
+  top: 50rem;
+  font-size: 50rem;
+  color: var(--red);
+}
+
+#screen-extras .tile {
+  position: absolute;
+  left: 50%;
+  top: 200rem;
+  transform: translateX(-50%);
+  width: 380rem;
+  height: 200rem;
+  background: linear-gradient(135deg, #ff4f6d, #c90016);
+  color: white;
+  border: none;
+  border-radius: 6rem;
+  box-shadow: 2rem 2rem 2rem black;
+  cursor: pointer;
+  font-size: 26rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14rem;
+  transition: filter 100ms;
+}
+
+#screen-extras .tile:hover {
+  filter: brightness(1.3);
+}
+
+#screen-extras .tile:active {
+  box-shadow: 0 0 2rem black;
+  transform: translate(calc(-50% + 2rem), 2rem);
+}
+
+#screen-extras .tile .tile-emoji {
+  font-size: 90rem;
+}
