@@ -696,7 +696,6 @@ const SCENES = {
     choices: [
       { label: "Sit on the bench", goto: "willie-bench" },
       { label: "Jog to the gym", goto: "willie-jog" },
-      { label: "Go home", goto: "willie-outside-home" },
     ],
   },
   "willie-bench": {
@@ -704,8 +703,8 @@ const SCENES = {
     title: "Willie — Bench (Bob)",
     bg: BG.park,
     portrait: "images/willie.png",
-    text: "You sit. The bench has Bob's face. The face smiles, faintly, from somewhere in the wood. You stand up at a polite speed.",
-    choices: [{ label: "Pretend that didn't happen", goto: "willie-outside-home" }],
+    text: "You sit. The bench has Bob's face. The face smiles, faintly, from somewhere in the wood. You stand up at a polite speed and decide it is, urgently, time to get a job.",
+    choices: [{ label: "Find a job", goto: "willie-job-hunt" }],
   },
   "willie-jog": {
     character: "willie",
@@ -715,7 +714,7 @@ const SCENES = {
     text: "You jog three steps. Your lungs file a formal complaint. Your knees second the motion.",
     choices: [
       { label: "Push through", goto: "willie-collapse" },
-      { label: "Walk home, defeated", goto: "willie-outside-home" },
+      { label: "Wander toward the tomatoes", goto: "willie-tomato-garden" },
     ],
   },
   "willie-collapse": {
@@ -784,8 +783,8 @@ const SCENES = {
     title: "Peter — 555-LIFE",
     bg: BG.cosmos,
     portrait: "images/peter.png",
-    text: "By the phone, a sticky note: \"555-LIFE.\" You dial. A voice answers, calm, ancient: \"...we've been waiting for you, Peter.\" Click. Dial tone.",
-    choices: [{ label: "Back to the apartment", goto: "peter-home" }],
+    text: "By the phone, a sticky note: \"555-LIFE.\" You dial. A voice answers, calm, ancient: \"...we've been waiting for you, Peter.\" Click. Dial tone. You set down the phone and grab your keys.",
+    choices: [{ label: "Head to work", goto: "peter-depot" }],
   },
   "peter-depot": {
     character: "peter",
@@ -981,8 +980,8 @@ const SCENES = {
     title: "Bob — Jukebox",
     bg: BG.bar,
     portrait: "images/bob.png",
-    text: "Track A1: \"My Wife Left Me (And Took the Bus).\" Track A2: \"My Wife Left Me (Reprise).\" You play A1 three times. The whole bar joins in by the third.",
-    choices: [{ label: "Back to the bar", goto: "bob-bar" }],
+    text: "Track A1: \"My Wife Left Me (And Took the Bus).\" Track A2: \"My Wife Left Me (Reprise).\" You play A1 three times. The whole bar joins in by the third. You sit down feeling profoundly thirsty.",
+    choices: [{ label: "Drink", goto: "bob-drinks" }],
   },
   "bob-talk-bouncer": {
     character: "bob",
@@ -992,7 +991,7 @@ const SCENES = {
     text: "The bouncer is the size of a small horse. He nods. He has not spoken in eleven years. The silence is doing most of the talking.",
     choices: [
       { label: "Insult him anyway", goto: "game-over-bar" },
-      { label: "Back away slowly", goto: "bob-bar" },
+      { label: "Back away slowly", goto: "bob-drinks" },
     ],
   },
   "bob-drinks": {

@@ -14,6 +14,7 @@ const state = (() => {
           Array.isArray(parsed.charactersWon) ? parsed.charactersWon : []
         ),
         currentCharacter: parsed.currentCharacter || null,
+        helpOpened: !!parsed.helpOpened,
       };
     }
   } catch (_) {}
@@ -22,6 +23,7 @@ const state = (() => {
     hasWon: false,
     charactersWon: new Set(),
     currentCharacter: null,
+    helpOpened: false,
   };
 })();
 
@@ -34,6 +36,7 @@ function saveState() {
         hasWon: state.hasWon,
         charactersWon: [...state.charactersWon],
         currentCharacter: state.currentCharacter,
+        helpOpened: state.helpOpened,
       })
     );
   } catch (_) {}
@@ -60,14 +63,16 @@ function goToScreen(id) {
   const target = document.querySelector("#screen-" + id);
   if (target) target.style.display = "block";
 
+  if (id === "help" && !state.helpOpened) {
+    state.helpOpened = true;
+    saveState();
+  }
   if (id === "menu") refreshMenuLocks();
   if (id === "scenes") renderSceneSelection();
   if (id === "extras") renderExtras();
 }
 
 function closeHelp() {
-  const helpBtn = document.querySelector("#help-button");
-  if (helpBtn) helpBtn.style.display = "none";
   goToScreen("menu");
 }
 
@@ -77,16 +82,24 @@ function refreshMenuLocks() {
   const extrasBtn = document.querySelector("#screen-menu .extras button");
   const trueBtn = document.querySelector("#screen-menu .true-ending button");
   const lockedOverlay = document.querySelector("#screen-menu .locked");
+  const helpContainer = document.querySelector("#screen-menu .help");
 
   const scenesUnlocked = state.visited.size > 0;
   const extrasUnlocked = state.hasWon;
-  const trueUnlocked = state.charactersWon.size >= 3;
+  // True Ending takes over HELP's menu slot once the player has opened
+  // HELP at least once AND won with all three characters.
+  const trueUnlocked = state.charactersWon.size >= 3 && state.helpOpened;
 
   if (scenesBtn) scenesBtn.disabled = !scenesUnlocked;
   if (extrasBtn) extrasBtn.disabled = !extrasUnlocked;
   if (trueBtn) trueBtn.disabled = !trueUnlocked;
 
-  // True-ending tile is fully hidden until unlocked.
+  // HELP button disappears permanently once visited; True Ending may
+  // surface in its place if also unlocked.
+  if (helpContainer) {
+    helpContainer.style.display = state.helpOpened ? "none" : "";
+  }
+
   const trueContainer = document.querySelector("#screen-menu .true-ending");
   if (trueContainer) trueContainer.classList.toggle("unlocked", trueUnlocked);
 
@@ -413,6 +426,7 @@ window.confirmCharacter = confirmCharacter;
 window.playScene = playScene;
 
 window.addEventListener("resize", updateScale);
+mountScreens();
 updateScale();
 refreshMenuLocks();
 goToScreen("menu");

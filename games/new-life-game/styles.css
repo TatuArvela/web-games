@@ -261,9 +261,9 @@ section {
 
 #screen-menu .true-ending {
   position: absolute;
-  transform: rotate(1.5deg);
-  right: 125rem;
-  top: 110rem;
+  transform: rotate(1deg);
+  right: 130rem;
+  top: 250rem; /* same slot as .help — appears once HELP has been opened */
   display: none; /* hidden until unlocked */
 }
 
