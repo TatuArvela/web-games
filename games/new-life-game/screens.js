@@ -119,7 +119,7 @@ function confirmHtml(characterId) {
     </div>
     <img class="portrait" src="${ch.portrait}" alt="${ch.shortName}"/>
     <div class="confirm-button-container">
-      <button class="common-button secondary" onclick="playScene('game-over-indecisive')">Uhh what?</button>
+      <button class="common-button secondary" onclick="playScene('${ch.id}-game-over-indecisive')">Uhh what?</button>
       <button class="common-button" onclick="confirmCharacter('${ch.id}')">Confirm</button>
     </div>
   `;
@@ -129,7 +129,12 @@ function scenesHtml() {
   return `
     <button class="back-button" onclick="goToScreen('menu')">⬅</button>
     <h1>SCENE SELECTION</h1>
-    <div class="lists"></div>
+    <div class="character-toggle">
+      <button class="char-tab" data-char="bob" onclick="selectScenesTab('bob')">Bob</button>
+      <button class="char-tab" data-char="willie" onclick="selectScenesTab('willie')">Willie</button>
+      <button class="char-tab" data-char="peter" onclick="selectScenesTab('peter')">Peter</button>
+    </div>
+    <div class="scene-tree"></div>
   `;
 }
 

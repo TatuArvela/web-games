@@ -2,7 +2,16 @@
 
 const STORAGE_KEY = "newLifeGame:state:v1";
 
+const STAT_KEYS = ["intelligence", "money", "fitness"];
+const STAT_ICONS = { intelligence: "💡", money: "💰", fitness: "💪" };
+
+function emptyStats() {
+  return { intelligence: 0, money: 0, fitness: 0 };
+}
+
 const state = (() => {
+  // Stats are intentionally NOT persisted — they reset to character defaults
+  // each time the player starts a new run via confirmCharacter().
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -15,6 +24,7 @@ const state = (() => {
         ),
         currentCharacter: parsed.currentCharacter || null,
         helpOpened: !!parsed.helpOpened,
+        stats: emptyStats(),
       };
     }
   } catch (_) {}
@@ -24,6 +34,7 @@ const state = (() => {
     charactersWon: new Set(),
     currentCharacter: null,
     helpOpened: false,
+    stats: emptyStats(),
   };
 })();
 
@@ -119,8 +130,21 @@ function confirmCharacter(characterId) {
   // Remember which character the player is currently living, so a `win` ending
   // can credit it. Drives the True Ending unlock (need all 3 character wins).
   state.currentCharacter = characterId;
+  // Seed stats from the start scene's declared stats (Model B: scene.stats is
+  // the full state, not a delta). Pre-setting here means the start scene's
+  // initial render matches state, avoiding a flicker.
+  state.stats = statsForScene(window.SCENES[ch.startScene]);
   saveState();
   playScene(ch.startScene);
+}
+
+// Pull a scene's full declared stats; fall back to all-zero if missing.
+function statsForScene(scene) {
+  const out = emptyStats();
+  if (scene?.stats) {
+    for (const k of STAT_KEYS) if (scene.stats[k]) out[k] = 1;
+  }
+  return out;
 }
 
 // ── Scene rendering ───────────────────────────────────────
@@ -152,34 +176,38 @@ function playScene(id) {
 
   const isRoadSign = scene.template === "road-sign";
 
-  // Background can be specified as either:
-  //   bg: { image: "images/foo.png" }         ← real artwork; replaces emoji
-  //   bg: { gradient: "...", emoji: "🏠" }    ← placeholder gradient + big emoji
-  //   bg: { image: "...", gradient: "..." }   ← image with gradient fallback
+  // Background: scene.bg is a path to a full-frame image (one of BG.*). It
+  // covers the scene area. Road-sign scenes use it as the sky behind the sign.
+  // The .bg container keeps a dark fill so a missing/failed image isn't jarring.
   const bg = document.createElement("div");
   bg.className = "bg";
-  const hasImage = !isRoadSign && scene.bg?.image;
-
-  if (isRoadSign) {
-    bg.style.background = "linear-gradient(#a9c8e0, #d0d8df)";
-  } else if (hasImage) {
-    bg.style.backgroundImage = `url('${scene.bg.image}')`;
-    bg.style.backgroundSize = "cover";
-    bg.style.backgroundPosition = "center";
-    bg.style.backgroundRepeat = "no-repeat";
-    if (scene.bg.gradient) bg.style.backgroundColor = scene.bg.gradient;
-  } else {
-    bg.style.background = scene.bg?.gradient || "#000";
-  }
-
-  // Emoji placeholder is hidden once a real image is provided.
-  if (!isRoadSign && !hasImage && scene.bg?.emoji) {
-    const emoji = document.createElement("div");
-    emoji.className = "bg-emoji";
-    emoji.textContent = scene.bg.emoji;
-    bg.appendChild(emoji);
+  if (scene.bg) {
+    const img = document.createElement("img");
+    img.className = "bg-image";
+    img.src = scene.bg;
+    img.alt = "";
+    img.onerror = () => img.remove();
+    bg.appendChild(img);
   }
   root.appendChild(bg);
+
+  // Decorative overlays — absolutely positioned in scene-coordinate (rem)
+  // units, same coordinate system as hotspots. Each failed image removes
+  // itself so missing assets degrade silently to the base background.
+  if (Array.isArray(scene.overlays)) {
+    for (const ov of scene.overlays) {
+      const el = document.createElement("img");
+      el.className = "overlay";
+      el.src = ov.image;
+      el.alt = "";
+      el.style.left = ov.x + "rem";
+      el.style.top = ov.y + "rem";
+      el.style.width = ov.w + "rem";
+      el.style.height = ov.h + "rem";
+      el.onerror = () => el.remove();
+      root.appendChild(el);
+    }
+  }
 
   if (scene.label) {
     const label = document.createElement("div");
@@ -187,6 +215,11 @@ function playScene(id) {
     label.textContent = scene.label;
     root.appendChild(label);
   }
+
+  // Stat tracker — top-left HUD. Hidden on loading interstitials and endings
+  // (the scene reads as a result screen there, not active gameplay).
+  const showStats = !isRoadSign && !scene.ending;
+  if (showStats) renderStatTracker(root, scene);
 
   // Portrait: explicit scene.portrait wins, otherwise fall back to the
   // current character's portrait (so loading screens auto-display the
@@ -241,45 +274,19 @@ function playScene(id) {
   }
 
   if (isRoadSign) {
-    // Ground strip along the bottom (gray bar the character walks on).
-    const ground = document.createElement("div");
-    ground.className = "ground";
-    root.appendChild(ground);
-
-    const sign = document.createElement("div");
-    sign.className = "road-sign";
-
-    const board = document.createElement("div");
-    board.className = "sign-board";
-    // Inline SVG draws the pentagon (rectangle + arrow tip) with a single
-    // continuous stroke, so the arrow is visually part of the sign.
-    board.innerHTML = `
-      <svg viewBox="0 0 420 100" class="sign-shape">
-        <defs>
-          <linearGradient id="sign-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#dcdcdc" />
-            <stop offset="100%" stop-color="#b8b8b8" />
-          </linearGradient>
-        </defs>
-        <polygon points="3,3 340,3 417,50 340,97 3,97"
-                 fill="url(#sign-grad)" stroke="#333"
-                 stroke-width="3" stroke-linejoin="miter" />
-      </svg>
-    `;
-
     const textEl = document.createElement("div");
-    textEl.className = "sign-text";
+    textEl.className = "loading-text";
     textEl.textContent = scene.text || "";
-    board.appendChild(textEl);
+    root.appendChild(textEl);
 
     const firstChoice = (scene.choices || [])[0];
     if (firstChoice) {
       const btn = document.createElement("button");
-      btn.className = "choice sign-button pending";
+      btn.className = "choice loading-button pending";
       btn.textContent = firstChoice.label;
       btn.disabled = true;
       btn.addEventListener("click", () => playScene(firstChoice.goto));
-      board.appendChild(btn);
+      root.appendChild(btn);
 
       // Fake-loading reveal: button appears after a delay.
       const delay =
@@ -289,16 +296,6 @@ function playScene(id) {
         btn.disabled = false;
       }, delay);
     }
-
-    sign.appendChild(board);
-
-    const posts = document.createElement("div");
-    posts.className = "posts";
-    posts.appendChild(document.createElement("div"));
-    posts.appendChild(document.createElement("div"));
-    sign.appendChild(posts);
-
-    root.appendChild(sign);
   } else {
     if (scene.text) {
       const textEl = document.createElement("div");
@@ -328,88 +325,271 @@ function playScene(id) {
   root.style.display = "block";
 }
 
-// Depth-first walk from a starting scene, recording the order each scene is
-// first encountered. Used to sort Scene Selection chronologically so each
-// branch reads top-to-bottom the way a single playthrough would.
-function dfsOrder(startId) {
-  const order = new Map();
-  let i = 0;
-  function visit(id) {
-    if (order.has(id) || id.startsWith("__") || !window.SCENES[id]) return;
-    order.set(id, i++);
-    const scene = window.SCENES[id];
-    for (const c of scene.choices || []) if (c.goto) visit(c.goto);
-    for (const h of scene.hotspots || []) if (h.goto) visit(h.goto);
+// Mounts the top-left stat HUD. Pending changes from `scene.stats` are applied
+// one tick later so the icon visibly animates from its old state to its new one.
+function renderStatTracker(root, scene) {
+  const bar = document.createElement("div");
+  bar.className = "stat-tracker";
+
+  const items = {};
+  for (const key of STAT_KEYS) {
+    const item = document.createElement("div");
+    item.className = "stat-item" + (state.stats[key] ? " active" : "");
+    item.dataset.stat = key;
+    item.textContent = STAT_ICONS[key];
+    bar.appendChild(item);
+    items[key] = item;
   }
-  visit(startId);
-  return order;
+  root.appendChild(bar);
+
+  if (!scene.stats) return;
+  // Defer so the initial render paints with the OLD value before flipping —
+  // otherwise the transition has nothing to interpolate from. Model B:
+  // scene.stats is the complete state at this scene, so any stat omitted from
+  // scene.stats is treated as 0 (full replacement, not partial).
+  setTimeout(() => {
+    for (const key of STAT_KEYS) {
+      const next = scene.stats[key] ? 1 : 0;
+      if (state.stats[key] === next) continue;
+      state.stats[key] = next;
+      const el = items[key];
+      el.classList.toggle("active", next === 1);
+      el.classList.remove("changing");
+      // Force reflow so re-adding the class restarts the animation.
+      void el.offsetWidth;
+      el.classList.add("changing");
+    }
+  }, 400);
 }
 
-// ── Scene selection ───────────────────────────────────────
+// ── Scene selection (tree view) ───────────────────────────
+// Which character's tree is currently shown. Persisted in-memory only; defaults
+// to the last-played character or Bob.
+let scenesTab = null;
+
+function selectScenesTab(character) {
+  scenesTab = character;
+  renderSceneSelection();
+}
+
+// Tree-graph geometry, all in the game's logical rem units.
+const SCENE_NODE_W = 210;
+const SCENE_NODE_H = 64;
+const SCENE_H_GAP = 18;
+const SCENE_V_GAP = 56;
+const SCENE_PAD = 40;
+
 function renderSceneSelection() {
-  const root = document.querySelector("#screen-scenes .lists");
+  const root = document.querySelector("#screen-scenes .scene-tree");
   if (!root) return;
+
+  // Default tab on first open: Bob.
+  if (!scenesTab) {
+    scenesTab = "bob";
+  }
+
+  // Highlight active toggle.
+  document.querySelectorAll("#screen-scenes .char-tab").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.char === scenesTab);
+  });
+
+  enableScenePan(root);
   root.innerHTML = "";
 
-  const groups = [
-    { key: "bob", title: "Bob" },
-    { key: "willie", title: "Willie" },
-    { key: "peter", title: "Peter" },
-  ];
+  const startScene = window.CHARACTERS[scenesTab]?.startScene;
+  if (!startScene || !window.SCENES[startScene]) return;
 
-  // A scene's character may be a string ("bob") or an array (["bob","willie"])
-  // — endings reached from multiple characters appear in each of their columns.
-  const sceneInGroup = (scene, key) =>
-    Array.isArray(scene.character)
-      ? scene.character.includes(key)
-      : scene.character === key;
+  // Build the tree, then assign positions in a family-tree layout: the root
+  // sits centered at the top, and each subtree claims a horizontal band wide
+  // enough to fit all its leaves without overlap.
+  const tree = buildSceneTree(startScene);
+  if (!tree) return;
+  let maxDepth = 0;
+  (function place(node, leftEdge, depth) {
+    if (depth > maxDepth) maxDepth = depth;
+    node.x = leftEdge + node.width / 2;
+    node.y = depth * (SCENE_NODE_H + SCENE_V_GAP);
+    let off = leftEdge;
+    for (const child of node.children) {
+      place(child, off, depth + 1);
+      off += child.width;
+    }
+  })(tree, 0, 0);
 
-  for (const group of groups) {
-    const col = document.createElement("div");
-    col.className = "col";
+  const totalWidth = tree.width + SCENE_PAD * 2;
+  const totalHeight =
+    (maxDepth + 1) * (SCENE_NODE_H + SCENE_V_GAP) + SCENE_PAD * 2;
+  const ox = SCENE_PAD;
+  const oy = SCENE_PAD;
 
-    const h2 = document.createElement("h2");
-    h2.textContent = group.title;
-    col.appendChild(h2);
+  const canvas = document.createElement("div");
+  canvas.className = "scene-canvas";
+  canvas.style.width = totalWidth + "rem";
+  canvas.style.height = totalHeight + "rem";
 
-    // List every scene in the group (excluding loading interstitials).
-    // Visited scenes become clickable entries; unvisited render as "???"
-    // placeholders so the player can see how much there is left to explore.
-    const allEntries = Object.entries(window.SCENES).filter(
-      ([id, scene]) =>
-        sceneInGroup(scene, group.key) && scene.template !== "road-sign"
-    );
+  // Arrows: cubic curves from each parent's bottom-center to each child's
+  // top-center, with an arrowhead marker at the child end.
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("class", "scene-arrows");
+  svg.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
+  svg.setAttribute("preserveAspectRatio", "none");
+  const defs = document.createElementNS(SVG_NS, "defs");
+  const marker = document.createElementNS(SVG_NS, "marker");
+  marker.setAttribute("id", "scene-arrowhead");
+  marker.setAttribute("viewBox", "0 0 10 10");
+  marker.setAttribute("refX", "9");
+  marker.setAttribute("refY", "5");
+  marker.setAttribute("markerUnits", "userSpaceOnUse");
+  marker.setAttribute("markerWidth", "10");
+  marker.setAttribute("markerHeight", "10");
+  marker.setAttribute("orient", "auto");
+  const head = document.createElementNS(SVG_NS, "path");
+  head.setAttribute("d", "M0 0 L10 5 L0 10 z");
+  head.setAttribute("fill", "#a04050");
+  marker.appendChild(head);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+  (function drawArrows(node) {
+    for (const child of node.children) {
+      const x1 = node.x + ox;
+      const y1 = node.y + SCENE_NODE_H / 2 + oy;
+      const x2 = child.x + ox;
+      const y2 = child.y - SCENE_NODE_H / 2 + oy;
+      const midY = (y1 + y2) / 2;
+      const path = document.createElementNS(SVG_NS, "path");
+      path.setAttribute("class", "scene-arrow");
+      path.setAttribute(
+        "d",
+        `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`
+      );
+      path.setAttribute("marker-end", "url(#scene-arrowhead)");
+      svg.appendChild(path);
+      drawArrows(child);
+    }
+  })(tree);
+  canvas.appendChild(svg);
 
-    // Story scenes first, then game-overs, then wins (climactic at the bottom).
-    // Within each tier sort chronologically by DFS depth from the character's
-    // start scene — so each branch reads in playthrough order.
-    const startScene = window.CHARACTERS[group.key]?.startScene;
-    const orderMap = startScene ? dfsOrder(startScene) : new Map();
-    const rank = (s) =>
-      s.ending === "win" ? 2 : s.ending === "game-over" ? 1 : 0;
-    allEntries.sort(([idA, a], [idB, b]) => {
-      const r = rank(a) - rank(b);
-      if (r !== 0) return r;
-      return (orderMap.get(idA) ?? Infinity) - (orderMap.get(idB) ?? Infinity);
-    });
+  // Nodes: each scene-entry positioned absolutely; SVG sits underneath so
+  // arrows appear behind tiles without obscuring titles.
+  (function placeNodes(node) {
+    const entry = buildSceneEntry(node.id, node.scene);
+    entry.style.left = node.x - SCENE_NODE_W / 2 + ox + "rem";
+    entry.style.top = node.y - SCENE_NODE_H / 2 + oy + "rem";
+    entry.style.width = SCENE_NODE_W + "rem";
+    entry.style.height = SCENE_NODE_H + "rem";
+    canvas.appendChild(entry);
+    for (const child of node.children) placeNodes(child);
+  })(tree);
 
-    for (const [id, scene] of allEntries) {
-      if (state.visited.has(id)) {
-        const btn = document.createElement("button");
-        btn.className = "scene-entry";
-        btn.textContent = scene.title || id;
-        btn.addEventListener("click", () => playScene(id));
-        col.appendChild(btn);
-      } else {
-        const placeholder = document.createElement("div");
-        placeholder.className = "scene-entry unvisited";
-        placeholder.textContent = "???";
-        col.appendChild(placeholder);
+  root.appendChild(canvas);
+
+  // Center the root horizontally in the viewport on first paint. scrollLeft
+  // is in CSS pixels, so derive the px-per-rem ratio from the canvas's
+  // measured width.
+  requestAnimationFrame(() => {
+    const rect = canvas.getBoundingClientRect();
+    const pxPerRem = rect.width / totalWidth || 1;
+    root.scrollLeft = (tree.x + ox) * pxPerRem - root.clientWidth / 2;
+    root.scrollTop = 0;
+  });
+}
+
+function buildSceneTree(startId) {
+  const visited = new Set();
+  function build(id) {
+    if (visited.has(id)) return null;
+    const scene = window.SCENES[id];
+    if (!scene) return null;
+    visited.add(id);
+
+    const childIds = [];
+    for (const c of scene.choices || []) {
+      if (c.goto && !c.goto.startsWith("__") && !visited.has(c.goto)) {
+        childIds.push(c.goto);
+      }
+    }
+    for (const h of scene.hotspots || []) {
+      if (h.goto && !h.goto.startsWith("__") && !visited.has(h.goto)) {
+        childIds.push(h.goto);
       }
     }
 
-    root.appendChild(col);
+    const node = { id, scene, children: [], width: 0 };
+    let total = 0;
+    for (const cid of childIds) {
+      const child = build(cid);
+      if (!child) continue;
+      node.children.push(child);
+      total += child.width;
+    }
+    node.width = Math.max(SCENE_NODE_W + SCENE_H_GAP, total);
+    return node;
   }
+  return build(startId);
+}
+
+// Mouse-drag panning of the scene-tree viewport. The viewport itself
+// persists across re-renders, so we bind the listener exactly once.
+function enableScenePan(viewport) {
+  if (viewport.dataset.panBound) return;
+  viewport.dataset.panBound = "1";
+  // Suppress native HTML5 drag (image ghosts, link drag) so it doesn't
+  // hijack our drag-to-pan.
+  viewport.addEventListener("dragstart", (e) => e.preventDefault());
+  viewport.addEventListener("mousedown", (e) => {
+    // Clicking a scene tile should play the scene, not start a pan.
+    if (e.target.closest(".scene-entry")) return;
+    e.preventDefault();
+    viewport.classList.add("dragging");
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const scrollX = viewport.scrollLeft;
+    const scrollY = viewport.scrollTop;
+    function move(ev) {
+      viewport.scrollLeft = scrollX - (ev.clientX - startX);
+      viewport.scrollTop = scrollY - (ev.clientY - startY);
+    }
+    function up() {
+      document.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseup", up);
+      viewport.classList.remove("dragging");
+    }
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", up);
+  });
+}
+
+function buildSceneEntry(id, scene) {
+  const seen = state.visited.has(id);
+  const entry = document.createElement(seen ? "button" : "div");
+  entry.className = "scene-entry" + (seen ? "" : " unvisited");
+
+  const thumb = document.createElement("div");
+  thumb.className = "scene-thumb";
+  if (seen && scene.bg) {
+    const img = document.createElement("img");
+    img.src = scene.bg;
+    img.alt = "";
+    img.onerror = () => img.remove();
+    thumb.appendChild(img);
+  }
+  entry.appendChild(thumb);
+
+  const title = document.createElement("span");
+  title.className = "scene-title";
+  title.textContent = seen ? scene.title || id : "???";
+  entry.appendChild(title);
+
+  if (seen) {
+    entry.addEventListener("click", () => {
+      // Pre-set state.stats so the scene's tracker doesn't briefly show
+      // stale values from the previous run before the deferred apply.
+      state.stats = statsForScene(scene);
+      playScene(id);
+    });
+  }
+  return entry;
 }
 
 // ── Extras menu ───────────────────────────────────────────
@@ -424,6 +604,7 @@ window.goToScreen = goToScreen;
 window.closeHelp = closeHelp;
 window.confirmCharacter = confirmCharacter;
 window.playScene = playScene;
+window.selectScenesTab = selectScenesTab;
 
 window.addEventListener("resize", updateScale);
 mountScreens();
