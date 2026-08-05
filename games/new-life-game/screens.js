@@ -15,7 +15,7 @@ function menuHtml() {
     <div class="line line-2"></div>
     <div class="line line-3"></div>
     <div class="version">Version 0.0.2</div>
-    <div class="subtitle">Why would they make this? 😩</div>
+    <div class="subtitle">😩 This is a terrible AI slop experiment based on an old idea. I'll rework this later</div>
     <div class="start">
       <button class="button" onclick="goToScreen('select-character')">START GAME</button>
     </div>
@@ -81,9 +81,7 @@ function selectCharacterHtml() {
     </div>
   `;
   const stat = (v) =>
-    v > 0
-      ? '<div class="plus">+</div>'
-      : '<div class="minus">-</div>';
+    v > 0 ? '<div class="plus">+</div>' : '<div class="minus">-</div>';
   const cards = ["bob", "willie", "peter"]
     .map((key) => {
       const ch = window.CHARACTERS[key];
@@ -162,7 +160,7 @@ function mountScreens() {
   make("help", helpHtml());
   make("select-character", selectCharacterHtml());
   make("confirm", "", "confirm-screen"); // populated by showConfirm()
-  make("story", "");                      // populated by playScene()
+  make("story", ""); // populated by playScene()
   make("scenes", scenesHtml());
   make("extras", extrasHtml());
 }
