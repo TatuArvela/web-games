@@ -1,22 +1,27 @@
 const SYMBOLS = [
-  { name: "cherry", emoji: "🍒", color: "#e74c3c" },
-  { name: "lemon", emoji: "🍋", color: "#f1c40f" },
-  { name: "orange", emoji: "🍊", color: "#e67e22" },
-  { name: "plum", emoji: "🍇", color: "#8e44ad" },
-  { name: "bell", emoji: "🔔", color: "#f39c12" },
-  { name: "bar", emoji: "BAR", color: "#222" },
-  { name: "seven", emoji: "7", color: "#e74c3c" },
+  { name: "cherry", emoji: "🍒" },
+  { name: "lemon", emoji: "🍋" },
+  { name: "orange", emoji: "🍊" },
+  { name: "plum", emoji: "🍇" },
+  { name: "bell", emoji: "🔔" },
+  { name: "bar", emoji: "BAR" },
+  { name: "seven", emoji: "7" },
 ];
 
 // Drum 0: cherry×5 lemon×4 orange×4 plum×3 bell×2 bar×1 seven×1
 // Drum 1: cherry×4 lemon×4 orange×3 plum×3 bell×3 bar×2 seven×1
 // Drum 2: cherry×3 lemon×4 orange×3 plum×3 bell×3 bar×3 seven×1
 const REEL_STRIPS = (function () {
-  const S = {};
-  for (const sym of SYMBOLS) S[sym.name[0]] = sym;
-  S["7"] = SYMBOLS.find((s) => s.name === "seven");
-  S["B"] = SYMBOLS.find((s) => s.name === "bar");
-  S["b"] = SYMBOLS.find((s) => s.name === "bell");
+  const byName = Object.fromEntries(SYMBOLS.map((s) => [s.name, s]));
+  const map = {
+    c: byName.cherry,
+    l: byName.lemon,
+    o: byName.orange,
+    p: byName.plum,
+    b: byName.bell,
+    B: byName.bar,
+    7: byName.seven,
+  };
 
   const raw = [
     "c l o p c o l b c p o l c p b l o c B 7",
@@ -24,7 +29,6 @@ const REEL_STRIPS = (function () {
     "o l p c b o l B p b l B c o b l p B c 7",
   ];
 
-  const map = { c: S.c, l: S.l, o: S.o, p: S.p, b: S.b, B: S.B, 7: S["7"] };
   return raw.map((str) => str.split(" ").map((key) => map[key]));
 })();
 

@@ -1,6 +1,6 @@
 const canvas = document.getElementById("canvas");
-canvas.width = 800;
-canvas.height = 600;
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
 const context = canvas.getContext("2d");
 context.imageSmoothingEnabled = false;
 const updateIntervalMs = 10;
@@ -15,6 +15,10 @@ let payoutTimer = 0;
 let nextCoinDelay = 120;
 let coins = [];
 const COIN_R = 13;
+const GRAVITY = 0.7;
+const WALL_RESTITUTION = 0.4; // horizontal bounce off the tray walls
+const FLOOR_RESTITUTION = -0.35; // vertical bounce off the tray floor
+const FLOOR_FRICTION = 0.88; // damping while a coin rests on the floor
 
 let insertingCoins = []; // coins animating into the slot
 let pendingEject = 0; // credits still to return to the tray
@@ -28,26 +32,87 @@ let ejectDimLevel = 1; // eased dim for the eject button (dim when nothing to ej
 let armPullOffset = 0; // 0 = resting, positive = pulled down
 let armDown = false; // true while the lever is held down
 
-const topMargin = 200;
-const bottomMargin = 120;
-const rightMargin = 120;
-
-const frameWidth = canvas.width - rightMargin;
-const frameHeight = canvas.height - topMargin - bottomMargin;
-
-const drumsHorizontalMargin = 140;
-const drumsVerticalMargin = 25;
-const drumsWidth = frameWidth - drumsHorizontalMargin * 2;
-const drumsHeight = frameHeight - drumsVerticalMargin * 2;
+// Machine geometry (topMargin, frameWidth, drumsWidth, trayX, coinSlotX, …)
+// lives in layout.js, loaded first.
 const drums = REEL_STRIPS.map((strip) => new Drum(strip));
+
+// Advances a single tray coin one physics tick: gravity, wall/floor bounce,
+// coin-to-coin collision resolution, and settling. Reads the shared `coins`
+// array for neighbours. Shared by the load-time warm-up and the live loop.
+function stepCoin(coin, floorY, leftX, rightX) {
+  if (coin.settled) return;
+  coin.vy += GRAVITY;
+  coin.x += coin.vx;
+  coin.y += coin.vy;
+
+  if (coin.x < leftX) {
+    coin.x = leftX;
+    coin.vx = Math.abs(coin.vx) * WALL_RESTITUTION;
+  }
+  if (coin.x > rightX) {
+    coin.x = rightX;
+    coin.vx = -Math.abs(coin.vx) * WALL_RESTITUTION;
+  }
+
+  for (const other of coins) {
+    if (other === coin) continue;
+    const dx = coin.x - other.x;
+    const dy = coin.y - other.y;
+    const distSq = dx * dx + dy * dy;
+    const minDist = COIN_R * 2;
+    if (distSq < minDist * minDist && distSq > 0.01) {
+      const dist = Math.sqrt(distSq);
+      const overlap = minDist - dist;
+      const nx = dx / dist;
+      const ny = dy / dist;
+      if (other.settled) {
+        coin.x += nx * overlap;
+        coin.y += ny * overlap * 0.15; // tiny vertical nudge for piling
+        const dot = coin.vx * nx;
+        if (dot < 0) {
+          coin.vx -= dot * nx * 1.3;
+          coin.vx *= 0.6;
+        }
+      } else {
+        coin.x += nx * overlap * 0.5;
+        coin.y += ny * overlap * 0.15;
+        other.x -= nx * overlap * 0.5;
+        other.y -= ny * overlap * 0.15;
+      }
+    }
+  }
+
+  if (coin.y > floorY) {
+    coin.y = floorY;
+    coin.vy *= FLOOR_RESTITUTION;
+    coin.vx *= 0.75;
+  }
+  if (coin.y >= floorY - 2) {
+    coin.vx *= FLOOR_FRICTION;
+    coin.vy *= FLOOR_FRICTION;
+  }
+  if (
+    Math.abs(coin.vy) < 0.4 &&
+    Math.abs(coin.vx) < 0.3 &&
+    coin.y >= floorY - COIN_R * 2
+  ) {
+    coin.settled = true;
+    coin.vx = 0;
+    coin.vy = 0;
+  }
+}
+
+function stepCoins() {
+  const floorY = trayY + trayH - 10;
+  const leftX = trayX + 18;
+  const rightX = trayX + trayW - 18;
+  for (const coin of coins) stepCoin(coin, floorY, leftX, rightX);
+}
 
 function placeTrayCoinsImmediate() {
   coins = [];
   const count = Math.min(trayCount, 50);
   const slotCenterX = trayX + trayW / 2;
-  const floorY = trayY + trayH - 10;
-  const leftX = trayX + 18;
-  const rightX = trayX + trayW - 18;
 
   for (let i = 0; i < count; i++) {
     coins.push({
@@ -60,65 +125,7 @@ function placeTrayCoinsImmediate() {
   }
 
   for (let tick = 0; tick < 5000; tick++) {
-    for (const coin of coins) {
-      if (coin.settled) continue;
-      coin.vy += 0.7;
-      coin.x += coin.vx;
-      coin.y += coin.vy;
-      if (coin.x < leftX) {
-        coin.x = leftX;
-        coin.vx = Math.abs(coin.vx) * 0.4;
-      }
-      if (coin.x > rightX) {
-        coin.x = rightX;
-        coin.vx = -Math.abs(coin.vx) * 0.4;
-      }
-      for (const other of coins) {
-        if (other === coin) continue;
-        const dx = coin.x - other.x;
-        const dy = coin.y - other.y;
-        const distSq = dx * dx + dy * dy;
-        const minDist = COIN_R * 2;
-        if (distSq < minDist * minDist && distSq > 0.01) {
-          const dist = Math.sqrt(distSq);
-          const overlap = minDist - dist;
-          const nx = dx / dist;
-          const ny = dy / dist;
-          if (other.settled) {
-            coin.x += nx * overlap;
-            coin.y += ny * overlap * 0.15;
-            const dot = coin.vx * nx;
-            if (dot < 0) {
-              coin.vx -= dot * nx * 1.3;
-              coin.vx *= 0.6;
-            }
-          } else {
-            coin.x += nx * overlap * 0.5;
-            coin.y += ny * overlap * 0.15;
-            other.x -= nx * overlap * 0.5;
-            other.y -= ny * overlap * 0.15;
-          }
-        }
-      }
-      if (coin.y > floorY) {
-        coin.y = floorY;
-        coin.vy *= -0.35;
-        coin.vx *= 0.75;
-      }
-      if (coin.y >= floorY - 2) {
-        coin.vx *= 0.88;
-        coin.vy *= 0.88;
-      }
-      if (
-        Math.abs(coin.vy) < 0.4 &&
-        Math.abs(coin.vx) < 0.3 &&
-        coin.y >= floorY - COIN_R * 2
-      ) {
-        coin.settled = true;
-        coin.vx = 0;
-        coin.vy = 0;
-      }
-    }
+    stepCoins();
     if (coins.every((c) => c.settled)) break;
   }
 
@@ -129,7 +136,7 @@ function placeTrayCoinsImmediate() {
   }
 }
 
-window.addEventListener("load", placeTrayCoinsImmediate);
+placeTrayCoinsImmediate(); // geometry is ready at load time (see layout.js)
 
 function spawnTrayCoin() {
   if (coins.length >= 50) return;
@@ -267,7 +274,9 @@ function getCanvasCoords(e) {
 }
 
 function isInLeverRegion(x, y) {
-  return x > 680 && y < canvas.height / 2;
+  // The lever grab zone: the ball and shaft, everything above the base pivot.
+  // Derived from the same geometry the renderer uses (see layout.js).
+  return x > leverBaseX && y < leverBaseY;
 }
 
 function isInCoinSlotRegion(x, y) {
@@ -340,38 +349,39 @@ document.addEventListener("keyup", (e) => {
   }
 });
 
-let spinTickCounter = 0;
+// Move `value` toward `target` by at most `rate`, without overshooting.
+const approach = (value, target, rate) =>
+  value < target
+    ? Math.min(target, value + rate)
+    : Math.max(target, value - rate);
 
-function update() {
-  drums.forEach((d) => d.update());
+// Smoothstep ease-in-out for a 0..1 input.
+const smoothstep = (x) => x * x * (3 - 2 * x);
 
+function updateArm() {
   // Arm animation — follows the lever's held state
   if (armDown) {
     armPullOffset = Math.min(120, armPullOffset + 8);
   } else {
     armPullOffset = Math.max(0, armPullOffset - 4);
   }
+}
 
+function updateDimming() {
   // Smooth machine dim/light transition (dim when no coins are inserted)
   const dimTarget = credits <= 0 && state === "idle" ? 1 : 0;
-  if (dimRaw < dimTarget) {
-    dimRaw = Math.min(dimTarget, dimRaw + 0.045);
-  } else if (dimRaw > dimTarget) {
-    dimRaw = Math.max(dimTarget, dimRaw - 0.045);
-  }
-  dimLevel = dimRaw * dimRaw * (3 - 2 * dimRaw); // smoothstep ease-in-out
+  dimRaw = approach(dimRaw, dimTarget, 0.045);
+  dimLevel = smoothstep(dimRaw);
 
   // Eject button is lit only when an eject is possible: idle, has credits,
   // and not already ejecting. Otherwise it dims (spinning, paying out, empty).
   const ejectDimTarget =
     credits <= 0 || pendingEject > 0 || state !== "idle" ? 1 : 0;
-  if (ejectDimRaw < ejectDimTarget) {
-    ejectDimRaw = Math.min(ejectDimTarget, ejectDimRaw + 0.08);
-  } else if (ejectDimRaw > ejectDimTarget) {
-    ejectDimRaw = Math.max(ejectDimTarget, ejectDimRaw - 0.08);
-  }
-  ejectDimLevel = ejectDimRaw * ejectDimRaw * (3 - 2 * ejectDimRaw);
+  ejectDimRaw = approach(ejectDimRaw, ejectDimTarget, 0.08);
+  ejectDimLevel = smoothstep(ejectDimRaw);
+}
 
+function updateInsertingCoins() {
   // Coins animating into the slot; each becomes a credit once fully inserted
   for (let i = insertingCoins.length - 1; i >= 0; i--) {
     insertingCoins[i].t += 0.05;
@@ -381,114 +391,49 @@ function update() {
       playInsertCoinSound();
     }
   }
+}
 
+function updateEject() {
   // Eject: return inserted credits to the tray, one coin at a time
-  if (pendingEject > 0) {
-    ejectTimer += updateIntervalMs;
-    if (ejectTimer >= nextEjectDelay) {
-      ejectTimer = 0;
-      nextEjectDelay = 40 + Math.random() * 50;
-      if (credits > 0) {
-        credits -= 1;
-        trayCount += 1;
-        spawnTrayCoin();
-        playInsertCoinSound();
-        pendingEject -= 1;
-      } else {
-        pendingEject = 0; // nothing left to eject
-      }
-    }
+  if (pendingEject <= 0) return;
+  ejectTimer += updateIntervalMs;
+  if (ejectTimer < nextEjectDelay) return;
+  ejectTimer = 0;
+  nextEjectDelay = 40 + Math.random() * 50;
+  if (credits > 0) {
+    credits -= 1;
+    trayCount += 1;
+    spawnTrayCoin();
+    playInsertCoinSound();
+    pendingEject -= 1;
+  } else {
+    pendingEject = 0; // nothing left to eject
   }
+}
 
-  if (state === "showing-win") {
-    winFlashTimer += updateIntervalMs;
+function updatePayout() {
+  if (state !== "showing-win") return;
+  winFlashTimer += updateIntervalMs;
+
+  if (pendingPayout <= 0) return;
+  payoutTimer += updateIntervalMs;
+  if (payoutTimer < nextCoinDelay) return;
+  payoutTimer = 0;
+  nextCoinDelay = 80 + Math.random() * 120; // 80–200ms per coin
+  trayCount += 1;
+  pendingPayout -= 1;
+  playInsertCoinSound();
+  spawnTrayCoin();
+  if (pendingPayout <= 0) {
+    setTimeout(() => {
+      state = "idle";
+    }, 600);
   }
+}
 
-  if (state === "showing-win" && pendingPayout > 0) {
-    payoutTimer += updateIntervalMs;
-    if (payoutTimer >= nextCoinDelay) {
-      payoutTimer = 0;
-      nextCoinDelay = 80 + Math.random() * 120; // 80–200ms per coin
-      trayCount += 1;
-      pendingPayout -= 1;
-      playInsertCoinSound();
-      spawnTrayCoin();
-      if (pendingPayout <= 0) {
-        setTimeout(() => {
-          state = "idle";
-        }, 600);
-      }
-    }
-  }
+let spinTickCounter = 0;
 
-  const floorY = trayY + trayH - 10;
-  const leftX = trayX + 18;
-  const rightX = trayX + trayW - 18;
-  for (const coin of coins) {
-    if (coin.settled) continue;
-    coin.vy += 0.7;
-    coin.x += coin.vx;
-    coin.y += coin.vy;
-    
-    if (coin.x < leftX) {
-      coin.x = leftX;
-      coin.vx = Math.abs(coin.vx) * 0.4;
-    }
-    if (coin.x > rightX) {
-      coin.x = rightX;
-      coin.vx = -Math.abs(coin.vx) * 0.4;
-    }
-
-    for (const other of coins) {
-      if (other === coin) continue;
-      const dx = coin.x - other.x;
-      const dy = coin.y - other.y;
-      const distSq = dx * dx + dy * dy;
-      const minDist = COIN_R * 2;
-      if (distSq < minDist * minDist && distSq > 0.01) {
-        const dist = Math.sqrt(distSq);
-        const overlap = minDist - dist;
-        const nx = dx / dist;
-        const ny = dy / dist;
-        if (other.settled) {
-          coin.x += nx * overlap;
-          coin.y += ny * overlap * 0.15; // tiny vertical nudge for piling
-          const dot = coin.vx * nx;
-          if (dot < 0) {
-            coin.vx -= dot * nx * 1.3;
-            coin.vx *= 0.6;
-          }
-        } else {
-          coin.x += nx * overlap * 0.5;
-          coin.y += ny * overlap * 0.15;
-          other.x -= nx * overlap * 0.5;
-          other.y -= ny * overlap * 0.15;
-        }
-      }
-    }
-
-    if (coin.y > floorY) {
-      coin.y = floorY;
-      coin.vy *= -0.35;
-      coin.vx *= 0.75;
-    }
-
-    if (coin.y >= floorY - 2) {
-      coin.vx *= 0.88;
-      coin.vy *= 0.88;
-    }
-
-    if (
-      Math.abs(coin.vy) < 0.4 &&
-      Math.abs(coin.vx) < 0.3 &&
-      coin.y >= floorY - COIN_R * 2
-    ) {
-      coin.settled = true;
-      coin.vx = 0;
-      coin.vy = 0;
-    }
-  }
-
+function updateSpinSound() {
   if (state === "spinning" || drums.some((d) => d.spinning)) {
     spinTickCounter++;
     if (spinTickCounter % 12 === 0) {
@@ -497,6 +442,17 @@ function update() {
   } else {
     spinTickCounter = 0;
   }
+}
+
+function update() {
+  drums.forEach((d) => d.update());
+  updateArm();
+  updateDimming();
+  updateInsertingCoins();
+  updateEject();
+  updatePayout();
+  stepCoins();
+  updateSpinSound();
 }
 
 setInterval(() => update(), updateIntervalMs);

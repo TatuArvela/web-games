@@ -6,9 +6,7 @@ class Drum {
     this.speed = 0;
     this.spinning = false;
     this.stopping = false;
-    this.stopped = true;
     this.symbolHeight = 90;
-    this.stopDelay = 0;
   }
 
   get visibleSymbols() {
@@ -31,7 +29,6 @@ class Drum {
   spin() {
     this.spinning = true;
     this.stopping = false;
-    this.stopped = false;
     this.speed = 25 + Math.random() * 5;
   }
 
@@ -57,12 +54,10 @@ class Drum {
     if (this.stopping) {
       this.stopProgress += 0.015;
       if (this.stopProgress >= 1) {
-        const totalHeight = this.strip.length * this.symbolHeight;
         this.position = this.targetSymbolIndex * this.symbolHeight;
         this.speed = 0;
         this.spinning = false;
         this.stopping = false;
-        this.stopped = true;
         playStopSound();
         return;
       }

@@ -1,24 +1,41 @@
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+// One-shot burst of filtered white noise with an exponential volume decay —
+// the shared body of every percussive/mechanical sound (reel clack, lever snap,
+// coin clink). `delay` schedules the burst for later without a separate timer.
+function playFilteredNoise({
+  duration,
+  volume,
+  filterType = "lowpass",
+  frequency,
+  Q = 1,
+  delay = 0,
+}) {
+  setTimeout(() => {
+    const now = audioCtx.currentTime;
+    const bufferSize = Math.ceil(audioCtx.sampleRate * duration);
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = filterType;
+    filter.frequency.value = frequency;
+    filter.Q.value = Q;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(volume, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    source.start(now);
+    source.stop(now + duration);
+  }, delay);
+}
+
 function playNoise(duration, volume = 0.05, cutoff = 2000) {
-  const bufferSize = Math.ceil(audioCtx.sampleRate * duration);
-  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-  const source = audioCtx.createBufferSource();
-  source.buffer = buffer;
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = "lowpass";
-  filter.frequency.value = cutoff;
-  const gain = audioCtx.createGain();
-  const now = audioCtx.currentTime;
-  gain.gain.setValueAtTime(volume, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-  source.connect(filter);
-  filter.connect(gain);
-  gain.connect(audioCtx.destination);
-  source.start();
-  source.stop(now + duration);
+  playFilteredNoise({ duration, volume, filterType: "lowpass", frequency: cutoff });
 }
 
 function playSpinSound() {
@@ -116,30 +133,15 @@ function playWinSound(winAmount = 0) {
 }
 
 function playLeverSound() {
-  function snap(delayMs, vol) {
-    setTimeout(() => {
-      const now = audioCtx.currentTime;
-      const dur = 0.022;
-      const bufferSize = Math.ceil(audioCtx.sampleRate * dur);
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-      const source = audioCtx.createBufferSource();
-      source.buffer = buffer;
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = "bandpass";
-      filter.frequency.value = 1100;
-      filter.Q.value = 0.9;
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(vol, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.destination);
-      source.start(now);
-      source.stop(now + dur);
-    }, delayMs);
-  }
+  const snap = (delay, volume) =>
+    playFilteredNoise({
+      duration: 0.022,
+      volume,
+      filterType: "bandpass",
+      frequency: 1100,
+      Q: 0.9,
+      delay,
+    });
 
   snap(0, 0.38);
   snap(40, 0.28);
@@ -147,30 +149,15 @@ function playLeverSound() {
 }
 
 function playInsertCoinSound() {
-  function microBurst(delayMs, vol, cutoff) {
-    setTimeout(() => {
-      const now = audioCtx.currentTime;
-      const dur = 0.006 + Math.random() * 0.005;
-      const bufferSize = Math.ceil(audioCtx.sampleRate * dur);
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-      const source = audioCtx.createBufferSource();
-      source.buffer = buffer;
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = "bandpass";
-      filter.frequency.value = cutoff;
-      filter.Q.value = 0.5;
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(vol, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.destination);
-      source.start(now);
-      source.stop(now + dur);
-    }, delayMs);
-  }
+  const microBurst = (delay, volume, frequency) =>
+    playFilteredNoise({
+      duration: 0.006 + Math.random() * 0.005,
+      volume,
+      filterType: "bandpass",
+      frequency,
+      Q: 0.5,
+      delay,
+    });
 
   const v = 0.7 + Math.random() * 0.6;
   const p = 0.85 + Math.random() * 0.3;
