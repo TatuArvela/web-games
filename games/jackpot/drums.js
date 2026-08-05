@@ -1,16 +1,14 @@
-// ── Drum class ───────────────────────────────────────────
-// Generic spinning drum — takes a strip of symbol objects
 class Drum {
   constructor(strip) {
     this.strip = strip;
-    this.position = 0; // Current position in pixels
-    this.targetSymbolIndex = 0; // Where we want to stop
-    this.speed = 0; // Current spin speed
+    this.position = 0;
+    this.targetSymbolIndex = 0;
+    this.speed = 0;
     this.spinning = false;
     this.stopping = false;
     this.stopped = true;
-    this.symbolHeight = 90; // Height of each symbol cell
-    this.stopDelay = 0; // Delay before this drum starts stopping
+    this.symbolHeight = 90;
+    this.stopDelay = 0;
   }
 
   get visibleSymbols() {
@@ -44,7 +42,6 @@ class Drum {
     const totalHeight = this.strip.length * this.symbolHeight;
     const targetPos = targetIndex * this.symbolHeight;
 
-    // Place target at least 1 full revolution ahead of current position
     let futureTarget = targetPos;
     while (futureTarget < this.position + totalHeight) {
       futureTarget += totalHeight;
@@ -60,7 +57,6 @@ class Drum {
     if (this.stopping) {
       this.stopProgress += 0.015;
       if (this.stopProgress >= 1) {
-        // Snap exactly to target
         const totalHeight = this.strip.length * this.symbolHeight;
         this.position = this.targetSymbolIndex * this.symbolHeight;
         this.speed = 0;
@@ -70,7 +66,7 @@ class Drum {
         playStopSound();
         return;
       }
-      // Cubic ease-out for smooth deceleration
+
       const t = 1 - Math.pow(1 - this.stopProgress, 3);
       this.position =
         this.stopStartPosition +
